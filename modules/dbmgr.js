@@ -23,4 +23,4 @@ var ActionRecord = mongoose.model('ActionRecord', new mongoose.Schema({
 );
 
 //Export module
-module.exports = {"UserRecord": UserRecord, ActionRecord: "ActionRecord"};
+module.exports = {"UserRecord": UserRecord, "ActionRecord": ActionRecord};

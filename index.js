@@ -6,7 +6,6 @@ const schedule = require('node-schedule');
 const PastebinAPI = require('pastebin-js');
 const moment = require("moment");
 
-
 //Global initializations
 const bot = new Discord.Client();
 const pastebin = new PastebinAPI(config.PASTEBIN_DEV_KEY);
