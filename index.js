@@ -59,12 +59,12 @@ var processError = function (area, err) {
 //Handle message receive event
 bot.on('message', message => {
     //Check if the user is applicable for punishment
-    if (message.author.bot || config.triggerNames.indexOf(config.triggerNames) > -1) return;
+    if (message.author.bot || config.prohibitedMentions.indexOf(message.author.username) > -1 || config.notAffected.indexOf(message.author.username) > -1) return;
 
     //Check if the message has mentioned a person on the list
     var contains = false;
     for (var user of message.mentions.users) {
-        if (config.triggerNames.indexOf(user[1].username) > -1) {
+        if (config.prohibitedMentions.indexOf(user[1].username) > -1) {
             contains = true;
             break;
         }
@@ -111,11 +111,17 @@ bot.on('message', message => {
             //Delete the message
             message.delete();
 
+            var pms = [
+                "It is not permitted to mention Meme-Team members directly. This rule is in place to prevent those members from being spammed.\n\n**This is a warning**",
+                "It is not permitted to mention Meme-Team members directly. This rule is in place to prevent those members from being spammed.\n\n**You have been muted for a small period of time**",
+                "It is not permitted to mention Meme-Team members directly. This rule is in place to prevent those members from being spammed.\n\n**Since you have been ignoring your previous warnings, you have been permanently banned.**",
+            ];
+
             //Apply punishment
             switch (user.infractionLevel) {
                 case 1:
                     //Send PM
-                    message.author.sendMessage("Level 1 message");
+                    message.author.sendMessage(pms[0]);
 
                     //Save action log
                     new dbmgr.ActionRecord({
@@ -129,7 +135,7 @@ bot.on('message', message => {
                     break;
                 case 2:
                     //Send PM
-                    message.author.sendMessage("Level 2 message");
+                    message.author.sendMessage(pms[1]);
 
                     //Mute user
                     user.mutedUntil = moment().unix() + config.mutetime;
@@ -149,7 +155,7 @@ bot.on('message', message => {
                     break;
                 case 3:
                     //Send PM
-                    message.author.sendMessage("Level 3 message");
+                    message.author.sendMessage(pms[2]);
 
                     //Ban user
                     message.member.ban();
