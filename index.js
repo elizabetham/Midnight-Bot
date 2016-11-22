@@ -316,6 +316,7 @@ bot.on('message', message => {
 
                         //Ban user
                         message.member.ban();
+                        user.banned = true;
 
                         //Save action log
                         new dbmgr.ActionRecord({
@@ -346,7 +347,7 @@ bot.on('message', message => {
 schedule.scheduleJob('*/30 * * * * *', function () {
 
     //Decrease infraction levels
-    dbmgr.UserRecord.find({infractionLevel: {$gt: 0}, decreaseWhen: {$lte: moment().unix()}}, function (err, docs) {
+    dbmgr.UserRecord.find({infractionLevel: {$gt: 0}, decreaseWhen: {$lte: moment().unix()}, banned: false}, function (err, docs) {
         for (var doc of docs) {
             if (doc == null) continue;
 
