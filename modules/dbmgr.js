@@ -10,7 +10,9 @@ var UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
         banned: {type: Boolean, required: true},
         mutedUntil: {type: Number, required: true},
         infractionLevel: {type: Number, required: true},
-        decreaseWhen: {type: Number, required: true}
+        decreaseWhen: {type: Number, required: true},
+        lastWritten: {type: Number, required: true},
+        username: {type: String, required: true}
     })
 );
 
