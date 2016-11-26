@@ -51,4 +51,6 @@ data/localstore.json
 .idea/
 
 #Vim
-.swp
+*~
+*.swp
+*.swo

@@ -187,7 +187,7 @@ bot.on('message', message => {
                     return;
                 }
 
-                var guildmember = getGuildMemberByUsername(args[0], message.guild);
+                var guildmember = getGuildMemberByUsername(args.join(" "), message.guild);
                 if (!guildmember) {
                     message.reply("No user found by that name.");
                     return;
