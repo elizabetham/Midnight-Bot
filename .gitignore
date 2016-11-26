@@ -49,3 +49,6 @@ data/localstore.json
 
 #IntelliJ
 .idea/
+
+#Vim
+.swp

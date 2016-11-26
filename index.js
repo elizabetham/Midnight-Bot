@@ -278,7 +278,10 @@ bot.on('message', message => {
                     new dbmgr.ActionRecord({
                         userid: user.userid,
                         timestamp: moment().unix(),
-                        actionType: "WARN"
+                        actionType: "WARN",
+                        data: {
+                            message: message.content
+                        }
                     }).save(function (err) {
                         if (err)
                             processError("save ActionRecord", err);
@@ -300,7 +303,10 @@ bot.on('message', message => {
                     new dbmgr.ActionRecord({
                         userid: user.userid,
                         timestamp: moment().unix(),
-                        actionType: "MUTE"
+                        actionType: "MUTE",
+                        data: {
+                            message: message.content
+                        }
                     }).save(function (err) {
                         if (err)
                             processError("save ActionRecord", err);
@@ -322,7 +328,10 @@ bot.on('message', message => {
                     new dbmgr.ActionRecord({
                         userid: user.userid,
                         timestamp: moment().unix(),
-                        actionType: "BAN"
+                        actionType: "BAN",
+                        data: {
+                            message: message.content
+                        }
                     }).save(function (err) {
                         if (err)
                             processError("save ActionRecord", err);
@@ -344,7 +353,7 @@ bot.on('message', message => {
 );
 
 //Schedule checks for unmuting & infraction levels
-schedule.scheduleJob('*/30 * * * * *', function () {
+schedule.scheduleJob('*/10 * * * * *', function () {
 
     //Decrease infraction levels
     dbmgr.UserRecord.find({infractionLevel: {$gt: 0}, decreaseWhen: {$lte: moment().unix()}, banned: false}, function (err, docs) {
@@ -356,7 +365,9 @@ schedule.scheduleJob('*/30 * * * * *', function () {
                 userid: doc.userid,
                 timestamp: moment().unix(),
                 actionType: "DECREASE INFRACTION LEVEL",
-                data: "NEW LEVEL: " + (doc.infractionLevel - 1)
+                data: { 
+                    newLevel: doc.infractionLevel - 1
+                }
             }).save(function (err) {
                 if (err)
                     processError("save ActionRecord", err);
@@ -403,7 +414,6 @@ schedule.scheduleJob('*/30 * * * * *', function () {
             });
 
             //Remove muted roles
-
             for (var guild of bot.guilds) {
                 var member = getGuildMemberByID(doc.userid, guild[1]);
                 if (!member) continue;
