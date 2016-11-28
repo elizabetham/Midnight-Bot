@@ -141,7 +141,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
                 modLog("**[5min MUTE]** issued to _" + user.username + " (" + user.id + ")_\n**Reason:** " + modLogReason);
 
                 //Set action log data
-                actionType = "MUTE";
+                actionType = "MUTE1";
                 data = {infractionLevel: UserRecord.infractionLevel, duration: 300};
                 break;
             case 3:
@@ -157,23 +157,28 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
                 modLog("**[6hr MUTE]** issued to _" + user.username + " (" + user.id + ")_\n**Reason:** " + modLogReason);
 
                 //Set action log data
-                actionType = "MUTE";
+                actionType = "MUTE2";
                 data = {infractionLevel: UserRecord.infractionLevel, duration: 3600 * 6};
                 break;
             case 4:
                 //Send PM
-                user.sendMessage("In response to your latest infraction, you have been permanently banned as your record went over the threshold of allowed infractions.");
+                user.sendMessage("In response to your latest infraction, you have been permanently muted as your record went over the threshold of allowed infractions.");
+
+                //Mute user
+                UserRecord.mutedUntil = Number.MAX_SAFE_INTEGER;
+                var mutedRole = getRole(guild, "Muted");
+                if (mutedRole) getGuildMemberByID(user.id, guild).addRole(mutedRole);
 
                 //Leave mod log
-                modLog("**[BAN]** issued to _" + user.username + " (" + user.id + ")_\n**Reason:** " + modLogReason);
+                modLog("**[PERM MUTE]** issued to _" + user.username + " (" + user.id + ")_\n**Reason:** " + modLogReason);
 
                 //Ban user
                 getGuildMemberByID(user.id, guild).ban();
                 UserRecord.banned = true;
 
                 //Set action log data
-                actionType = "BAN";
-                data = {infractionLevel: UserRecord.infractionLevel};
+                actionType = "MUTEPERM";
+                data = {infractionLevel: UserRecord.infractionLevel, duration: -1 };
                 break;
             default:
                 //Nothing here (yet)
@@ -316,6 +321,24 @@ bot.on('message', message => {
                     }
 
                     var reply = guildmember.user.username + " (" + guildmember.user.id + ")";
+                    message.reply(reply);
+                    return;
+                }
+                case "stats": {
+                    //Check permissions
+                    var member = getGuildMemberByID(message.author.id, message.guild);
+                    var hasperms = false;
+                    for (var role of member.roles) {
+                        if (role[1].name == config.botDevRole) {
+                            hasperms = true;
+                            break;
+                        }
+                    }
+                    if (!hasperms)
+                        return;
+
+                    var reply = "Members: " + message.guild.members.length;
+                    //TODO: Add more stats
                     message.reply(reply);
                     return;
                 }
