@@ -110,6 +110,8 @@ var increaseInfractionLevel = function (userid, username, logReason) {
         user.username = username;
         user.lastWritten = moment().unix();
 
+        var actionType, data;
+
         //Apply punishment
         switch (user.infractionLevel) {
             case 1:
@@ -119,18 +121,9 @@ var increaseInfractionLevel = function (userid, username, logReason) {
                 //Leave mod log
                 modLog("**[WARN]** issued to _" + username + " (" + userid + ")_\n**Reason:** " + logReason);
 
-                //Save action log
-                new dbmgr.ActionRecord({
-                    userid: user.userid,
-                    timestamp: moment().unix(),
-                    actionType: "WARN",
-                    data: {
-                        infractionLevel: user.infractionLevel
-                    }
-                }).save(function (err) {
-                    if (err)
-                        processError("save ActionRecord", err);
-                });
+                //Set action log data
+                actionType = "WARN";
+                data = {infractionLevel: user.infractionLevel};
                 break;
             case 2:
                 //Send PM
@@ -144,19 +137,9 @@ var increaseInfractionLevel = function (userid, username, logReason) {
                 //Leave mod log
                 modLog("**[5min MUTE]** issued to _" + message.author.username + " (" + message.author.id + ")_\n**Reason:** " + logReason);
 
-                //Save action log
-                new dbmgr.ActionRecord({
-                    userid: user.userid,
-                    timestamp: moment().unix(),
-                    actionType: "MUTE",
-                    data: {
-                        infractionLevel: user.infractionLevel
-                    }
-                }).save(function (err) {
-                    if (err)
-                        processError("save ActionRecord", err);
-                });
-
+                //Set action log data
+                actionType = "MUTE";
+                data = {infractionLevel: user.infractionLevel, duration: 300};
                 break;
             case 3:
                 //Send PM
@@ -170,19 +153,9 @@ var increaseInfractionLevel = function (userid, username, logReason) {
                 //Leave mod log
                 modLog("**[6hr MUTE]** issued to _" + message.author.username + " (" + message.author.id + ")_\n**Reason:** " + logReason);
 
-                //Save action log
-                new dbmgr.ActionRecord({
-                    userid: user.userid,
-                    timestamp: moment().unix(),
-                    actionType: "MUTE",
-                    data: {
-                        infractionLevel: user.infractionLevel,
-                        duration: 3600 * 6
-                    }
-                }).save(function (err) {
-                    if (err)
-                        processError("save ActionRecord", err);
-                });
+                //Set action log data
+                actionType = "MUTE";
+                data = {infractionLevel: user.infractionLevel, duration: 3600 * 6};
                 break;
             case 4:
                 //Send PM
@@ -195,23 +168,24 @@ var increaseInfractionLevel = function (userid, username, logReason) {
                 message.member.ban();
                 user.banned = true;
 
-                //Save action log
-                new dbmgr.ActionRecord({
-                    userid: user.userid,
-                    timestamp: moment().unix(),
-                    actionType: "BAN",
-                    data: {
-                        infractionLevel: user.infractionLevel
-                    }
-                }).save(function (err) {
-                    if (err)
-                        processError("save ActionRecord", err);
-                });
+                //Set action log data
+                actionType = "BAN";
+                data = {infractionLevel: user.infractionLevel};
                 break;
             default:
                 //Nothing here (yet)
                 break;
         }
+
+        new dbmgr.ActionRecord({
+            userid: user.userid,
+            timestamp: moment().unix(),
+            actionType: actionType,
+            data: data
+        }).save(function (err) {
+            if (err)
+                processError("save ActionRecord", err);
+        });
 
         //Save user
         user.save(function (err) {
