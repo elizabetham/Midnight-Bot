@@ -20,7 +20,8 @@ var ActionRecord = mongoose.model('ActionRecord', new mongoose.Schema({
         userid: {type: String, required: true},
         actionType: {type: String, required: true},
         timestamp: {type: Number, required: true},
-        data: mongoose.Schema.Types.Mixed
+        data: mongoose.Schema.Types.Mixed,
+        triggerMessage: String
     })
 );
 
