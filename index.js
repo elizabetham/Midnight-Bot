@@ -178,7 +178,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
                 //Set action log data
                 actionType = "MUTEPERM";
-                data = {infractionLevel: UserRecord.infractionLevel, duration: -1 };
+                data = {infractionLevel: UserRecord.infractionLevel, duration: -1};
                 break;
             default:
                 //Nothing here (yet)
@@ -431,7 +431,8 @@ bot.on('message', message => {
 
             //Check for spam filter regex triggers
             for (var rule of [
-                [/.*(.)\1{6,}.*/gi, 1], //repeated characters
+                [/.*([^.])\1{6,}.*/gi, 1], //repeated characters
+                [/.*b+a+z+a{4,}.*/gi, 1], //Bazza filter
                 [emojiRegex(), 10] //emojis
             ]) {
                 var occurred = message.content.match(rule[0]);
