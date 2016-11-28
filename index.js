@@ -399,19 +399,17 @@ bot.on('message', message => {
             }
         }
 
-        if (!message.author.bot) {
+        if (!message.author.bot && config.notAffected.indexOf(message.author.username) == -1) {
             //Check for Grandmaster Gang mentions
-            if (config.prohibitedMentions.indexOf(message.author.username) == -1 && config.notAffected.indexOf(message.author.username) == -1) {
-                for (var user of message.mentions.users) {
-                    if (config.prohibitedMentions.indexOf(user[1].username) > -1) {
-                        //Remove the message
-                        message.delete();
-                        //PM the infraction message
-                        message.author.sendMessage("You have been issued an infraction: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
-                        //Execute applicable punishment
-                        increaseInfractionLevel(message.guild, message.author, "Mentioning a 'Grandmaster Gang' member in a message.", message.content);
-                        break;
-                    }
+            for (var user of message.mentions.users) {
+                if (config.prohibitedMentions.indexOf(user[1].username) > -1) {
+                    //Remove the message
+                    message.delete();
+                    //PM the infraction message
+                    message.author.sendMessage("You have been issued an infraction: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
+                    //Execute applicable punishment
+                    increaseInfractionLevel(message.guild, message.author, "Mentioning a 'Grandmaster Gang' member in a message.", message.content);
+                    break;
                 }
             }
 
