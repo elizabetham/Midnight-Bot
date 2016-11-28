@@ -333,7 +333,7 @@ bot.on('message', message => {
                         return;
 
                     if (args.length == 0) {
-                        message.reply("```I cannot comply: Not enough arguments present.\nUsage: !infractions <username> [page]```");
+                        message.reply("```I cannot comply: Not enough arguments present.\nUsage: !infractions <username>```");
                         return;
                     }
 
@@ -345,13 +345,6 @@ bot.on('message', message => {
 
                     //Construct query
                     var query = dbmgr.ActionRecord.find({userid: guildmember.user.id}).sort({timestamp: -1});
-                    if (args.length > 1) {
-                        if (isNaN(parseInt(args[1]))) {
-                            message.reply("```I cannot comply: The second argument provided is not a number.\nUsage: !infractions <username> [page]```");
-                            return;
-                        }
-                        query = query.skip(5 * (parseInt(args[1]) - 1));
-                    }
                     query = query.limit(5);
 
                     //Execute query
