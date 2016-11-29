@@ -235,95 +235,6 @@ bot.on('message', message => {
             var cmd = split[0].substr(1, split[0].length);
             var args = split.splice(1, split.length);
             switch (cmd) {
-                case "logpull": {
-                    //Check permissions
-                    var member = getGuildMemberByID(message.author.id, message.guild);
-                    var hasperms = false;
-                    for (var role of member.roles) {
-                        if (role[1].name == config.botDevRole) {
-                            hasperms = true;
-                            break;
-                        }
-                    }
-                    if (!hasperms)
-                        return;
-
-                    //Construct query
-                    var query = dbmgr.ActionRecord.find({}).sort({timestamp: -1});
-                    if (args.length > 0) {
-                        if (isNaN(parseInt(args[0]))) {
-                            message.reply("```I cannot comply: The first argument provided is not a number.\nUsage: !logpull [amount] [skip]```");
-                            return;
-                        }
-                        query = query.limit(Math.max(0, parseInt(args[0])));
-                    }
-                    else {
-                        query = query.limit(10);
-                    }
-                    if (args.length > 1) {
-                        if (isNaN(parseInt(args[1]))) {
-                            message.reply("```I cannot comply: The second argument provided is not a number.\nUsage: !logpull [amount] [skip]```");
-                            return;
-                        }
-                        query = query.skip(Math.max(0, parseInt(args[1])));
-                    }
-
-                    //Execute query
-                    query.exec(function (err, posts) {
-                        //Log errors
-                        if (err) {
-                            processError("!logpull query.exec", err);
-                            message.reply("I encountered an error. Please check the log channel to see what went wrong.");
-                            return;
-                        }
-
-                        var reply = "";
-                        if (posts.length == 0) {
-                            reply = "No results.";
-                        }
-                        else {
-                            for (var post of posts) {
-                                reply += "[" + moment.unix(post.timestamp).format('MMM Do YYYY, h:mm:ss a') + "] " + post.actionType + " (User: " + getUsernameByID(post.userid) + " (" + post.userid + ")) ";
-                                if (post.hasOwnProperty("data"))
-                                    reply += "data: " + post.data;
-                                reply += "\n\n";
-                            }
-                        }
-                        if (reply.length <= 2000)
-                            message.reply(reply);
-                        else
-                            message.reply("Too much resulting data. Please use a smaller data set!");
-                    });
-                    return;
-                }
-                case "userinfo": {
-                    //Check permissions
-                    var member = getGuildMemberByID(message.author.id, message.guild);
-                    var hasperms = false;
-                    for (var role of member.roles) {
-                        if (role[1].name == config.botDevRole) {
-                            hasperms = true;
-                            break;
-                        }
-                    }
-                    if (!hasperms)
-                        return;
-
-                    if (args.length == 0) {
-                        message.reply("```I cannot comply: Not enough arguments present.\nUsage: !userinfo <username>```");
-                        return;
-                    }
-
-                    var guildmember = getGuildMemberByUsername(args.join(" "), message.guild);
-                    if (!guildmember) {
-                        message.reply("No user found by that name.");
-                        return;
-                    }
-
-                    var reply = guildmember.user.username + " (" + guildmember.user.id + ")";
-                    message.reply(reply);
-                    return;
-                }
                 case "stats": {
                     //Check permissions
                     var member = getGuildMemberByID(message.author.id, message.guild);
@@ -356,13 +267,13 @@ bot.on('message', message => {
                         return;
 
                     if (args.length == 0) {
-                        message.reply("```I cannot comply: Not enough arguments present.\nUsage: !infractions <username>```");
+                        message.reply("```I cannot comply: Not enough arguments present.\nUsage: !infractions <userId>```");
                         return;
                     }
 
-                    var guildmember = getGuildMemberByUsername(args.join(" "), message.guild);
+                    var guildmember = getGuildMemberByID(args[0], message.guild);
                     if (!guildmember) {
-                        message.reply("No user found by that name.");
+                        message.reply("No user found by that id.");
                         return;
                     }
 
@@ -424,16 +335,16 @@ bot.on('message', message => {
                     //PM the infraction message
                     message.author.sendMessage("You have been issued an infraction: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
                     //Execute applicable punishment
-                    increaseInfractionLevel(message.guild, message.author, "Mentioning a 'Grandmaster Gang' member in a message.", message.content);
+                    increaseInfractionLevel(message.guild, message.author, "Mentioning a 'Grandmaster Gang' member in a message. (" + user[1].username + ")", message.content);
                     break;
                 }
             }
 
             //Check for spam filter regex triggers
             for (var rule of [
-                [/.*([^.])\1{6,}.*/gi, 1], //repeated characters
-                [/.*b+a+z+a{4,}.*/gi, 1], //Bazza filter
-                [emojiRegex(), 10] //emojis
+                [/.*([^.])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
+                [/.*b+a+z+a{4,}.*/gi, 1, "Bazza Filter"], //Bazza filter
+                [emojiRegex(), 10, "Emoji Filter"] //emojis
             ]) {
                 var occurred = message.content.match(rule[0]);
                 if (!occurred) continue;
@@ -443,7 +354,7 @@ bot.on('message', message => {
                     //PM the infraction message
                     message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
                     //Execute applicable punishment
-                    increaseInfractionLevel(message.guild, message.author, "Posting a message with spam-content", message.content);
+                    increaseInfractionLevel(message.guild, message.author, "Posting a message with spam-content (" + rule[2] + ")", message.content);
                     break;
                 }
             }
@@ -460,17 +371,17 @@ bot.on('message', message => {
 
             //Check for language filters
             for (var rule of [
-                /.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi,
-                /.*\bj+(e|3)+w+s*\b.*/gi,
-                /.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi
+                [/.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, "Nigger Filter"],
+                [/.*\bj+(e|3)+w+s*\b.*/gi, "Jew Filter"],
+                [/.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi, "Fag Filter"]
             ]) {
-                if (message.content.match(rule)) {
+                if (message.content.match(rule[0])) {
                     //Remove the message
                     message.delete();
                     //PM the infraction message
                     message.author.sendMessage("You have been issued an infraction: The use of racist or discriminative terms is not permitted here.");
                     //Execute applicable punishment
-                    increaseInfractionLevel(message.guild, message.author, "Posting a racist or discriminative term", message.content);
+                    increaseInfractionLevel(message.guild, message.author, "Posting a racist or discriminative term (" + rule[1] + ")", message.content);
                 }
             }
         }
