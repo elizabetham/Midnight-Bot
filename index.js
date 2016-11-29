@@ -84,6 +84,9 @@ var getUsernameByID = function (userid) {
 };
 
 var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessage) {
+
+    if (!guild || !user) return;
+
     dbmgr.UserRecord.findOne({userid: user.id}, function (err, UserRecord) {
 
         //Log errors
@@ -228,6 +231,8 @@ var processError = function (area, err) {
 
 //Handle message receive event
 bot.on('message', message => {
+
+        if (!message.guild) return;
 
         //Check for commands
         if (message.content.startsWith("!")) {
