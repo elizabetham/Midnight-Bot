@@ -245,11 +245,11 @@ bot.on('guildMemberAdd', guildMember => {
             if (mutedRole) guildMember.addRole(mutedRole);
 
             //Leave log
-            modLog("**[MUTE EVASION DETECTED]** By user _" + user.username + " (" + user.id + ")_");
+            modLog("**[MUTE EVASION DETECTED]** By user _" + guildMember.user.username + " (" + guildMember.user.id + ")_");
 
             //Save action log
             new dbmgr.ActionRecord({
-                userid: doc.userid,
+                userid: guildMember.user.id,
                 timestamp: moment().unix(),
                 actionType: "REMUTE"
             }).save(function (err) {
