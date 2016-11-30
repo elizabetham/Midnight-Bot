@@ -91,7 +91,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
         //Log errors
         if (err) {
-            processError("findOne UserRecord", err);
+            processError("increaseInfractionLevel() UserRecord findOne", err);
             return;
         }
 
@@ -193,12 +193,12 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
         };
         if (triggerMessage) record["triggerMessage"] = triggerMessage;
         new dbmgr.ActionRecord(record).save(function (err) {
-            if (err) processError("save ActionRecord", err);
+            if (err) processError("increaseInfractionLevel() ActionRecord save", err);
         });
 
         //Save user record
         userRecord.save(function (err) {
-            if (err) processError("save UserRecord", err);
+            if (err) processError("increaseInfractionLevel() UserRecord save", err);
         });
     });
 };
@@ -230,7 +230,7 @@ bot.on('guildMemberAdd', guildMember => {
     }, function (err, userRecord) {
         //Process error
         if (err) {
-            processError("UserRecord findOne guildMemberAdd", err);
+            processError("guildMemberAdd UserRecord findOne", err);
             console.log(err);
             return;
         }
@@ -434,7 +434,7 @@ schedule.scheduleJob('*/10 * * * * *', function () {
             if (doc.infractionLevel == 1) {
                 doc.remove(function (err) {
                     if (err)
-                        processError("remove UserRecord 1", err);
+                        processError("cron UserRecord remove", err);
                 });
             }
             else {
@@ -442,7 +442,7 @@ schedule.scheduleJob('*/10 * * * * *', function () {
                 doc.decreaseWhen = moment().unix() + config.leveldrop;
                 doc.save(function (err) {
                     if (err)
-                        processError("save UserRecord", err);
+                        processError("cron UserRecord save", err);
                 });
             }
         }
@@ -451,7 +451,7 @@ schedule.scheduleJob('*/10 * * * * *', function () {
     //Unmute peeps
     dbmgr.UserRecord.find({mutedUntil: {$gt: 0, $lte: moment().unix()}}, function (err, docs) {
         if (err) {
-            processError("find UserRecord", err);
+            processError("cron UserRecord find", err);
             return;
         }
         for (var doc of docs) {
@@ -467,7 +467,7 @@ schedule.scheduleJob('*/10 * * * * *', function () {
                 actionType: "UNMUTE"
             }).save(function (err) {
                 if (err)
-                    processError("save ActionRecord", err);
+                    processError("cron ActionRecord save", err);
             });
 
             //Remove muted roles
@@ -481,14 +481,14 @@ schedule.scheduleJob('*/10 * * * * *', function () {
             //Save user record
             doc.save(function (err) {
                 if (err)
-                    processError("save UserRecord", err);
+                    processError("cron UserRecord save", err);
             });
         }
     });
 
     //Remove level 0 peeps to reduce DB clutter
     dbmgr.UserRecord.remove({infractionLevel: 0}, function (err) {
-        if (err) processError("remove UserRecord 2", err);
+        if (err) processError("cron UserRecord remove", err);
     });
 });
 
