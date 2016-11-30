@@ -347,7 +347,7 @@ bot.on('message', message => {
 
             //Check for spam filter regex triggers
             for (var rule of [
-                [/.*([^.])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
+                [/.*([^.\s])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
                 [/.*b+a+z+a{4,}.*/gi, 1, "Bazza Filter"], //Bazza filter
                 [emojiRegex(), 10, "Emoji Filter"] //emojis
             ]) {
