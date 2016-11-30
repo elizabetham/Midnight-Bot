@@ -87,7 +87,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
     if (!guild || !user) return;
 
-    dbmgr.UserRecord.findOne({userid: user.id}, function (err, UserRecord) {
+    dbmgr.UserRecord.findOne({userid: user.id}, function (err, userRecord) {
 
         //Log errors
         if (err) {
@@ -96,8 +96,8 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
         }
 
         //Create user if it does not yet exist
-        if (!UserRecord) {
-            UserRecord = new dbmgr.UserRecord({
+        if (!userRecord) {
+            userRecord = new dbmgr.UserRecord({
                 userid: user.id,
                 banned: false,
                 mutedUntil: -1,
@@ -109,17 +109,17 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
         }
 
         //Increase his infraction level & reset the infraction level timer
-        UserRecord.infractionLevel++;
-        if (UserRecord.infractionLevel > 4) UserRecord.infractionLevel = 4;
-        UserRecord.decreaseWhen = moment().unix() + config.leveldrop;
-        UserRecord.username = user.username;
-        UserRecord.lastWritten = moment().unix();
+        userRecord.infractionLevel++;
+        if (userRecord.infractionLevel > 4) userRecord.infractionLevel = 4;
+        userRecord.decreaseWhen = moment().unix() + config.leveldrop;
+        userRecord.username = user.username;
+        userRecord.lastWritten = moment().unix();
 
         var actionType = "UNKNOWN";
         var data = {};
 
         //Apply punishment
-        switch (UserRecord.infractionLevel) {
+        switch (userRecord.infractionLevel) {
             case 1:
                 //Send PM
                 user.sendMessage("In response to your last infraction, you have been issued a warning.");
@@ -129,14 +129,14 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
                 //Set action log data
                 actionType = "WARN";
-                data = {infractionLevel: UserRecord.infractionLevel};
+                data = {infractionLevel: userRecord.infractionLevel};
                 break;
             case 2:
                 //Send PM
                 user.sendMessage("In response to your latest infraction, you have been issued a 5 minute mute.");
 
                 //Mute user
-                UserRecord.mutedUntil = moment().unix() + 300;
+                userRecord.mutedUntil = moment().unix() + 300;
                 var mutedRole = getRole(guild, "Muted");
                 if (mutedRole) getGuildMemberByID(user.id, guild).addRole(mutedRole);
 
@@ -145,14 +145,14 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
                 //Set action log data
                 actionType = "MUTE1";
-                data = {infractionLevel: UserRecord.infractionLevel, duration: 300};
+                data = {infractionLevel: userRecord.infractionLevel, duration: 300};
                 break;
             case 3:
                 //Send PM
                 user.sendMessage("In response to your latest infraction, you have been issued a 24 hour mute.");
 
                 //Mute user
-                UserRecord.mutedUntil = moment().unix() + 3600 * 6;
+                userRecord.mutedUntil = moment().unix() + 3600 * 6;
                 var mutedRole = getRole(guild, "Muted");
                 if (mutedRole) getGuildMemberByID(user.id, guild).addRole(mutedRole);
 
@@ -161,14 +161,14 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
                 //Set action log data
                 actionType = "MUTE2";
-                data = {infractionLevel: UserRecord.infractionLevel, duration: 3600 * 6};
+                data = {infractionLevel: userRecord.infractionLevel, duration: 3600 * 6};
                 break;
             case 4:
                 //Send PM
                 user.sendMessage("In response to your latest infraction, you have been permanently muted as your record went over the threshold of allowed infractions.");
 
                 //Mute user
-                UserRecord.mutedUntil = Number.MAX_SAFE_INTEGER;
+                userRecord.mutedUntil = Number.MAX_SAFE_INTEGER;
                 var mutedRole = getRole(guild, "Muted");
                 if (mutedRole) getGuildMemberByID(user.id, guild).addRole(mutedRole);
 
@@ -177,7 +177,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
 
                 //Set action log data
                 actionType = "MUTEPERM";
-                data = {infractionLevel: UserRecord.infractionLevel, duration: -1};
+                data = {infractionLevel: userRecord.infractionLevel, duration: -1};
                 break;
             default:
                 //Nothing here (yet)
@@ -197,7 +197,7 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
         });
 
         //Save user record
-        UserRecord.save(function (err) {
+        userRecord.save(function (err) {
             if (err) processError("save UserRecord", err);
         });
     });
@@ -222,6 +222,34 @@ var processError = function (area, err) {
         });
 };
 
+//Handle member joining
+bot.on('guildMemberAdd', guildMember => {
+    //Verify mute state to combat mute evasion
+    dbmgr.UserRecord.findOne({
+        userid: guildMember.user.id
+    }, function (err, userRecord) {
+        //Process error
+        if (err) {
+            processError("UserRecord findOne guildMemberAdd", err);
+            console.log(err);
+            return;
+        }
+
+        //Stop if no record of this user exists yet
+        if (!userRecord) return;
+
+        //Check if user should be muted
+        if (userRecord.mutedUntil > moment().unix()) {
+            //Reapply mute
+            var mutedRole = getRole(guildMember.guild, "Muted");
+            if (mutedRole) guildMember.addRole(mutedRole);
+
+            //Leave log
+            modLog("**[MUTE EVASION DETECTED]** By user _" + user.username + " (" + user.id + ")_");
+        }
+    });
+
+});
 
 //Handle message receive event
 bot.on('message', message => {
@@ -234,25 +262,6 @@ bot.on('message', message => {
             var cmd = split[0].substr(1, split[0].length);
             var args = split.splice(1, split.length);
             switch (cmd) {
-                case "stats": {
-                    //Check permissions
-                    var member = getGuildMemberByID(message.author.id, message.guild);
-                    var hasperms = false;
-                    for (var role of member.roles) {
-                        if (role[1].name == config.botDevRole) {
-                            hasperms = true;
-                            break;
-                        }
-                    }
-                    if (!hasperms)
-                        return;
-
-                    //Show statistics
-                    var reply = "Members: " + message.guild.memberCount;
-                    //TODO: Add more stats
-                    message.reply(reply);
-                    return;
-                }
                 case "infractions": {
                     //Check permissions
                     var member = getGuildMemberByID(message.author.id, message.guild);
@@ -335,6 +344,9 @@ bot.on('message', message => {
 
         //Start of chatfilters
         if (!message.author.bot && config.notAffected.indexOf(message.author.username) == -1) {
+
+            var triggered = false;
+
             //Check for Grandmaster Gang mentions
             for (var user of message.mentions.users) {
                 if (config.prohibitedMentions.indexOf(user[1].username) > -1) {
@@ -344,52 +356,60 @@ bot.on('message', message => {
                     message.author.sendMessage("You have been issued an infraction: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
                     //Execute applicable punishment
                     increaseInfractionLevel(message.guild, message.author, "Mentioning a 'Grandmaster Gang' member in a message. (" + user[1].username + ")", message.content);
+                    triggered = true;
                     break;
                 }
             }
 
             //Check for spam filter regex triggers
-            for (var rule of [
-                [/.*([^.\s])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
-                [/.*b+a+z+a{4,}.*/gi, 1, "Bazza Filter"], //Bazza filter
-                [emojiRegex(), 10, "Emoji Filter"] //emojis
-            ]) {
-                var occurred = message.content.match(rule[0]);
-                if (!occurred) continue;
-                if (occurred.length >= rule[1]) {
-                    //Remove the message
-                    message.delete();
-                    //PM the infraction message
-                    message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
-                    //Execute applicable punishment
-                    increaseInfractionLevel(message.guild, message.author, "Posting a message with spam-content (" + rule[2] + ")", message.content);
-                    break;
+            if (!triggered) {
+                for (var rule of [
+                    [/.*([^.\s])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
+                    [/.*b+a+z+a{4,}.*/gi, 1, "Bazza Filter"], //Bazza filter
+                    [emojiRegex(), 10, "Emoji Filter"] //emojis
+                ]) {
+                    var occurred = message.content.match(rule[0]);
+                    if (!occurred) continue;
+                    if (occurred.length >= rule[1]) {
+                        //Remove the message
+                        message.delete();
+                        //PM the infraction message
+                        message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
+                        //Execute applicable punishment
+                        increaseInfractionLevel(message.guild, message.author, "Posting a message with spam-content (" + rule[2] + ")", message.content);
+                        triggered = true;
+                        break;
+                    }
                 }
             }
 
             //Check for discord invite links
-            if (message.content.match(/.*discord\.gg\/.*/gi)) {
+            if (!triggered && message.content.match(/.*discord\.gg\/.*/gi)) {
                 //Remove the message
                 message.delete();
                 //PM the infraction message
                 message.author.sendMessage("You have been issued an infraction: It is not allowed to advertise other Discord servers in our guild.");
                 //Execute applicable punishment
                 increaseInfractionLevel(message.guild, message.author, "Posting a Discord server invite url", message.content);
+                triggered = true;
             }
 
             //Check for language filters
-            for (var rule of [
-                [/.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, "Nigger Filter"],
-                [/.*\bj+(e|3)+w+s*\b.*/gi, "Jew Filter"],
-                [/.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi, "Fag Filter"]
-            ]) {
-                if (message.content.match(rule[0])) {
-                    //Remove the message
-                    message.delete();
-                    //PM the infraction message
-                    message.author.sendMessage("You have been issued an infraction: The use of racist or discriminative terms is not permitted here.");
-                    //Execute applicable punishment
-                    increaseInfractionLevel(message.guild, message.author, "Posting a racist or discriminative term (" + rule[1] + ")", message.content);
+            if (!triggered) {
+                for (var rule of [
+                    [/.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, "Nigger Filter"],
+                    [/.*\bj+(e|3)+w+s*\b.*/gi, "Jew Filter"],
+                    [/.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi, "Fag Filter"]
+                ]) {
+                    if (message.content.match(rule[0])) {
+                        //Remove the message
+                        message.delete();
+                        //PM the infraction message
+                        message.author.sendMessage("You have been issued an infraction: The use of racist or discriminative terms is not permitted here.");
+                        //Execute applicable punishment
+                        increaseInfractionLevel(message.guild, message.author, "Posting a racist or discriminative term (" + rule[1] + ")", message.content);
+                        triggered = true;
+                    }
                 }
             }
         }
