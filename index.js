@@ -175,10 +175,6 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
                 //Leave mod log
                 modLog("**[PERM MUTE]** issued to _" + user.username + " (" + user.id + ")_\n**Reason:** " + modLogReason);
 
-                //Ban user
-                getGuildMemberByID(user.id, guild).ban();
-                UserRecord.banned = true;
-
                 //Set action log data
                 actionType = "MUTEPERM";
                 data = {infractionLevel: UserRecord.infractionLevel, duration: -1};
