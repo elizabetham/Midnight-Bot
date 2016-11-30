@@ -246,6 +246,16 @@ bot.on('guildMemberAdd', guildMember => {
 
             //Leave log
             modLog("**[MUTE EVASION DETECTED]** By user _" + user.username + " (" + user.id + ")_");
+
+            //Save action log
+            new dbmgr.ActionRecord({
+                userid: doc.userid,
+                timestamp: moment().unix(),
+                actionType: "REMUTE"
+            }).save(function (err) {
+                if (err)
+                    processError("guildMemberAdd ActionRecord save", err);
+            });
         }
     });
 
