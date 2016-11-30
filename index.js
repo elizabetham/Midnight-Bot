@@ -188,21 +188,19 @@ var increaseInfractionLevel = function (guild, user, modLogReason, triggerMessag
                 break;
         }
 
+        //Construct and save action record
         var record = {
             userid: user.id,
             timestamp: moment().unix(),
             actionType: actionType,
             data: data
         };
-
         if (triggerMessage) record["triggerMessage"] = triggerMessage;
-
         new dbmgr.ActionRecord(record).save(function (err) {
-            if (err)
-                processError("save ActionRecord", err);
+            if (err) processError("save ActionRecord", err);
         });
 
-        //Save user
+        //Save user record
         UserRecord.save(function (err) {
             if (err) processError("save UserRecord", err);
         });
@@ -234,7 +232,7 @@ bot.on('message', message => {
 
         if (!message.guild) return;
 
-        //Check for commands
+        //Start command detections
         if (message.content.startsWith("!")) {
             var split = message.content.trim().split(/\s+/);
             var cmd = split[0].substr(1, split[0].length);
@@ -253,7 +251,8 @@ bot.on('message', message => {
                     if (!hasperms)
                         return;
 
-                    var reply = "Members: " + message.guild.members.length;
+                    //Show statistics
+                    var reply = "Members: " + message.guild.memberCount;
                     //TODO: Add more stats
                     message.reply(reply);
                     return;
@@ -271,11 +270,13 @@ bot.on('message', message => {
                     if (!hasperms)
                         return;
 
+                    //Verify arguments
                     if (args.length == 0) {
                         message.reply("```I cannot comply: Not enough arguments present.\nUsage: !infractions <userId>```");
                         return;
                     }
 
+                    //Obtain guild member object from argument
                     var guildmember = getGuildMemberByID(args[0], message.guild);
                     if (!guildmember) {
                         message.reply("No user found by that id.");
@@ -295,11 +296,13 @@ bot.on('message', message => {
                             return;
                         }
 
+                        //Start constructing reply
                         var reply = "";
                         if (posts.length == 0) {
                             message.reply("No results.");
                         }
                         else {
+                            //Add infractions to the reply
                             for (var post of posts) {
                                 reply += "[" + moment.unix(post.timestamp).format('MMM Do YYYY, h:mm:ss a') + "]";
                                 reply += "\nAction: " + post.actionType;
@@ -309,8 +312,10 @@ bot.on('message', message => {
                             }
 
                             if (reply.length < 2000 - 6) {
+                                //Send reply in text
                                 message.reply("```" + reply + "```");
                             } else {
+                                //Upload reply to pastebin if it is too long
                                 pastebin.createPaste({
                                     text: reply,
                                     privacy: 1,
@@ -330,7 +335,9 @@ bot.on('message', message => {
                 }
             }
         }
+        //End of command detections
 
+        //Start of chatfilters
         if (!message.author.bot && config.notAffected.indexOf(message.author.username) == -1) {
             //Check for Grandmaster Gang mentions
             for (var user of message.mentions.users) {
@@ -390,6 +397,7 @@ bot.on('message', message => {
                 }
             }
         }
+        //End of chatfilters
     }
 );
 
