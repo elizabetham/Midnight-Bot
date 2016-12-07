@@ -376,7 +376,8 @@ bot.on('message', message => {
                 for (var rule of [
                     [/.*([^.\s])\1{6,}.*/gi, 1, "Repeated Character Filter"], //repeated characters
                     [/.*b+a+z+a{4,}.*/gi, 1, "Bazza Filter"], //Bazza filter
-                    [emojiRegex(), 10, "Emoji Filter"] //emojis
+                    [emojiRegex(), 10, "Emoji Filter"], //emojis
+                    [/.*<@{5,}.*/gi, 1, "Mention Spam Filter"] //mass mentioning
                 ]) {
                     var occurred = message.content.match(rule[0]);
                     if (!occurred) continue;
@@ -505,4 +506,3 @@ schedule.scheduleJob('*/10 * * * * *', function () {
 
 //Login to discord
 bot.login(config.botToken);
-
