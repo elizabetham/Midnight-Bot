@@ -38,8 +38,8 @@ filters.mentionFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Mention Filter",
                 triggerMessage: message.content
             });
@@ -62,8 +62,8 @@ filters.repeatedCharFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Repeated Character Filter",
                 triggerMessage: message.content
             });
@@ -86,8 +86,8 @@ filters.bazzaFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Bazza Filter",
                 triggerMessage: message.content
             });
@@ -111,8 +111,8 @@ filters.emojiSpamFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Emoji Spam Filter",
                 triggerMessage: message.content
             });
@@ -135,8 +135,8 @@ filters.bulkMentionFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Bulk Mention Filter",
                 triggerMessage: message.content
             });
@@ -159,8 +159,8 @@ filters.discordInviteFilter = {
 
         //Punish
         let self = this;
-        UserUtils.increaseNotoriety(message.author.id).then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
+        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Discord Invite Filter",
                 triggerMessage: message.content
             });
@@ -189,14 +189,15 @@ filters.racismFilter = {
         //Punish
         let self = this;
         UserUtils.increaseNotoriety(message.author.id)
-            .then((actionType, actionMeta) => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionType, actionMeta, {
-                displayName: "Racism Filter",
-                triggerMessage: message.content
-            });
-            infraction.save();
-            Logging.infractionLog(infraction);
-        }).catch(err => {
+            .then((actionData) => {
+                console.log("actionmeta", actionData.meta);
+                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                    displayName: "Racism Filter",
+                    triggerMessage: message.content
+                });
+                infraction.save();
+                Logging.infractionLog(infraction);
+            }).catch(err => {
             Logging.error("RACISM_FILTER_ACTION", err);
         });
     }

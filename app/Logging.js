@@ -1,6 +1,7 @@
 //Modules
 const DiscordUtils = require("./DiscordUtils.js");
 const Logging = require("./Logging.js");
+const TimeUtils = require("./TimeUtils.js");
 
 //Config
 const config = require("../config.js");
@@ -32,12 +33,10 @@ module.exports.format = (prefix, text) => "**[" + prefix + "]** " + text;
 
 module.exports.infractionLog = infraction => {
     let msg = "";
-    if (infraction.action.meta) {
-        switch (infraction.action.type) {
-            case "MUTE":
-                msg = "_(" + infraction.meta + "s)_ ";
-                break;
-        }
+    switch (infraction.action.type) {
+        case "MUTE":
+            msg = "_(" + ((infraction.action.meta == Number.MAX_SAFE_INTEGER) ? "Permanent" : TimeUtils.readableInterval(infraction.action.meta)) + ")_ ";
+            break;
     }
     DiscordUtils.client.fetchUser(infraction.userid).then(user => {
         msg += "User _" + user.username + " (" + infraction.userid + ")_ has received an infraction.";

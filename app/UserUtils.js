@@ -99,7 +99,7 @@ module.exports.increaseNotoriety = (userid) => {
                     if (err) reject("increaseInfractionLevel() UserRecord SAVE");
                 });
 
-                accept(actionType, actionMeta);
+                accept({type: actionType, meta: actionMeta});
             }).catch((err) => {
                 reject(err);
             });
