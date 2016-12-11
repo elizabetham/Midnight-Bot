@@ -38,7 +38,7 @@ module.exports.increaseNotoriety = (userid) => {
 
                 //Increase the user's notoriety level & reset the notoriety decrease timer
                 userRecord.notoriety++;
-                if (userRecord.notoriety > 4) userRecord.notoriety = 4; //Enforce ceiling
+                if (userRecord.notoriety > 5) userRecord.notoriety = 5; //Enforce ceiling
                 userRecord.decreaseWhen = moment().unix() + config.leveldrop;
                 userRecord.username = (user.username) ? user.username || null : null;
 
@@ -46,10 +46,11 @@ module.exports.increaseNotoriety = (userid) => {
                 let actionType, actionMeta;
                 switch (userRecord.notoriety) {
                     case 1:
+                    case 2:
                         user.sendMessage("In response to your last infraction, you have been issued a warning.");
                         actionType = "WARN";
                         break;
-                    case 2:
+                    case 3:
                         user.sendMessage("In response to your latest infraction, you have been issued a 5 minute mute.");
                         actionType = "MUTE";
                         actionMeta = 300;
@@ -62,7 +63,7 @@ module.exports.increaseNotoriety = (userid) => {
                             });
                         });
                         break;
-                    case 3:
+                    case 4:
                         user.sendMessage("In response to your latest infraction, you have been issued a 24 hour mute.");
                         actionType = "MUTE";
                         actionMeta = 3600 * 6;
@@ -75,7 +76,7 @@ module.exports.increaseNotoriety = (userid) => {
                             });
                         });
                         break;
-                    case 4:
+                    case 5:
                         //Send PM
                         user.sendMessage("In response to your latest infraction, you have been permanently muted as your record went over the threshold of allowed infractions.");
                         actionType = "MUTE";

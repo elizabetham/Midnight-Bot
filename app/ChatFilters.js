@@ -190,7 +190,6 @@ filters.racismFilter = {
         let self = this;
         UserUtils.increaseNotoriety(message.author.id)
             .then((actionData) => {
-                console.log("actionmeta", actionData.meta);
                 let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                     displayName: "Racism Filter",
                     triggerMessage: message.content
