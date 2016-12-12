@@ -6,3 +6,6 @@ require("./app/Cron.js");
 
 //Start Discord Bot
 require("./app/DiscordUtils.js").start();
+
+//Start express
+require("./app/HTTPServer.js");

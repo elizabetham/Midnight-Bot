@@ -16,7 +16,9 @@ const pastebin = new (require('pastebin-js'))(config.PASTEBIN_DEV_KEY);
 DiscordUtils.client.on('ready', () => {
     console.log('Discord connection ready.');
     //Set the avatar of the bot
-    DiscordUtils.client.user.setAvatar("./app/res/img/avatar.png");
+    setTimeout(() => {
+        DiscordUtils.client.user.setAvatar("./app/res/img/avatar.png");
+    }, 1000);
 });
 
 //Handle member joining

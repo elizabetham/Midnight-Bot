@@ -13,6 +13,7 @@
     "discord.js": "^10.0.1",
     "emoji-regex": "^6.0.0",
     "emojione": "^2.2.6",
+    "express": "^4.14.0",
     "moment": "^2.15.2",
     "moment-timezone": "^0.5.7",
     "mongoose": "^4.6.5",
