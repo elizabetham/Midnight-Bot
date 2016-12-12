@@ -26,6 +26,8 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 
 //Handle message receive event
 DiscordUtils.client.on('message', message => {
+        //Prevent bot from using itself
+        if (!message.author.bot) return;
         //Disable PM
         if (!message.guild) return;
         //Command detection
@@ -33,8 +35,8 @@ DiscordUtils.client.on('message', message => {
             processCommand(message);
             return;
         }
-        //Pull through chatfilters if user is applicable to punishment
-        if (!message.author.bot && config.notAffected.indexOf(message.author.username) == -1) ChatFilters.process(message);
+        //Check if user is on role whitelist
+        if (message.member.roles.array.filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message);
     }
 );
 
