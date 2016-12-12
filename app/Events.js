@@ -28,13 +28,25 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 DiscordUtils.client.on('message', message => {
         //Disable PM
         if (!message.guild) return;
+        //Prevent triggering of self
+        if (!message.author.bot) return;
         //Command detection
         if (message.content.startsWith("!")) {
             processCommand(message);
             return;
         }
-        //Pull through chatfilters if user is applicable to punishment
-        if (!message.author.bot && config.notAffected.indexOf(message.author.username) == -1) ChatFilters.process(message);
+        //Check if user is on role whitelist
+        let member = message.guild.members.get(message.author.id);
+        let whitelist = false;
+        for (let role of member.roles) {
+            if (role[1].id == config.whitelistedRoles) {
+                whitelist = true;
+                break;
+            }
+        }
+        if (!whitelist) {
+            ChatFilters.process(message);
+        }
     }
 );
 
