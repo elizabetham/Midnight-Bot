@@ -36,7 +36,7 @@ DiscordUtils.client.on('message', message => {
             return;
         }
         //Check if user is on role whitelist
-        if (message.member.roles.array.filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message);
+        if (message.member.roles.array().filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message);
     }
 );
 
