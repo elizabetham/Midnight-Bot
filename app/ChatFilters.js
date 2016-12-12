@@ -202,4 +202,18 @@ filters.racismFilter = {
     }
 };
 
+filters.linkFilter = {
+    displayName: "Lobby Link Filter",
+    check: message => {
+      let channels = ["249323706285948928","252543317844295680"];
+      let filters = [/.*http:\/\/.*/gi, /.*www.*/gi];
+      return channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0;
+    },
+    action: message => {
+        message.delete();
+        message.author.sendMessage("Your message was removed: Posting links in the lobby channels is prohibited.");
+        // Do not issue infraction for posting links, just keep the chat clean
+    }
+};
+
 module.exports.filters = filters;
