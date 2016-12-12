@@ -36,17 +36,7 @@ DiscordUtils.client.on('message', message => {
             return;
         }
         //Check if user is on role whitelist
-        let member = message.guild.members.get(message.author.id);
-        let whitelist = false;
-        for (let role of member.roles) {
-            if (role[1].id == config.whitelistedRoles) {
-                whitelist = true;
-                break;
-            }
-        }
-        if (!whitelist) {
-            ChatFilters.process(message);
-        }
+        if (message.member.roles.array.filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message);
     }
 );
 
