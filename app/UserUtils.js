@@ -32,7 +32,8 @@ module.exports.increaseNotoriety = (userid) => {
                         mutedUntil: -1,
                         notoriety: 0,
                         decreaseWhen: -1,
-                        username: user.username
+                        username: user.username,
+                        username_lower: user.username.toLowerCase()
                     });
                 }
 

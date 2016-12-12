@@ -11,7 +11,8 @@ let UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
         mutedUntil: {type: Number, required: true},
         notoriety: {type: Number, required: true},
         decreaseWhen: {type: Number, required: true},
-        username: {type: String, required: true}
+        username: {type: String, required: true},
+        username_lower: {type: String, required: true}
     })
 );
 
