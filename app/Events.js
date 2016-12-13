@@ -43,55 +43,12 @@ DiscordUtils.client.on('message', message => {
 );
 
 let processCommand = message => {
-
-    /*
-     TODO: BREAK OUT INTO COMMAND FRAMEWORK & CLEAN UP THIS HORRIBLE COMMAND MESS.
-     _I'm sorry this shit was written in a hurry please don't kill me_
-     */
-
-    let split = message.content.trim().split(/\s+/);
-    let cmd = split[0].substr(1, split[0].length);
-    let args = split.splice(1, split.length);
-    switch (cmd) {
-        //TODO: Replace infractions with a web interface
-        case "infractions": {
-            //Check permissions
-            let member = message.guild.members.get(message.author.id);
-            let hasperms = false;
-            for (let role of member.roles) {
-                if (role[1].name == config.botDevRole) {
-                    hasperms = true;
-                    break;
-                }
-            }
-            if (!hasperms)
-                return;
-            if (args.length == 0) {
-                message.reply("You did not specify a user id.");
-                return;
-            }
-            DBManager.Infraction
-                .find({userid: args[0]})
-                .sort({timestamp: -1}).limit(5)
-                .then(docs => {
-                    if (docs.length == 0) {
-                        message.reply("This user has no logged infractions!");
-                        return;
-                    }
-                    let msg = "**Infractions for user _" + message.author.username + " (" + message.author.id + ")_**\n\n```";
-                    docs.forEach(d => {
-                        msg += JSON.stringify(d, null, 2) + "\n\n";
-                    });
-                    msg += "```";
-                    message.reply(msg);
-                })
-                .catch(err => {
-                    Logging.error("!infractions", err);
-                    message.reply("Something went wrong! Please check the logs.");
-                });
-            return;
-        }
-    }
+    //TODO: Implement command framework
+    // let split = message.content.trim().split(/\s+/);
+    // let cmd = split[0].substr(1, split[0].length);
+    // let args = split.splice(1, split.length);
+    // switch (cmd) {
+    // }
 };
 
 let combatMuteEvasion = guildMember => {
