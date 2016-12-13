@@ -1,18 +1,19 @@
 {
-  "name": "MuseBot",
+  "displayName": "MidnightBot",
   "version": "1.1.0",
   "description": "A Discord Bot to issue infractions in MuselK's Discord Guild.",
-  "main": "index.js",
+  "main": "Midnight.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "BeMacized",
-  "license": "Apache License 2.0",
+  "license": "GPL-3.0",
   "dependencies": {
     "console.table": "^0.7.0",
     "discord.js": "^10.0.1",
     "emoji-regex": "^6.0.0",
     "emojione": "^2.2.6",
+    "express": "^4.14.0",
     "moment": "^2.15.2",
     "moment-timezone": "^0.5.7",
     "mongoose": "^4.6.5",

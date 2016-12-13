@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Infractions</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css"
+          integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="dist/css/infractions.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/css/tether.min.css"/>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills float-xs-right">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Infractions</a>
+                </li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">Midnight</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Username or ID:</h2>
+            <input type="text" id="searchBox" class="form-control">
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="infractionTemplateContainer">
+            <div class="card infraction">
+                <div class="card-block">
+                    <h4 class="card-title">
+                    </h4>
+                    <p class="card-text">
+
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12" id="resultContainer">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 ">
+            <a class="btn btn-primary btn-lg" id="loadMoreButton">Load more</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy;<a href="http://bemacized.net/">BeMacized</a> 2016-2017</p>
+    </footer>
+
+</div> <!-- /container -->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js"></script>
+<script src="dist/js/page/infractions.js"></script>
+</body>
+</html>
