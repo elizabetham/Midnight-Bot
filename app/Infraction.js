@@ -8,7 +8,7 @@ module.exports = function (userid, timestamp, increasedNotoriety, actionType, ac
         if (!filterData.hasOwnProperty("displayName")) throw "displayName field not specified in filterdata";
         if (!filterData.hasOwnProperty("triggerMessage")) throw "triggerMessage field not specified in filterdata";
     }
-    if (!userid || !timestamp || !increasedNotoriety || !actionType)
+    if (!userid || !timestamp || typeof(increasedNotoriety) !== "boolean" || !actionType)
         throw "Missing required parameters";
 
     let infraction = {

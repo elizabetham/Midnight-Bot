@@ -64,10 +64,13 @@ let loadData = function (user, append, before) {
                 title += " - " + infraction.username + " (" + infraction.userid + ")";
                 card.find(".card-title").text(title);
                 let textContainer = card.find(".card-text");
-                textContainer.append($("<b>Timestamp: " + moment.unix(infraction.timestamp).format('MMMM Do YYYY, h:mm:ss a') + "<br></b>"));
+                textContainer.append($("<p><b>Timestamp: </b>" + moment.unix(infraction.timestamp).format('MMMM Do YYYY, h:mm:ss a') + "</p>"));
+                textContainer.append($("<p><b>Increased notoriety: </b>" + ((infraction.action.increasedNotoriety) ? "Yes" : "No") + "</p>"));
                 if (infraction.hasOwnProperty("filter")) {
-                    textContainer.append($("<b>Filter: " + infraction.filter.displayName + "<br></b>"));
-                    textContainer.append($("<b>Offending Message:</b>"));
+                    textContainer.append($(
+                        "<p><b>Filter: </b>" + infraction.filter.displayName + "</p>" +
+                        "<p><b>Offending Message:</b></p>"
+                    ));
                     textContainer.append($("<pre>" + infraction.filter.triggerMessage + "</pre>"));
                 }
                 $("#resultContainer").append(card);

@@ -29,9 +29,10 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 //Handle message receive event
 DiscordUtils.client.on('message', message => {
         //Prevent bot from using itself
-        if (!message.author.bot) return;
+        if (message.author.bot) return;
         //Disable PM
         if (!message.guild) return;
+
         //Command detection
         if (message.content.startsWith("!")) {
             processCommand(message);

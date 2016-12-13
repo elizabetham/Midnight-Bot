@@ -58,7 +58,7 @@ module.exports.error = (identifier, err) => {
     pastebin.createPaste({
         text: JSON.stringify(err, null, 2),
         privacy: 1,
-        title: "[" + config.botName + "] Error (ID: " + identifier + ")"
+        title: "[Midnight] Error (ID: " + identifier + ")"
     })
         .then(function (data) {
             self.bot(self.format("ERROR", "[" + identifier + "]: <http://pastebin.com/" + data + ">"));

@@ -22,7 +22,6 @@ module.exports.process = message => {
 };
 
 //FILTERS
-
 let filters = {};
 filters.mentionFilter = {
     displayName: "Mention Filter",
@@ -34,7 +33,7 @@ filters.mentionFilter = {
     },
     action: (message) => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
+        message.author.sendMessage("Your message was removed: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
 
         //Punish
         let self = this;
@@ -58,7 +57,7 @@ filters.repeatedCharFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
         let self = this;
@@ -82,7 +81,7 @@ filters.bazzaFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
         let self = this;
@@ -107,7 +106,7 @@ filters.emojiSpamFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
         let self = this;
@@ -131,7 +130,7 @@ filters.bulkMentionFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
         let self = this;
@@ -155,7 +154,7 @@ filters.discordInviteFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: It is not allowed to advertise other Discord servers in our guild.");
+        message.author.sendMessage("Your message was removed: It is not allowed to advertise other Discord servers in our guild.");
 
         //Punish
         let self = this;
@@ -184,7 +183,7 @@ filters.racismFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("You have been issued an infraction: The use of racist or discriminative terms is not permitted here.");
+        message.author.sendMessage("Your message was removed: The use of racist or discriminative terms is not permitted here.");
 
         //Punish
         let self = this;
@@ -205,14 +204,24 @@ filters.racismFilter = {
 filters.linkFilter = {
     displayName: "Lobby Link Filter",
     check: message => {
-      let channels = ["249323706285948928","252543317844295680"];
-      let filters = [/.*http:\/\/.*/gi, /.*www.*/gi];
-      return channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0;
+        let channels = [
+            "249323706285948928", //Main Guild #lobby_1
+            "252543317844295680", //Main Guild #lobby_2
+            "257564280725962753" //Test Guild #development
+        ];
+
+        let filters = [/.*https{0,1}:\/\/.*/gi, /.*www.*/gi];
+        return channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0;
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Posting links in the lobby channels is prohibited.");
-        // Do not issue infraction for posting links, just keep the chat clean
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Lobby Link Filter",
+            triggerMessage: message.content
+        });
+        infraction.save();
+        Logging.infractionLog(infraction);
     }
 };
 
