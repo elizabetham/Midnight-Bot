@@ -2,6 +2,7 @@
 const UserUtils = require("./UserUtils.js");
 const Logging = require("./Logging.js");
 const Infraction = require("./Infraction.js");
+const DBManager = require("./DBManager.js");
 
 //Config
 const config = require("../config.js");
@@ -14,10 +15,11 @@ const emojiRegex = require("emoji-regex");
 module.exports.process = message => {
     for (let filter in filters) {
         if (!filters.hasOwnProperty(filter)) continue;
-        if (filters[filter].check(message)) {
-            filters[filter].action(message);
-            break;
-        }
+        filters[filter].check(message).then(res => {
+            if (res) filters[filter].action(message);
+        }).catch(err => {
+            Logging.error("GENERIC_FILTER_ERROR", err);
+        });
     }
 };
 
@@ -26,17 +28,18 @@ let filters = {};
 filters.mentionFilter = {
     displayName: "Mention Filter",
     check: (message) => {
-        return message.mentions.users
-                .array()
-                .filter(u => config.prohibitedMentions.indexOf(u.username) > -1)
-                .length > 0;
+        return new Promise(resolve => {
+            resolve(message.mentions.users
+                    .array()
+                    .filter(u => config.prohibitedMentions.indexOf(u.username) > -1)
+                    .length > 0);
+        });
     },
     action: (message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Mention Filter",
@@ -53,14 +56,15 @@ filters.mentionFilter = {
 filters.repeatedCharFilter = {
     displayName: "Repeated Character Filter",
     check: message => {
-        return message.content.match(/.*([^.\s])\1{6,}.*/gi);
+        return new Promise(resolve => {
+            resolve(message.content.match(/.*([^.\s])\1{6,}.*/gi));
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Repeated Character Filter",
@@ -77,14 +81,15 @@ filters.repeatedCharFilter = {
 filters.bazzaFilter = {
     displayName: "Bazza Filter",
     check: message => {
-        return message.content.match(/.*b+a+z+a{4,}.*/gi);
+        return new Promise(resolve => {
+            resolve(message.content.match(/.*b+a+z+a{4,}.*/gi));
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Bazza Filter",
@@ -101,15 +106,16 @@ filters.bazzaFilter = {
 filters.emojiSpamFilter = {
     displayName: "Emoji Spam Filter",
     check: message => {
-        let matches = message.content.match(emojiRegex());
-        return matches && matches.length >= 10;
+        return new Promise(resolve => {
+            let matches = message.content.match(emojiRegex());
+            resolve(matches && matches.length >= 10);
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Emoji Spam Filter",
@@ -126,14 +132,15 @@ filters.emojiSpamFilter = {
 filters.bulkMentionFilter = {
     displayName: "Bulk Mention Filter",
     check: message => {
-        return message.content.match(/.*@{5,}.*/gi);
+        return new Promise(resolve => {
+            resolve(message.content.match(/.*@{5,}.*/gi));
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Bulk Mention Filter",
@@ -150,14 +157,15 @@ filters.bulkMentionFilter = {
 filters.discordInviteFilter = {
     displayName: "Discord Invite Filter",
     check: message => {
-        return message.content.match(/.*discord\.gg\/.*/gi);
+        return new Promise(resolve => {
+            resolve(message.content.match(/.*discord\.gg\/.*/gi));
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: It is not allowed to advertise other Discord servers in our guild.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Discord Invite Filter",
@@ -174,19 +182,20 @@ filters.discordInviteFilter = {
 filters.racismFilter = {
     displayName: "Racism Filter",
     check: message => {
-        let rules = [
-            /.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, //nigger
-            /.*\bj+(e|3)+w+s*\b.*/gi, //jew
-            /.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi //fag
-        ];
-        return rules.filter(rule => message.content.match(rule)).length > 0;
+        return new Promise(resolve => {
+            let rules = [
+                /.*\bn+(i|1)+(g|6)+((a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, //nigger
+                /.*\bj+(e|3)+w+s*\b.*/gi, //jew
+                /.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi //fag
+            ];
+            resolve(rules.filter(rule => message.content.match(rule)).length > 0)
+        });
     },
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: The use of racist or discriminative terms is not permitted here.");
 
         //Punish
-        let self = this;
         UserUtils.increaseNotoriety(message.author.id)
             .then((actionData) => {
                 let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
@@ -204,14 +213,16 @@ filters.racismFilter = {
 filters.linkFilter = {
     displayName: "Lobby Link Filter",
     check: message => {
-        let channels = [
-            "249323706285948928", //Main Guild #lobby_1
-            "252543317844295680", //Main Guild #lobby_2
-            "257564280725962753" //Test Guild #development
-        ];
-
-        let filters = [/.*https{0,1}:\/\/.*/gi, /.*www.*/gi];
-        return channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0;
+        return new Promise(resolve => {
+                let channels = [
+                    "249323706285948928", //Main Guild #lobby_1
+                    "252543317844295680", //Main Guild #lobby_2
+                    "257564280725962753" //Test Guild #development
+                ];
+                let filters = [/.*https{0,1}:\/\/.*/gi, /.*www.*/gi];
+                resolve(channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0);
+            }
+        );
     },
     action: message => {
         message.delete();
@@ -224,5 +235,96 @@ filters.linkFilter = {
         Logging.infractionLog(infraction);
     }
 };
+
+filters.floodFilter = {
+    displayName: "Flood-Spam Filter",
+    check: message => {
+        const MESSAGES = 5; //messages per
+        const SECONDS = 10; //period of seconds
+        //Define key
+        let key = message.author.id + ":floodcount";
+
+        return DBManager.redis.existsAsync(key)
+            .then(res => {
+                //Create key if it does not exist yet
+                if (!res) {
+                    DBManager.redis.set(key, 0);
+                    DBManager.redis.expire(key, SECONDS);
+                }
+                //Increment message count
+                DBManager.redis.incr(key);
+                return DBManager.redis.getAsync(key);
+            })
+            .then(res => new Promise(resolve => {
+                resolve(res > MESSAGES);
+            }));
+    },
+    action: message => {
+        message.author.sendMessage("Spamming messages or posting messages with spam-like content is not permitted.");
+
+        //Reset floodcount & remove messages
+        let key = message.author.id + ":floodcount";
+        DBManager.redis.getAsync(key).then(res => {
+            const msgCount = res;
+            message.channel.fetchMessages({limit: 40}).then(res => {
+                res.array().filter(msg => msg.author.id == message.author.id).sort((a, b) => b - a).slice(0, msgCount).forEach(msg => {
+                    msg.delete();
+                });
+            });
+            DBManager.redis.del(key);
+        });
+
+        //Punish
+        UserUtils.increaseNotoriety(message.author.id)
+            .then((actionData) => {
+                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                    displayName: "Flood-Spam Filter",
+                    triggerMessage: "MULTIPLE MESSAGES"
+                });
+                infraction.save();
+                Logging.infractionLog(infraction);
+            }).catch(err => {
+            Logging.error("RACISM_FILTER_ACTION", err);
+        });
+    }
+};
+
+filters.duplicateMessageFilter = {
+    displayName: "Duplicate Message Filter",
+    check: message => {
+        //Define key
+        let key = message.author.id + ":lastMessage";
+
+        return DBManager.redis.existsAsync(key)
+            .then(res => {
+                //Create key if it does not exist yet and stop here
+                if (!res) {
+                    DBManager.redis.set(key, message.content);
+                    DBManager.redis.expire(key, 20);
+                    return new Promise(resolve => {
+                        resolve(false);
+                    });
+                }
+                //Check if content matches
+                return DBManager.redis.getAsync(key).then(res => {
+                    return new Promise(resolve => {
+                        //TODO: Add check that covers slight variations
+                        resolve((message.content == res));
+                    });
+                });
+            });
+    },
+    action: message => {
+        message.delete();
+        message.author.sendMessage("Your message was removed: Identical consecutive messages are not permitted.");
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Duplicate Message Filter",
+            triggerMessage: message.content
+        });
+        infraction.save();
+        Logging.infractionLog(infraction);
+    }
+};
+
 
 module.exports.filters = filters;

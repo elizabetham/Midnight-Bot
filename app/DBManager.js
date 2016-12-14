@@ -1,12 +1,21 @@
 'use strict';
-let mongoose = require('mongoose');
-const config = require('../config.js');
+//Modules & Dependencies
+const mongoose = require("mongoose");
+const config = require("../config.js");
+const Logging = require("./Logging.js");
+const redis = require("redis");
+const bluebird = require("bluebird");
 
-//connect to database
+//Make redis promise compatible
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
+//connect to databases
 mongoose.connect(config.database);
+module.exports.redis = redis.createClient();
 
-//Define schemas
-let UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
+//Define mongoose schemas
+module.exports.UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
         userid: {type: String, required: true},
         mutedUntil: {type: Number, required: true},
         notoriety: {type: Number, required: true},
@@ -16,7 +25,7 @@ let UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
     })
 );
 
-let Infraction = mongoose.model('Infraction', new mongoose.Schema({
+module.exports.Infraction = mongoose.model('Infraction', new mongoose.Schema({
         userid: {type: String, required: true},
         timestamp: {type: Number, required: true},
         filter: {
@@ -30,5 +39,8 @@ let Infraction = mongoose.model('Infraction', new mongoose.Schema({
         }
     })
 );
-//Export module
-module.exports = {"UserRecord": UserRecord, "Infraction": Infraction};
+
+//Handle redis errors
+module.exports.redis.on("error", err => {
+    Logging.error("REDIS_GENERIC_ERROR", err);
+});
