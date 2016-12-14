@@ -15,9 +15,15 @@ schedule.scheduleJob('*/10 * * * * *', () => {
 
 //Utility functions
 const cleanup = () => {
-    //Remove level 0 peeps to reduce DB clutter
-    DBManager.UserRecord.remove({infractionLevel: 0, mutedUntil: {$lt: 0}}, err => {
-        if (err) Logging.error("CRON_CLEANUP", err);
+    //Remove level 0 peeps without infractions to reduce DB clutter
+    DBManager.UserRecord.find({infractionLevel: 0, mutedUntil: {$lt: 0}}).then(res => {
+        res.forEach(userRecord => {
+            DBManager.Infraction.find({userid: userRecord.userid}).then(res => {
+                if (res.length == 0) userRecord.remove();
+            });
+        });
+    }).catch(err => {
+        Logging.error("CRON_CLEANUP", err);
     });
 };
 
