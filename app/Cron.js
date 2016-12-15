@@ -67,20 +67,13 @@ const decreaseNotorietyLevel = () => {
         docs.forEach(doc => {
             if (doc == null) return;
 
-            //Remove or update record
-            if (doc.infractionLevel == 1) {
-                doc.remove(err => {
-                    if (err)
-                        Logging.error("CRON_DECREASE_NOTORIETY_REMOVE", err);
-                });
-            }
-            else {
-                doc.infractionLevel--;
-                doc.decreaseWhen = moment().unix() + config.leveldrop;
-                doc.save(err => {
-                    if (err) Logging.error("CRON_DECREASE_NOTORIETY_SAVE", err);
-                });
-            }
+            //Update record
+            doc.infractionLevel--;
+            doc.decreaseWhen = moment().unix() + config.leveldrop;
+            doc.save(err => {
+                if (err) Logging.error("CRON_DECREASE_NOTORIETY_SAVE", err);
+            });
+
         });
     });
 };
