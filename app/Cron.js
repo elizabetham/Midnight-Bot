@@ -16,7 +16,7 @@ schedule.scheduleJob('*/10 * * * * *', () => {
 //Utility functions
 const cleanup = () => {
     //Remove level 0 peeps without infractions to reduce DB clutter
-    DBManager.UserRecord.find({infractionLevel: 0, mutedUntil: {$lt: 0}}).then(res => {
+    DBManager.UserRecord.find({notoriety: 0, mutedUntil: {$lt: 0}}).then(res => {
         res.forEach(userRecord => {
             DBManager.Infraction.find({userid: userRecord.userid}).then(res => {
                 if (res.length == 0) userRecord.remove();
@@ -60,15 +60,14 @@ const unmuteApplicableUsers = () => {
 
 const decreaseNotorietyLevel = () => {
     DBManager.UserRecord.find({
-        infractionLevel: {$gt: 0},
-        decreaseWhen: {$lte: moment().unix()},
-        banned: false
+        notoriety: {$gt: 0},
+        decreaseWhen: {$lte: moment().unix()}
     }, (err, docs) => {
         docs.forEach(doc => {
             if (doc == null) return;
 
             //Update record
-            doc.infractionLevel--;
+            doc.notoriety--;
             doc.decreaseWhen = moment().unix() + config.leveldrop;
             doc.save(err => {
                 if (err) Logging.error("CRON_DECREASE_NOTORIETY_SAVE", err);
