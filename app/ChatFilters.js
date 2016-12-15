@@ -284,7 +284,7 @@ filters.floodFilter = {
                 infraction.save();
                 Logging.infractionLog(infraction);
             }).catch(err => {
-            Logging.error("RACISM_FILTER_ACTION", err);
+            Logging.error("FLOOD_FILTER_ACTION", err);
         });
     }
 };

@@ -1,3 +1,5 @@
+$("#loadMoreButton").hide();
+
 let oldestLoaded = -1;
 
 $("#searchBox").on("keyup", function (e) {
@@ -46,15 +48,15 @@ let loadData = function (user, append, before) {
 
             if (resp.hasOwnProperty("error")) {
                 $("#resultContainer").append("<h2>" + resp.error + "</h2>");
+                $("#loadMoreButton").hide();
                 return;
             }
 
             if (!resp.hasOwnProperty("data")) {
                 $("#resultContainer").append("<h2>An unknown error occurred.</h2>");
+                $("#loadMoreButton").hide();
                 return;
             }
-
-            console.log(resp.data);
 
             resp.data.forEach(function (infraction) {
                 var card = $("#infractionTemplateContainer").find("*:eq(0)").clone();
