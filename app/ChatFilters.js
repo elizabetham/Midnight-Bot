@@ -63,18 +63,12 @@ filters.repeatedCharFilter = {
     action: message => {
         message.delete();
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
-
-        //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                displayName: "Repeated Character Filter",
-                triggerMessage: message.content
-            });
-            infraction.save();
-            Logging.infractionLog(infraction);
-        }).catch(err => {
-            Logging.error("REPEATED_CHARACTER_FILTER_ACTION", err);
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Repeated Character Filter",
+            triggerMessage: message.content
         });
+        infraction.save();
+        Logging.infractionLog(infraction);
     }
 };
 
@@ -90,16 +84,12 @@ filters.bazzaFilter = {
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                displayName: "Bazza Filter",
-                triggerMessage: message.content
-            });
-            infraction.save();
-            Logging.infractionLog(infraction);
-        }).catch(err => {
-            Logging.error("BAZZA_FILTER_ACTION", err);
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Bazza Filter",
+            triggerMessage: message.content
         });
+        infraction.save();
+        Logging.infractionLog(infraction);
     }
 };
 
@@ -116,16 +106,12 @@ filters.emojiSpamFilter = {
         message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
-            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                displayName: "Emoji Spam Filter",
-                triggerMessage: message.content
-            });
-            infraction.save();
-            Logging.infractionLog(infraction);
-        }).catch(err => {
-            Logging.error("EMOJI_SPAM_FILTER_ACTION", err);
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Emoji Spam Filter",
+            triggerMessage: message.content
         });
+        infraction.save();
+        Logging.infractionLog(infraction);
     }
 };
 
