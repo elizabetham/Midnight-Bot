@@ -225,12 +225,12 @@ filters.linkFilter = {
     }
 };
 
-filters.linkFilter = {
+filters.scamLinkFilter = {
     displayName: "Scam Link Filter",
     check: message => {
         return new Promise(resolve => {
                 let rules = [
-                    /.*https{0,1}:\/\/(www\.|)giftsofsteam\/[^\s]+.*/gi //Giftsofsteam scam
+                    /.*https{0,1}:\/\/(www\.|)giftsofsteam\.com(\/|).*/gi //Giftsofsteam scam
                 ];
                 resolve(rules.filter(rule => message.content.match(rule)).length > 0)
             }
