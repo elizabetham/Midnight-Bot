@@ -205,7 +205,10 @@ filters.linkFilter = {
                     "252543317844295680", //Main Guild #lobby_2
                     "257564280725962753" //Test Guild #development
                 ];
-                let filters = [/.*https{0,1}:\/\/.*/gi, /.*www.*/gi];
+                let filters = [
+                    /.*https{0,1}:\/\/.*/gi,
+                    /.*www[0-9]*\.[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}.*/gi
+                ];
                 resolve(channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0);
             }
         );
@@ -215,6 +218,29 @@ filters.linkFilter = {
         message.author.sendMessage("Your message was removed: Posting links in the lobby channels is prohibited.");
         let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
             displayName: "Lobby Link Filter",
+            triggerMessage: message.content
+        });
+        infraction.save();
+        Logging.infractionLog(infraction);
+    }
+};
+
+filters.linkFilter = {
+    displayName: "Scam Link Filter",
+    check: message => {
+        return new Promise(resolve => {
+                let rules = [
+                    /.*https{0,1}:\/\/(www\.|)giftsofsteam\/[^\s]+.*/gi //Giftsofsteam scam
+                ];
+                resolve(rules.filter(rule => message.content.match(rule)).length > 0)
+            }
+        );
+    },
+    action: message => {
+        message.delete();
+        message.author.sendMessage("Your message was removed: Posting scam links is prohibited.\nIf you did this unknowingly, your login details to whatever site (Steam etc. ) may be compromised. Change them immediately!");
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Scam Link Filter",
             triggerMessage: message.content
         });
         infraction.save();
