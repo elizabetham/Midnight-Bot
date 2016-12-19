@@ -222,6 +222,29 @@ filters.linkFilter = {
     }
 };
 
+filters.linkFilter = {
+    displayName: "Scam Link Filter",
+    check: message => {
+        return new Promise(resolve => {
+                let rules = [
+                  /.*giftsofsteam.*/gi //Giftsofsteam scam
+                ];
+                resolve(rules.filter(rule => message.content.match(rule)).length > 0)
+            }
+        );
+    },
+    action: message => {
+        message.delete();
+        message.author.sendMessage("Your message was removed: Posting scam links is prohibited.\nIf you did this unknowingly, your login details to whatever site (Steam etc. ) may be compromised. Change them immediately!");
+        let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
+            displayName: "Scam Link Filter",
+            triggerMessage: message.content
+        });
+        infraction.save();
+        Logging.infractionLog(infraction);
+    }
+};
+
 filters.floodFilter = {
     displayName: "Flood-Spam Filter",
     check: message => {
