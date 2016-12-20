@@ -23,7 +23,7 @@ DiscordUtils.client.on('ready', () => {
 
 //Handle member joining
 DiscordUtils.client.on('guildMemberAdd', guildMember => {
-    combatMuteEvasion(guildMember)
+    combatMuteEvasion(guildMember);
 });
 
 //Handle message receive event
@@ -70,7 +70,7 @@ let combatMuteEvasion = guildMember => {
         //Check if user should be muted
         if (userRecord.mutedUntil > moment().unix()) {
             //Reapply mute
-            DiscordUtils.getRole(guildMember.guild, "Muted").then(role => guildMember.addRole(role));
+            DiscordUtils.getRole(guildMember.guild, "Muted").then(role => guildMember.addRole(role)).catch(err => Logging.error("MUTE_EVASION_REAPPLICATION", err));
 
             //Leave log
             Logging.mod(Logging.format("MUTE EVASION DETECTED", "By user _" + guildMember.user.username + " (" + guildMember.user.id + ")_"));
