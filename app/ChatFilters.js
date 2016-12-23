@@ -200,7 +200,7 @@ filters.offensiveFilter = {
     displayName: "Offensive Behavior Filter",
     check: message => {
         return new Promise(resolve => {
-            let rules = [
+            let rules = [   //Potentially expand this later
                 /.*\bk+y+s\b.*/gi //kys
             ];
             resolve(rules.filter(rule => message.content.match(rule)).length > 0)
