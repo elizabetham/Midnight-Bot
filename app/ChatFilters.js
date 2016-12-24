@@ -196,6 +196,35 @@ filters.racismFilter = {
     }
 };
 
+filters.offensiveFilter = {
+    displayName: "Offensive Behavior Filter",
+    check: message => {
+        return new Promise(resolve => {
+            let rules = [   //Potentially expand this later
+                /.*\bk+y+s\b.*/gi //kys
+            ];
+            resolve(rules.filter(rule => message.content.match(rule)).length > 0)
+        });
+    },
+    action: message => {
+        message.delete();
+        message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted.");
+
+        //Punish
+        UserUtils.increaseNotoriety(message.author.id)
+            .then((actionData) => {
+                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                    displayName: "Offensive Behavior Filter",
+                    triggerMessage: message.content
+                });
+                infraction.save();
+                Logging.infractionLog(infraction);
+            }).catch(err => {
+            Logging.error("OFFENSIVE_FILTER_ACTION", err);
+        });
+    }
+};
+
 filters.linkFilter = {
     displayName: "Lobby Link Filter",
     check: message => {
@@ -230,7 +259,8 @@ filters.scamLinkFilter = {
     check: message => {
         return new Promise(resolve => {
                 let rules = [
-                    /.*https{0,1}:\/\/(www\.|)giftsofsteam\.com(\/|).*/gi //Giftsofsteam scam
+                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)giftsofsteam\.com.*/gi //Giftsofsteam scam
+                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)give-aways\.net.*/gi //Riot Points scam
                 ];
                 resolve(rules.filter(rule => message.content.match(rule)).length > 0)
             }
