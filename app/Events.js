@@ -46,14 +46,15 @@ DiscordUtils.client.on('message', message => {
 
 //Log ban event
 //TODO: Write proper ban and reason system with command
+//TODO: Save these as infractions
 DiscordUtils.client.on('guildBanAdd', (guild, user) => {
   Logging.mod(Logging.format("BAN", "issued to _" + user.username + " (" + user.id + ")_"));
-})
+});
 
 //Log unban event
 DiscordUtils.client.on('guildBanRemove', (guild, user) => {
   Logging.mod(Logging.format("UNBAN", "issued to _" + user.username + " (" + user.id + ")_"));
-})
+});
 
 
 let processCommand = message => {
