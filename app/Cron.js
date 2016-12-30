@@ -9,23 +9,8 @@ const config = require("../config.js");
 schedule.scheduleJob('*/10 * * * * *', () => {
         decreaseNotorietyLevel();
         unmuteApplicableUsers();
-        cleanup();
     }
 );
-
-//Utility functions
-const cleanup = () => {
-    //Remove level 0 peeps without infractions to reduce DB clutter
-    DBManager.UserRecord.find({notoriety: 0, mutedUntil: {$lt: 0}}).then(res => {
-        res.forEach(userRecord => {
-            DBManager.Infraction.find({userid: userRecord.userid}).then(res => {
-                if (res.length == 0) userRecord.remove();
-            });
-        });
-    }).catch(err => {
-        Logging.error("CRON_CLEANUP", err);
-    });
-};
 
 const unmuteApplicableUsers = () => {
     DBManager.UserRecord.find({mutedUntil: {$gte: 0, $lte: moment().unix()}}, (err, docs) => {
