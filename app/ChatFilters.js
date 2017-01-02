@@ -260,7 +260,7 @@ filters.scamLinkFilter = {
         return new Promise(resolve => {
                 let rules = [
                     /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)giftsofsteam\.com.*/gi, //Giftsofsteam scam
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)give-aways\.net.*/gi //Riot Points scam
+                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)give-aways\.net.*/gi, //Riot Points scam
                     /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)steamdigitalgift\.com.*/gi //Steam Digital Gift scam
                 ];
                 resolve(rules.filter(rule => message.content.match(rule)).length > 0)
