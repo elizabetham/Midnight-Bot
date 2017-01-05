@@ -48,12 +48,12 @@ DiscordUtils.client.on('message', message => {
 //TODO: Write proper ban and reason system with command
 //TODO: Save these as infractions
 DiscordUtils.client.on('guildBanAdd', (guild, user) => {
-  Logging.mod(Logging.format("BAN", "issued to _" + user.username + " (" + user.id + ")_"));
+  Logging.mod(Logging.format("MANUAL BAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
 });
 
 //Log unban event
 DiscordUtils.client.on('guildBanRemove', (guild, user) => {
-  Logging.mod(Logging.format("UNBAN", "issued to _" + user.username + " (" + user.id + ")_"));
+  Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
 });
 
 
@@ -86,7 +86,7 @@ let combatMuteEvasion = guildMember => {
             DiscordUtils.getRole(guildMember.guild, "Muted").then(role => guildMember.addRole(role)).catch(err => Logging.error("MUTE_EVASION_REAPPLICATION", err));
 
             //Leave log
-            Logging.mod(Logging.format("MUTE EVASION DETECTED", "By user _" + guildMember.user.username + " (" + guildMember.user.id + ")_"));
+            Logging.mod(Logging.format("MUTE EVASION DETECTED", "By user **" + guildMember.user.username + "** (**" + guildMember.user.id + ")**"));
         }
     });
 };
