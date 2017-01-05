@@ -37,7 +37,7 @@ filters.mentionFilter = {
     },
     action: (message) => {
         message.delete();
-        message.author.sendMessage("Your message was removed: It is not permitted to mention members from the 'Grandmaster Gang' directly.");
+        message.author.sendMessage("Your message was removed: It is not permitted to mention members of the Grandmaster Gang directly."); //Grammar fix, not from but of
 
         //Punish
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
@@ -62,7 +62,7 @@ filters.repeatedCharFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
         let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
             displayName: "Repeated Character Filter",
             triggerMessage: message.content
@@ -81,7 +81,7 @@ filters.bazzaFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
 
         //Punish
         let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
@@ -103,7 +103,7 @@ filters.emojiSpamFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
 
         //Punish
         let infraction = new Infraction(message.author.id, moment().unix(), false, "WARN", null, {
@@ -124,7 +124,7 @@ filters.bulkMentionFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("Your message was removed: Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your message was removed: Mass mentioning people is not permitted.");
 
         //Punish
         UserUtils.increaseNotoriety(message.author.id).then(actionData => {
@@ -208,7 +208,7 @@ filters.offensiveFilter = {
     },
     action: message => {
         message.delete();
-        message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted.");
+        message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted here.");
 
         //Punish
         UserUtils.increaseNotoriety(message.author.id)
@@ -303,7 +303,7 @@ filters.floodFilter = {
             }));
     },
     action: message => {
-        message.author.sendMessage("Spamming messages or posting messages with spam-like content is not permitted.");
+        message.author.sendMessage("Your messages were removed: Rapid message spam is not permitted.");
 
         //Reset floodcount & remove messages
         let key = message.author.id + ":floodcount";

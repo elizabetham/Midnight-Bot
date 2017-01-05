@@ -35,11 +35,11 @@ module.exports.infractionLog = infraction => {
     let msg = "";
     switch (infraction.action.type) {
         case "MUTE":
-            msg = "_(" + ((infraction.action.meta == Number.MAX_SAFE_INTEGER) ? "Permanent" : TimeUtils.readableInterval(infraction.action.meta)) + ")_ ";
+            msg = "(**" + ((infraction.action.meta == Number.MAX_SAFE_INTEGER) ? "Permanent" : TimeUtils.readableInterval(infraction.action.meta)) + "**) ";
             break;
     }
     DiscordUtils.client.fetchUser(infraction.userid).then(user => {
-        msg += "User _" + user.username + " (" + infraction.userid + ")_ has received an infraction.";
+        msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction.";
         if (infraction.filter)
             msg += "\nFilter: " + infraction.filter.displayName;
         //TODO: Add link url to infraction information here
