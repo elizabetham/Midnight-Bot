@@ -4,7 +4,7 @@
   "description": "A Discord Bot to issue infractions in MuselK's Discord Guild.",
   "main": "Midnight.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "ssh bemacized@bots.bemacized.net \"cd ~/midnight && git pull\""
   },
   "author": "BeMacized",
   "license": "GPL-3.0",
