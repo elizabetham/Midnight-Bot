@@ -28,8 +28,10 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 
 //Handle message receive event
 DiscordUtils.client.on('message', message => {
+
         //Prevent bot from using itself
         if (message.author.bot) return;
+
         //Disable PM
         if (!message.guild) return;
 
@@ -48,12 +50,12 @@ DiscordUtils.client.on('message', message => {
 //TODO: Write proper ban and reason system with command
 //TODO: Save these as infractions
 DiscordUtils.client.on('guildBanAdd', (guild, user) => {
-  Logging.mod(Logging.format("MANUAL BAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
+    Logging.mod(Logging.format("MANUAL BAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
 });
 
 //Log unban event
 DiscordUtils.client.on('guildBanRemove', (guild, user) => {
-  Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
+    Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
 });
 
 

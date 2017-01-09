@@ -12,14 +12,14 @@ const moment = require("moment");
 const emojiRegex = require("emoji-regex");
 
 //FUNCTIONS
-module.exports.process = message => {
+module.exports.process = async function(message) {
     for (let filter in filters) {
         if (!filters.hasOwnProperty(filter)) continue;
-        filters[filter].check(message).then(res => {
-            if (res) filters[filter].action(message);
-        }).catch(err => {
-            Logging.error("GENERIC_FILTER_ERROR", err);
-        });
+        let applies = await filters[filter].check(message);
+        if (applies) {
+            filters[filter].action(message);
+            break;
+        }
     }
 };
 

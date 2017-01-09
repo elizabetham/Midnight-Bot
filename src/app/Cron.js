@@ -1,3 +1,4 @@
+"use strict";
 const schedule = require('node-schedule');
 const DBManager = require("./DBManager.js");
 const Logging = require("./Logging.js");
@@ -9,6 +10,11 @@ const config = require("../config.js");
 schedule.scheduleJob('*/10 * * * * *', () => {
         decreaseNotorietyLevel();
         unmuteApplicableUsers();
+    }
+);
+//Schedule cleanup
+schedule.scheduleJob('* * */1 * * *', () => {
+        cleanupInfractions();
     }
 );
 
@@ -49,7 +55,7 @@ const decreaseNotorietyLevel = () => {
         decreaseWhen: {$lte: moment().unix()}
     }, (err, docs) => {
         docs.forEach(doc => {
-            if (doc == null) return;
+            if (!doc) return;
 
             //Update record
             doc.notoriety--;
@@ -61,3 +67,38 @@ const decreaseNotorietyLevel = () => {
         });
     });
 };
+
+const cleanupInfractions = () => {
+    //Loop over all infractions
+    let infractionStream = DBManager.Infraction.find().stream();
+    let cleanupCount = 0;
+    infractionStream.on('data', async(infraction) => {
+        try {
+            //Check if user record exists
+            if (!(await DBManager.UserRecord.find({userid: infraction.userid}))) {
+                //If not, increment cleanup count and remove the infraction
+                cleanupCount++;
+                try {
+                    infraction.remove();
+                } catch (err) {
+                    Logging.error("CRON_INFRACTION_CLEANUP_INFRACTION_REMOVE", err);
+                }
+            }
+        } catch (err) {
+            Logging.error("CRON_INFRACTION_CLEANUP_USER_FIND", err);
+        }
+    });
+
+    //Handle errors
+    infractionStream.on('error', function (err) {
+        Logging.error("CRON_INFRACTION_CLEANUP_INFRACTION_STREAM", err);
+    });
+
+    //Let the managers know something's up
+    infractionStream.on('close', function () {
+        if (cleanupCount > 0) Logging.bot("Cleaned up " + cleanupCount + " infraction records with invalid user record pointers.");
+    });
+};
+
+//Execute at startup
+cleanupInfractions();
