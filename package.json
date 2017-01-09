@@ -1,6 +1,6 @@
 {
   "displayName": "MidnightBot",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A Discord Bot to issue infractions in MuselK's Discord Guild.",
   "main": "./dist/Midnight.js",
   "scripts": {
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
+    "babel-plugin-remove-comments": "^2.0.0",
     "babel-plugin-transform-async-to-generator": "^6.16.0"
   }
 }

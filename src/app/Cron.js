@@ -13,7 +13,7 @@ schedule.scheduleJob('*/10 * * * * *', () => {
     }
 );
 //Schedule cleanup
-schedule.scheduleJob('* * */1 * * *', () => {
+schedule.scheduleJob('*/1 * * *', () => {
         cleanupInfractions();
     }
 );
@@ -72,6 +72,9 @@ const cleanupInfractions = () => {
     //Loop over all infractions
     let infractionStream = DBManager.Infraction.find().stream();
     let cleanupCount = 0;
+    let done = false;
+    let logged = false;
+
     infractionStream.on('data', async(infraction) => {
         try {
             //Check if user record exists
@@ -84,19 +87,25 @@ const cleanupInfractions = () => {
                     Logging.error("CRON_INFRACTION_CLEANUP_INFRACTION_REMOVE", err);
                 }
             }
+
+            //Send message
+            if (cleanupCount > 0 && done && !logged) {
+                Logging.bot("Cleaned up " + cleanupCount + " infraction records with invalid user record pointers.");
+                logged = true;
+            }
         } catch (err) {
             Logging.error("CRON_INFRACTION_CLEANUP_USER_FIND", err);
         }
     });
 
     //Handle errors
-    infractionStream.on('error', function (err) {
+    infractionStream.on('error', (err) => {
         Logging.error("CRON_INFRACTION_CLEANUP_INFRACTION_STREAM", err);
     });
 
     //Let the managers know something's up
-    infractionStream.on('close', function () {
-        if (cleanupCount > 0) Logging.bot("Cleaned up " + cleanupCount + " infraction records with invalid user record pointers.");
+    infractionStream.on('close', () => {
+        done = true;
     });
 };
 
