@@ -55,7 +55,7 @@ const decreaseNotorietyLevel = () => {
         decreaseWhen: {$lte: moment().unix()}
     }, (err, docs) => {
         docs.forEach(doc => {
-            if (doc == null) return;
+            if (!doc) return;
 
             //Update record
             doc.notoriety--;
