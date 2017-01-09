@@ -2,9 +2,9 @@
   "displayName": "MidnightBot",
   "version": "1.4.0",
   "description": "A Discord Bot to issue infractions in MuselK's Discord Guild.",
-  "main": "Midnight.js",
+  "main": "./dist/Midnight.js",
   "scripts": {
-    "deploy": "ssh bemacized@bots.bemacized.net \"cd ~/midnight && git pull\""
+    "build": "babel -w src/ -d dist -s -D"
   },
   "author": "BeMacized",
   "license": "GPL-3.0",
@@ -23,5 +23,9 @@
     "randomstring": "^1.1.5",
     "redis": "^2.6.3",
     "request": "^2.76.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-async-to-generator": "^6.16.0"
   }
 }
