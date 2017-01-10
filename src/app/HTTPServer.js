@@ -37,20 +37,18 @@ app.get('/api/infractions', async function (req, res) {
         }
     })();
 
-    let query = {$or: [{userid: userRef}, {username_lower: userRef.toLowerCase()}]};
 
     try {
-
-        let userRecord = await DBManager.UserRecord.findOne(query);
+        let userRecord = await DBManager.UserRecord.findOne({$or: [{userid: userRef}, {username_lower: userRef.toLowerCase()}]});
 
         if (!userRecord) {
             res.status(404).json({error: "There are no logs about this user."});
             return;
         }
 
-        let query = {userid: userRecord.userid};
-        if (before !== -1) query.timestamp = {$lt: before};
         try {
+            const query = {userid: userRecord.userid};
+            if (before !== -1) query.timestamp = {$lt: before};
             let infractions = await DBManager.Infraction.find(query).sort({timestamp: -1}).limit(amount);
             let nInfractions = [];
             for (let infraction of infractions) {

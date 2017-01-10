@@ -41,7 +41,7 @@ module.exports.infractionLog = async(infraction) => {
             break;
     }
     try {
-        let user = DiscordUtils.client.fetchUser(infraction.userid);
+        let user = await DiscordUtils.client.fetchUser(infraction.userid);
         msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction.";
         if (infraction.filter)
             msg += "\nFilter: " + infraction.filter.displayName;
