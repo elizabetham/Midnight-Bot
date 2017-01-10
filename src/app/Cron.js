@@ -24,8 +24,8 @@ const unmuteApplicableUsers = () => {
             Logging.error("CRON_UNMUTE_FIND", err);
             return;
         }
-        docs.forEach(doc => {
-            if (doc == null) return;
+        docs.forEach(async doc => {
+            if (!doc) return;
 
             //Reset muted timestamp
             doc.mutedUntil = -1;
@@ -35,9 +35,8 @@ const unmuteApplicableUsers = () => {
                 let member = guild[1].members.get(doc.userid);
                 if (!member) continue;
                 Logging.mod(Logging.format("MUTE LIFT", "issued to _" + member.user.username + " (" + member.user.id + ")_"));
-                DiscordUtils.getRole(guild[1], "Muted").then(role => {
-                    member.removeRole(role);
-                });
+                let role = await DiscordUtils.getRole(guild[1], "Muted");
+                member.removeRole(role);
             }
 
             //Save user record

@@ -15,3 +15,6 @@ src/config.js
 
 #Transpiler output
 dist/
+
+#Test Scripts
+src/test.js

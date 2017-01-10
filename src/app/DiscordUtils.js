@@ -20,9 +20,8 @@ let DiscordUtils = function () {
         });
     };
 
-    this.start = () => {
-        //Login to discord
-        this.client.login(config.botToken);
+    this.start = async() => {
+        return await this.client.login(config.botToken);
     }
 };
 
