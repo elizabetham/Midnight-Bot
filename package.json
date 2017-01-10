@@ -5,13 +5,14 @@
   "main": "./dist/Midnight.js",
   "scripts": {
     "build": "rm -rf dist && babel src/ -d dist -s --minified -D",
-    "debug": "npm run build && cd dist && node Midnight.js"
+    "debug": "npm run build && cd dist && node Midnight.js",
+    "test": "mocha --compilers js:babel-register"
   },
   "author": "BeMacized",
   "license": "GPL-3.0",
   "dependencies": {
     "bluebird": "^3.4.6",
-    "discord.js": "^10.0.1",
+    "discord.js": "^11.0.0",
     "emoji-regex": "^6.0.0",
     "emojione": "^2.2.6",
     "express": "^4.14.0",
@@ -27,6 +28,10 @@
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-plugin-remove-comments": "^2.0.0",
-    "babel-plugin-transform-async-to-generator": "^6.16.0"
+    "babel-plugin-transform-async-to-generator": "^6.16.0",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "timeout-as-promise": "^1.0.0"
   }
 }

@@ -12,15 +12,16 @@ const moment = require("moment");
 const emojiRegex = require("emoji-regex");
 
 //FUNCTIONS
-module.exports.process = async function(message) {
+module.exports.process = async function (message, takeAction) {
     for (let filter in filters) {
         if (!filters.hasOwnProperty(filter)) continue;
         let applies = await filters[filter].check(message);
         if (applies) {
-            filters[filter].action(message);
-            break;
+            if (takeAction) filters[filter].action(message);
+            return filter;
         }
     }
+    return null;
 };
 
 //FILTERS
@@ -35,21 +36,22 @@ filters.mentionFilter = {
                     .length > 0);
         });
     },
-    action: (message) => {
+    action: async(message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: It is not permitted to mention members of the Grandmaster Gang directly."); //Grammar fix, not from but of
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+        try {
+            let actionData = await  UserUtils.increaseNotoriety(message.author.id);
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Mention Filter",
                 triggerMessage: message.content
             });
             infraction.save();
             Logging.infractionLog(infraction);
-        }).catch(err => {
+        } catch (err) {
             Logging.error("MENTION_FILTER_ACTION", err);
-        });
+        }
     }
 };
 
@@ -68,6 +70,7 @@ filters.repeatedCharFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };
@@ -89,6 +92,7 @@ filters.bazzaFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };
@@ -111,6 +115,7 @@ filters.emojiSpamFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };
@@ -122,21 +127,22 @@ filters.bulkMentionFilter = {
             resolve(message.content.match(/.*@{5,}.*/gi));
         });
     },
-    action: message => {
+    action: async(message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: Mass mentioning people is not permitted.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+        try {
+            let actionData = await UserUtils.increaseNotoriety(message.author.id);
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Bulk Mention Filter",
                 triggerMessage: message.content
             });
             infraction.save();
             Logging.infractionLog(infraction);
-        }).catch(err => {
+        } catch (err) {
             Logging.error("BULK_MENTION_FILTER_ACTION", err);
-        });
+        }
     }
 };
 
@@ -147,21 +153,22 @@ filters.discordInviteFilter = {
             resolve(message.content.match(/.*discord\.gg\/.*/gi));
         });
     },
-    action: message => {
+    action: async(message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: It is not allowed to advertise other Discord servers in our guild.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id).then(actionData => {
+        try {
+            let actionData = await UserUtils.increaseNotoriety(message.author.id);
             let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
                 displayName: "Discord Invite Filter",
                 triggerMessage: message.content
             });
             infraction.save();
             Logging.infractionLog(infraction);
-        }).catch(err => {
+        } catch (err) {
             Logging.error("DISCORD_INVITE_FITLER_ACTION", err);
-        });
+        }
     }
 };
 
@@ -177,22 +184,22 @@ filters.racismFilter = {
             resolve(rules.filter(rule => message.content.match(rule)).length > 0)
         });
     },
-    action: message => {
+    action: async(message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: The use of racist or discriminative terms is not permitted here.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id)
-            .then((actionData) => {
-                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                    displayName: "Racism Filter",
-                    triggerMessage: message.content
-                });
-                infraction.save();
-                Logging.infractionLog(infraction);
-            }).catch(err => {
+        try {
+            let actionData = await UserUtils.increaseNotoriety(message.author.id);
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                displayName: "Racism Filter",
+                triggerMessage: message.content
+            });
+            infraction.save();
+            Logging.infractionLog(infraction);
+        } catch (err) {
             Logging.error("RACISM_FILTER_ACTION", err);
-        });
+        }
     }
 };
 
@@ -206,22 +213,22 @@ filters.offensiveFilter = {
             resolve(rules.filter(rule => message.content.match(rule)).length > 0)
         });
     },
-    action: message => {
+    action: async(message) => {
         message.delete();
         message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted here.");
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id)
-            .then((actionData) => {
-                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                    displayName: "Offensive Behavior Filter",
-                    triggerMessage: message.content
-                });
-                infraction.save();
-                Logging.infractionLog(infraction);
-            }).catch(err => {
+        try {
+            let actionData = await UserUtils.increaseNotoriety(message.author.id);
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                displayName: "Offensive Behavior Filter",
+                triggerMessage: message.content
+            });
+            infraction.save();
+            Logging.infractionLog(infraction);
+        } catch (err) {
             Logging.error("OFFENSIVE_FILTER_ACTION", err);
-        });
+        }
     }
 };
 
@@ -250,6 +257,7 @@ filters.linkFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };
@@ -275,87 +283,79 @@ filters.scamLinkFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };
 
 filters.floodFilter = {
     displayName: "Flood-Spam Filter",
-    check: message => {
+    check: async(message) => {
         const MESSAGES = 5; //messages per
         const SECONDS = 10; //period of seconds
         //Define key
         let key = message.author.id + ":floodcount";
 
-        return DBManager.redis.existsAsync(key)
-            .then(res => {
-                //Create key if it does not exist yet
-                if (!res) {
-                    DBManager.redis.set(key, 0);
-                    DBManager.redis.expire(key, SECONDS);
-                }
-                //Increment message count
-                DBManager.redis.incr(key);
-                return DBManager.redis.getAsync(key);
-            })
-            .then(res => new Promise(resolve => {
-                resolve(res > MESSAGES);
-            }));
+        let res = await DBManager.redis.existsAsync(key);
+
+        //Create key if it does not exist yet
+        if (!res) {
+            DBManager.redis.set(key, 0);
+            DBManager.redis.expire(key, SECONDS);
+        }
+        //Increment message count
+        DBManager.redis.incr(key);
+        res = await DBManager.redis.getAsync(key);
+        return res > MESSAGES;
     },
-    action: message => {
+    action: async(message) => {
         message.author.sendMessage("Your messages were removed: Rapid message spam is not permitted.");
 
         //Reset floodcount & remove messages
         let key = message.author.id + ":floodcount";
-        DBManager.redis.getAsync(key).then(res => {
-            const msgCount = res;
-            message.channel.fetchMessages({limit: 40}).then(res => {
-                res.array().filter(msg => msg.author.id == message.author.id).sort((a, b) => b - a).slice(0, msgCount).forEach(msg => {
-                    msg.delete();
-                });
-            });
-            DBManager.redis.del(key);
-        });
+        const msgCount = await DBManager.redis.getAsync(key);
+        let res = await message.channel.fetchMessages({limit: 40});
+        res.array()
+            .filter(msg => msg.author.id == message.author.id)
+            .sort((a, b) => b - a)
+            .slice(0, msgCount)
+            .forEach(msg => msg.delete());
+
+        DBManager.redis.del(key);
 
         //Punish
-        UserUtils.increaseNotoriety(message.author.id)
-            .then((actionData) => {
-                let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
-                    displayName: "Flood-Spam Filter",
-                    triggerMessage: "MULTIPLE MESSAGES"
-                });
-                infraction.save();
-                Logging.infractionLog(infraction);
-            }).catch(err => {
+        try {
+            let actionData = await UserUtils.increaseNotoriety(message.author.id);
+            let infraction = new Infraction(message.author.id, moment().unix(), true, actionData.type, actionData.meta, {
+                displayName: "Flood-Spam Filter",
+                triggerMessage: "MULTIPLE MESSAGES"
+            });
+            infraction.save();
+            Logging.infractionLog(infraction);
+        } catch (err) {
             Logging.error("FLOOD_FILTER_ACTION", err);
-        });
+        }
     }
 };
 
 filters.duplicateMessageFilter = {
     displayName: "Duplicate Message Filter",
-    check: message => {
+    check: async(message) => {
         //Define key
         let key = message.author.id + ":lastMessage";
 
-        return DBManager.redis.existsAsync(key)
-            .then(res => {
-                //Create key if it does not exist yet and stop here
-                if (!res) {
-                    DBManager.redis.set(key, message.content);
-                    DBManager.redis.expire(key, 20);
-                    return new Promise(resolve => {
-                        resolve(false);
-                    });
-                }
-                //Check if content matches
-                return DBManager.redis.getAsync(key).then(res => {
-                    return new Promise(resolve => {
-                        //TODO: Add check that covers slight variations
-                        resolve((message.content == res));
-                    });
-                });
-            });
+
+        let res = await DBManager.redis.existsAsync(key);
+        //Create key if it does not exist yet and stop here
+        if (!res) {
+            DBManager.redis.set(key, message.content);
+            DBManager.redis.expire(key, 20);
+            return false;
+        }
+        //Check if content matches
+        res = await DBManager.redis.getAsync(key);
+        //TODO: Add check that covers slight variations
+        return message.content === res;
     },
     action: message => {
         message.delete();
@@ -365,6 +365,7 @@ filters.duplicateMessageFilter = {
             triggerMessage: message.content
         });
         infraction.save();
+        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(infraction);
     }
 };

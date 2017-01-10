@@ -42,7 +42,7 @@ DiscordUtils.client.on('message', message => {
         }
 
         //Check if user is on role whitelist
-        if (message.member && message.member.roles.array().filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message);
+        if (message.member && message.member.roles.array().filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message, true);
     }
 );
 
@@ -68,16 +68,10 @@ let processCommand = message => {
     // }
 };
 
-let combatMuteEvasion = guildMember => {
+let combatMuteEvasion = async(guildMember) => {
     //Verify mute state to combat mute evasion
-    DBManager.UserRecord.findOne({
-        userid: guildMember.user.id
-    }, (err, userRecord) => {
-        //Process error
-        if (err) {
-            Logging.error("MUTE_EVASION_COMBAT_FIND", err);
-            return;
-        }
+    try {
+        let userRecord = await DBManager.UserRecord.findOne({userid: guildMember.user.id});
 
         //Stop if no record of this user exists yet
         if (!userRecord) return;
@@ -85,10 +79,18 @@ let combatMuteEvasion = guildMember => {
         //Check if user should be muted
         if (userRecord.mutedUntil > moment().unix()) {
             //Reapply mute
-            DiscordUtils.getRole(guildMember.guild, "Muted").then(role => guildMember.addRole(role)).catch(err => Logging.error("MUTE_EVASION_REAPPLICATION", err));
+            try {
+                let role = await DiscordUtils.getRole(guildMember.guild, "Muted");
+                guildMember.addRole(role);
+            } catch (err) {
+                Logging.error("MUTE_EVASION_REAPPLICATION", err)
+            }
 
             //Leave log
             Logging.mod(Logging.format("MUTE EVASION DETECTED", "By user **" + guildMember.user.username + "** (**" + guildMember.user.id + ")**"));
         }
-    });
+    } catch (err) {
+        Logging.error("MUTE_EVASION_COMBAT_FIND", err);
+    }
+
 };
