@@ -6,6 +6,9 @@ const Logging = require("./Logging.js");
 const redis = require("redis");
 const bluebird = require("bluebird");
 
+//Replace mpromise with ES6 promises within Mongoose
+mongoose.Promise = global.Promise;
+
 //Make redis promise compatible
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
