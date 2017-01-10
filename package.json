@@ -4,7 +4,7 @@
   "description": "A Discord Bot to issue infractions in MuselK's Discord Guild.",
   "main": "./dist/Midnight.js",
   "scripts": {
-    "build": "rm -rf dist && babel src/ -d dist -s --minified -D",
+    "build": "rm -rf dist && babel src/ --out-dir dist --source-maps true --copy-files",
     "debug": "npm run build && cd dist && node Midnight.js",
     "test": "mocha --compilers js:babel-register"
   },
