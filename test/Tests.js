@@ -5,10 +5,10 @@ const assert = require("chai").assert;
 const sleep = require('timeout-as-promise');
 
 //Modules
-const UserUtils = require("../src/app/UserUtils.js");
-const DBManager = require("../src/app/DBManager.js");
-const DiscordUtils = require("../src/app/DiscordUtils.js");
-const ChatFilters = require("../src/app/ChatFilters.js");
+const UserUtils = require("../server_src/app/UserUtils.js");
+const DBManager = require("../server_src/app/DBManager.js");
+const DiscordUtils = require("../server_src/app/DiscordUtils.js");
+const ChatFilters = require("../server_src/app/ChatFilters.js");
 
 //Constants
 const userid = "250064170375053312" //Midnight-Test
