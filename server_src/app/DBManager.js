@@ -23,7 +23,7 @@ const redisClient = redis.createClient();
 export {redisClient as Redis};
 
 //Define mongoose schemas
-export let UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
+export const UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
     userid: {
         type: String,
         required: true
@@ -50,7 +50,7 @@ export let UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
     }
 }));
 
-export let InfractionRecord = mongoose.model('Infraction', new mongoose.Schema({
+export const InfractionRecord = mongoose.model('Infraction', new mongoose.Schema({
     userid: {
         type: String,
         required: true

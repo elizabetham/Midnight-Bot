@@ -60,7 +60,7 @@ export const infractionLog = async(infraction : InfractionRecord) => {
 
 export const error = async(identifier : string, err : any) => {
     //Log error to console
-    console.log("[" + identifier + "]", err);
+    console.error("[" + identifier + "]", err);
 
     //Create pastebin & post in client log channel
     try {
@@ -71,7 +71,7 @@ export const error = async(identifier : string, err : any) => {
         });
         bot(format("ERROR", "[" + identifier + "]: <http://pastebin.com/" + data + ">"));
     } catch (err) {
-        console.log(err);
+        console.error(err);
         bot(format("ERROR", "[" + identifier + "]: Could not upload to pastebin."));
     }
 };
