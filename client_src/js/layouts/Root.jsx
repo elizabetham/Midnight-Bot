@@ -1,3 +1,4 @@
+// @flow
 //Dependencies
 import React, {Component} from 'react';
 import {Router, Route, IndexRoute} from 'react-router';
@@ -8,15 +9,15 @@ import Infractions from './Infractions.jsx';
 
 class Root extends Component {
 
-  render() {
-    return (
-      <Router history={this.props.history}>
-        <Route path='/' component={App}>
-          <IndexRoute component={Infractions}/>
-        </Route>
-      </Router>
-    );
-  }
+    render() {
+        return (
+            <Router history={this.props.history}>
+                <Route path='/' component={App}>
+                    <IndexRoute component={Infractions}/>
+                </Route>
+            </Router>
+        );
+    }
 }
 
 export default Root;

@@ -3,7 +3,8 @@
     "es2015"
   ],
   "plugins": [
-    "transform-async-to-generator"
+    "transform-async-to-generator",
+    "transform-flow-strip-types"
   ],
   "comments": false
 }

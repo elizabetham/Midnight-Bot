@@ -1,0 +1,9 @@
+[ignore]
+.*/node_modules/flux/lib/.*
+.*/node_modules/fbjs/lib/.*
+
+[include]
+
+[libs]
+
+[options]
