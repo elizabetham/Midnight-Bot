@@ -5,7 +5,7 @@ export default {
 
     userSearch : async(query : string) => {
         return new Promise((resolve, reject) => {
-            request.post("http://127.0.0.1:8080/api/user/search").query({q: query}).end((err, response) => {
+            request.post("/api/user/search").query({q: query}).end((err, response) => {
                 if (err)
                     reject(err);
                 resolve(JSON.parse(response.text));
@@ -15,7 +15,7 @@ export default {
 
     getInfractions : async(userid : string) => {
         return new Promise((resolve, reject) => {
-            request.get("http://127.0.0.1:8080/api/user/" + userid + "/infractions").end((err, response) => {
+            request.get("/api/user/" + userid + "/infractions").end((err, response) => {
                 if (err)
                     reject(err);
                 resolve(JSON.parse(response.text));
