@@ -1,6 +1,10 @@
 #NPM
 node_modules
 .npm
+npm-debug.log
+
+#Flow
+flow-typed/
 
 #IntelliJ
 .idea/
@@ -11,10 +15,10 @@ node_modules
 *.swo
 
 #Config file
-src/config.js
+server_src/config.js
 
 #Transpiler output
 dist/
 
 #Test Scripts
-src/test.js
+server_src/test.js
