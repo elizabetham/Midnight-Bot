@@ -11,6 +11,7 @@ from './Infraction';
 //Import modules
 import {UserRecord} from './DBManager';
 import DiscordUtils from './DiscordUtils';
+import Logging from './Logging';
 
 export async function assertUserRecord(userid : string) : UserRecord {
     let userRecord: UserRecord = await UserRecord.findOne({userid: userid});
@@ -24,6 +25,10 @@ export async function assertUserRecord(userid : string) : UserRecord {
             username: user.username,
             username_lower: user.username.toLowerCase()
         });
+        await userRecord.save(err => {
+            if (err)
+                Logging.error("ASSERT_USER_RECORD_SAVE", err)
+        });
     }
     return userRecord;
 };
@@ -31,14 +36,14 @@ export async function assertUserRecord(userid : string) : UserRecord {
 export async function increaseNotoriety(userid : string) : Promise < $InfractionAction > {
 
     //Find existing record
-    let userRecord = await module.exports.assertUserRecord(userid);
+    let userRecord = await assertUserRecord(userid);
 
     //Obtain user reference
     let user = await DiscordUtils.client.fetchUser(userid);
 
     //Increase the user's notoriety level & reset the notoriety decrease timer
     userRecord.notoriety++;
-    if (userRecord.notoriety > 5) 
+    if (userRecord.notoriety > 5)
         userRecord.notoriety = 5; //Enforce ceiling
     userRecord.decreaseWhen = moment().unix() + Config.leveldrop;
     userRecord.username = (user.username)
@@ -117,4 +122,4 @@ export async function increaseNotoriety(userid : string) : Promise < $Infraction
 export default {
     increaseNotoriety,
     assertUserRecord
-}
+};
