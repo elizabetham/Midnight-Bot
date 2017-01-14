@@ -5,7 +5,7 @@
   "main": "./dist/Midnight.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register --require babel-polyfill",
-    "test-jenkins": "JUNIT_REPORT_PATH=/report.xml mocha --colors --compilers js:babel-register --require babel-polyfill --reporter mocha-jenkins-reporter",
+    "test-jenkins": "JUNIT_REPORT_PATH=report.xml mocha --colors --compilers js:babel-register --require babel-polyfill --reporter mocha-jenkins-reporter",
     "build": "webpack --config webpack.prod.config.js",
     "start": "npm run build && cd dist && node Midnight.js",
     "debug": "npm-run-all --parallel debug:*",

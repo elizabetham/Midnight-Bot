@@ -22,3 +22,6 @@ dist/
 
 #Test Scripts
 server_src/test.js
+
+#Mocha output
+report.xml
