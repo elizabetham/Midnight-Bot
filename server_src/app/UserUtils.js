@@ -1,19 +1,22 @@
-'use strict';
+// @flow
+
 //Config
-const config = require("../config.js");
+import Config from "../config";
 
 //Import dependencies
-const moment = require("moment");
+import moment from 'moment';
+import type {$InfractionAction}
+from './Infraction';
 
 //Import modules
-const DBManager = require("./DBManager.js");
-const DiscordUtils = require("./DiscordUtils.js");
+import {UserRecord} from './DBManager';
+import DiscordUtils from './DiscordUtils';
 
-module.exports.assertUserRecord = async(userid) => {
-    let userRecord = await DBManager.UserRecord.findOne({userid: userid});
+export async function assertUserRecord(userid : string) : UserRecord {
+    let userRecord: UserRecord = await UserRecord.findOne({userid: userid});
     if (!userRecord) {
         let user = await DiscordUtils.client.fetchUser(userid);
-        userRecord = new DBManager.UserRecord({
+        userRecord = new UserRecord({
             userid: userid,
             mutedUntil: -1,
             notoriety: 0,
@@ -25,7 +28,7 @@ module.exports.assertUserRecord = async(userid) => {
     return userRecord;
 };
 
-module.exports.increaseNotoriety = async(userid) => {
+export async function increaseNotoriety(userid : string) : Promise < $InfractionAction > {
 
     //Find existing record
     let userRecord = await module.exports.assertUserRecord(userid);
@@ -35,22 +38,34 @@ module.exports.increaseNotoriety = async(userid) => {
 
     //Increase the user's notoriety level & reset the notoriety decrease timer
     userRecord.notoriety++;
-    if (userRecord.notoriety > 5) userRecord.notoriety = 5; //Enforce ceiling
-    userRecord.decreaseWhen = moment().unix() + config.leveldrop;
-    userRecord.username = (user.username) ? user.username || null : null;
+    if (userRecord.notoriety > 5) 
+        userRecord.notoriety = 5; //Enforce ceiling
+    userRecord.decreaseWhen = moment().unix() + Config.leveldrop;
+    userRecord.username = (user.username)
+        ? user.username || null
+        : null;
 
     //Apply punishment
-    let actionType, actionMeta;
+    let InfractionAction = {
+        type: 'NONE',
+        increasedNotoriety: true
+    }
     switch (userRecord.notoriety) {
         case 1:
         case 2:
             user.sendMessage("In response to your last infraction, you have been issued a warning.");
-            actionType = "WARN";
+            InfractionAction = {
+                type: 'WARN',
+                increasedNotoriety: true
+            };
             break;
         case 3:
             user.sendMessage("In response to your latest infraction, you have been issued a 5 minute mute.");
-            actionType = "MUTE";
-            actionMeta = 300;
+            InfractionAction = {
+                type: 'MUTE',
+                increasedNotoriety: true,
+                meta: 300
+            };
 
             //Mute user
             userRecord.mutedUntil = moment().unix() + 300;
@@ -61,8 +76,11 @@ module.exports.increaseNotoriety = async(userid) => {
             break;
         case 4:
             user.sendMessage("In response to your latest infraction, you have been issued a 24 hour mute.");
-            actionType = "MUTE";
-            actionMeta = 3600 * 6;
+            InfractionAction = {
+                type: 'MUTE',
+                increasedNotoriety: true,
+                meta: 3600 * 6
+            };
 
             //Mute user
             userRecord.mutedUntil = moment().unix() + 3600 * 6;
@@ -75,8 +93,11 @@ module.exports.increaseNotoriety = async(userid) => {
         case 5:
             //Send PM
             user.sendMessage("In response to your latest infraction, you have been permanently muted as your record went over the threshold of allowed infractions.");
-            actionType = "MUTE";
-            actionMeta = Number.MAX_SAFE_INTEGER;
+            InfractionAction = {
+                type: 'MUTE',
+                increasedNotoriety: true,
+                meta: Number.MAX_SAFE_INTEGER
+            };
 
             //Mute user
             userRecord.mutedUntil = Number.MAX_SAFE_INTEGER;
@@ -90,5 +111,10 @@ module.exports.increaseNotoriety = async(userid) => {
     //Save user record
     await userRecord.save();
 
-    return {type: actionType, meta: actionMeta};
+    return InfractionAction;
 };
+
+export default {
+    increaseNotoriety,
+    assertUserRecord
+}

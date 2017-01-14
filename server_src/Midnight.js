@@ -1,11 +1,14 @@
+// @flow
+
 //Register Discord events
-require("./app/Events.js");
+import './app/Events.js';
 
 //Start timed events
-require("./app/Cron.js");
+import './app/Cron.js';
 
 //Start Discord Bot
-require("./app/DiscordUtils.js").start();
+import DiscordUtils from './app/DiscordUtils';
+DiscordUtils.start();
 
 //Start express
-require("./app/HTTPServer.js");
+import './app/HTTPServer.js';

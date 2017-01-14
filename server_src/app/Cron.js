@@ -1,31 +1,35 @@
-"use strict";
-const schedule = require('node-schedule');
-const DBManager = require("./DBManager.js");
-const Logging = require("./Logging.js");
-const DiscordUtils = require("./DiscordUtils.js");
-const moment = require("moment");
-const config = require("../config.js");
+// @flow
+import schedule from 'node-schedule';
+import {UserRecord, InfractionRecord} from './DBManager';
+import Logging from './Logging';
+import DiscordUtils from './DiscordUtils.js';
+import moment from 'moment';
+import Config from '../config';
 
 //Schedule the job
 schedule.scheduleJob('*/10 * * * * *', () => {
-        decreaseNotorietyLevel();
-        unmuteApplicableUsers();
-    }
-);
+    decreaseNotorietyLevel();
+    unmuteApplicableUsers();
+});
 //Schedule cleanup
 schedule.scheduleJob('*/1 * * *', () => {
-        cleanupInfractions();
-    }
-);
+    cleanupInfractions();
+});
 
 const unmuteApplicableUsers = () => {
-    DBManager.UserRecord.find({mutedUntil: {$gte: 0, $lte: moment().unix()}}, (err, docs) => {
+    UserRecord.find({
+        mutedUntil: {
+            $gte: 0,
+            $lte: moment().unix()
+        }
+    }, (err, docs) => {
         if (err) {
             Logging.error("CRON_UNMUTE_FIND", err);
             return;
         }
         docs.forEach(async doc => {
-            if (!doc) return;
+            if (!doc)
+                return;
 
             //Reset muted timestamp
             doc.mutedUntil = -1;
@@ -33,7 +37,8 @@ const unmuteApplicableUsers = () => {
             //Remove muted roles
             for (let guild of DiscordUtils.client.guilds) {
                 let member = guild[1].members.get(doc.userid);
-                if (!member) continue;
+                if (!member)
+                    continue;
                 Logging.mod(Logging.format("MUTE LIFT", "issued to _" + member.user.username + " (" + member.user.id + ")_"));
                 let role = await DiscordUtils.getRole(guild[1], "Muted");
                 member.removeRole(role);
@@ -41,27 +46,36 @@ const unmuteApplicableUsers = () => {
 
             //Save user record
             doc.save(err => {
-                if (err) Logging.error("CRON_UNMUTE_SAVE", err);
-            });
+                if (err)
+                    Logging.error("CRON_UNMUTE_SAVE", err);
+                }
+            );
         });
 
     });
 };
 
 const decreaseNotorietyLevel = () => {
-    DBManager.UserRecord.find({
-        notoriety: {$gt: 0},
-        decreaseWhen: {$lte: moment().unix()}
+    UserRecord.find({
+        notoriety: {
+            $gt: 0
+        },
+        decreaseWhen: {
+            $lte: moment().unix()
+        }
     }, (err, docs) => {
         docs.forEach(doc => {
-            if (!doc) return;
+            if (!doc)
+                return;
 
             //Update record
             doc.notoriety--;
-            doc.decreaseWhen = moment().unix() + config.leveldrop;
+            doc.decreaseWhen = moment().unix() + Config.leveldrop;
             doc.save(err => {
-                if (err) Logging.error("CRON_DECREASE_NOTORIETY_SAVE", err);
-            });
+                if (err)
+                    Logging.error("CRON_DECREASE_NOTORIETY_SAVE", err);
+                }
+            );
 
         });
     });
@@ -69,7 +83,7 @@ const decreaseNotorietyLevel = () => {
 
 const cleanupInfractions = () => {
     //Loop over all infractions
-    let infractionStream = DBManager.Infraction.find().stream();
+    let infractionStream = InfractionRecord.find().stream();
     let cleanupCount = 0;
     let done = false;
     let logged = false;
@@ -77,7 +91,7 @@ const cleanupInfractions = () => {
     infractionStream.on('data', async(infraction) => {
         try {
             //Check if user record exists
-            if (!(await DBManager.UserRecord.find({userid: infraction.userid}))) {
+            if (!(await UserRecord.find({userid: infraction.userid}))) {
                 //If not, increment cleanup count and remove the infraction
                 cleanupCount++;
                 try {

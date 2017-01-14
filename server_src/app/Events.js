@@ -1,15 +1,19 @@
+// @flow
+
 //Modules
-const DiscordUtils = require("./DiscordUtils.js");
-const DBManager = require("./DBManager.js");
-const Logging = require("./Logging.js");
-const ChatFilters = require("./ChatFilters.js");
+import DiscordUtils from './DiscordUtils';
+import {UserRecord, InfractionRecord} from './DBManager';
+import Logging from './Logging';
+import ChatFilters from './ChatFilters';
 
 //Config
-const config = require("../config.js");
+import Config from '../config';
 
 //Dependencies
-const moment = require("moment");
-const pastebin = new (require('pastebin-js'))(config.PASTEBIN_DEV_KEY);
+import moment from 'moment';
+import {GuildMember} from 'discord.js';
+import pastebinJs from 'pastebin-js'
+const pastebin = new pastebinJs(Config.PASTEBIN_DEV_KEY);
 
 //Files
 const avatar = require("./res/img/avatar.png");
@@ -20,8 +24,10 @@ DiscordUtils.client.on('ready', () => {
     //Set the avatar of the bot
     setTimeout(() => {
         DiscordUtils.client.user.setAvatar(avatar);
-        if (config.hasOwnProperty("playing"))DiscordUtils.client.user.setGame(config.playing);
-    }, 1000);
+        if (Config.hasOwnProperty("playing"))
+            DiscordUtils.client.user.setGame(Config.playing);
+        }
+    , 1000);
 });
 
 //Handle member joining
@@ -32,20 +38,23 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 //Handle message receive event
 DiscordUtils.client.on('message', message => {
 
-        //Prevent bot from using itself
-        if (message.author.bot) return;
+    //Prevent bot from using itself
+    if (message.author.bot)
+        return;
 
-        //Disable PM
-        if (!message.guild) return;
+    //Disable PM
+    if (!message.guild)
+        return;
 
-        //Command detection
-        if (message.content.startsWith("!")) {
-            processCommand(message);
-            return;
-        }
+    //Command detection
+    if (message.content.startsWith("!")) {
+        processCommand(message);
+        return;
+    }
 
-        //Check if user is on role whitelist
-        if (message.member && message.member.roles.array().filter(r => config.whitelistedRoles.indexOf(r.id) > -1).length == 0) ChatFilters.process(message, true);
+    //Check if user is on role whitelist
+    if (message.member && message.member.roles.array().filter(r => Config.whitelistedRoles.indexOf(r.id) > -1).length == 0)
+        ChatFilters.process(message, true);
     }
 );
 
@@ -61,7 +70,6 @@ DiscordUtils.client.on('guildBanRemove', (guild, user) => {
     Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
 });
 
-
 let processCommand = message => {
     //TODO: Implement command framework
     // let split = message.content.trim().split(/\s+/);
@@ -71,13 +79,14 @@ let processCommand = message => {
     // }
 };
 
-let combatMuteEvasion = async(guildMember) => {
+let combatMuteEvasion = async(guildMember : GuildMember) => {
     //Verify mute state to combat mute evasion
     try {
-        let userRecord = await DBManager.UserRecord.findOne({userid: guildMember.user.id});
+        let userRecord = await UserRecord.findOne({userid: guildMember.user.id});
 
         //Stop if no record of this user exists yet
-        if (!userRecord) return;
+        if (!userRecord)
+            return;
 
         //Check if user should be muted
         if (userRecord.mutedUntil > moment().unix()) {

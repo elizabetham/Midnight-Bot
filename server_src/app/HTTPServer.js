@@ -1,32 +1,37 @@
 // @flow
 
 //Modules
-const DBManager = require("./DBManager.js");
-const DiscordUtils = require("./DiscordUtils.js");
-const Logging = require("./Logging.js");
+import {UserRecord, InfractionRecord} from './DBManager';
+import DiscordUtils from './DiscordUtils';
+import Logging from './Logging';
 
 //Config
-const config = require("../config.js");
+import Config from '../config';
 
 //Dependencies
-const express = require("express");
-const escapeStringRegexp = require('escape-string-regexp');
+import express from 'express';
+import escapeStringRegexp from 'escape-string-regexp';
+
+//Types
+import type {$Request, $Response}
+from 'express';
 
 //Initialize express
 const app = express();
+
 const apiRouter = express.Router();
 
 //Register static content
 app.use(express.static('app/res/htdocs'));
 
 //Allow CORS
-if (config.allowCORS) {
+if (Config.allowCORS) {
     console.log("Warning: Allowing CORS!");
     app.use(require("cors")());
 }
 
 //API FUNCTIONS
-apiRouter.post('/user/search', async function(req, res) {
+apiRouter.post('/user/search', async function(req : $Request, res : $Response) {
     //Make sure query parameter is present
     if (!req.query.hasOwnProperty("q")) {
         res.status(400).json({error: "missing 'q' query parameter"});
@@ -40,7 +45,7 @@ apiRouter.post('/user/search', async function(req, res) {
 
     let query = new RegExp(escapeStringRegexp(req.query.q), 'i');
 
-    let records = (await DBManager.UserRecord.find({
+    let records = (await UserRecord.find({
         $or: [
             {
                 username: query
@@ -56,9 +61,9 @@ apiRouter.post('/user/search', async function(req, res) {
     res.status(200).json(records);
 });
 
-apiRouter.get('/user/:id', async function(req, res) {
+apiRouter.get('/user/:id', async function(req : $Request, res : $Response) {
     //Retrieve user record
-    let userRecord = await DBManager.UserRecord.findOne({userid: req.params.id});
+    let userRecord = await UserRecord.findOne({userid: req.params.id});
 
     //If this user does not exist, report that
     if (!userRecord) {
@@ -70,9 +75,9 @@ apiRouter.get('/user/:id', async function(req, res) {
     res.status(200).json({userid: userRecord.userid, username: userRecord.username, username_lower: userRecord.username_lower, notoriety: userRecord.notoriety});
 });
 
-apiRouter.get('/user/:id/infractions', async function(req, res) {
+apiRouter.get('/user/:id/infractions', async function(req : $Request, res : $Response) {
     //Retrieve user record
-    let userRecord = await DBManager.UserRecord.findOne({userid: req.params.id});
+    let userRecord = await UserRecord.findOne({userid: req.params.id});
 
     //If this user does not exist, report that
     if (!userRecord) {
@@ -81,7 +86,7 @@ apiRouter.get('/user/:id/infractions', async function(req, res) {
     }
 
     //Retrieve the infractions
-    let infractions = await DBManager.Infraction.find({userid: userRecord.userid}).sort({timestamp: -1}).lean();
+    let infractions = await InfractionRecord.find({userid: userRecord.userid}).sort({timestamp: -1}).lean();
 
     //Add username data to infractions
     infractions.forEach(i => {
@@ -96,6 +101,6 @@ apiRouter.get('/user/:id/infractions', async function(req, res) {
 app.use('/api', apiRouter);
 
 //Start HTTP server
-app.listen(config.HTTP_PORT, () => {
-    console.log("Express listening on port " + config.HTTP_PORT);
-});
+app.listen(Config.HTTP_PORT, () => {
+    console.log("Express listening on port " + Config.HTTP_PORT);
+});;;

@@ -1,24 +1,24 @@
-"use strict";
+// @flow
 
 //Dependencies
-const assert = require("chai").assert;
-const sleep = require('timeout-as-promise');
+import {assert} from 'chai';
+import sleep from 'timeout-as-promise';
 
 //Modules
-const UserUtils = require("../server_src/app/UserUtils.js");
-const DBManager = require("../server_src/app/DBManager.js");
-const DiscordUtils = require("../server_src/app/DiscordUtils.js");
-const ChatFilters = require("../server_src/app/ChatFilters.js");
+import UserUtils from '../server_src/app/UserUtils';
+import {UserRecord, InfractionRecord} from '../server_src/app/DBManager';
+import DiscordUtils from '../server_src/app/DiscordUtils';
+import ChatFilters from '../server_src/app/ChatFilters';
 
 //Constants
 const userid = "250064170375053312" //Midnight-Test
 
 //Buildup
 const cleanDB = async() => {
-    await DBManager.UserRecord.remove({});
-    await DBManager.Infraction.remove({});
-    assert.equal(await DBManager.Infraction.count(), 0, "The Infractions collection is empty.");
-    assert.equal(await DBManager.UserRecord.count(), 0, "The UserRecords collection is empty.");
+    await UserRecord.remove({});
+    await InfractionRecord.remove({});
+    assert.equal(await InfractionRecord.count(), 0, "The Infractions collection is empty.");
+    assert.equal(await UserRecord.count(), 0, "The UserRecords collection is empty.");
 };
 before(DiscordUtils.start);
 beforeEach(cleanDB);
@@ -32,14 +32,13 @@ describe("UserUtils", () => {
             let userRecord = (await UserUtils.assertUserRecord(userid)).toObject();
             delete userRecord._id;
             assert.deepEqual(userRecord, {
-                    userid: userid,
-                    mutedUntil: -1,
-                    notoriety: 0,
-                    decreaseWhen: -1,
-                    username: 'Midnight-Test',
-                    username_lower: 'midnight-test'
-                },
-                "User record inserts correctly");
+                userid: userid,
+                mutedUntil: -1,
+                notoriety: 0,
+                decreaseWhen: -1,
+                username: 'Midnight-Test',
+                username_lower: 'midnight-test'
+            }, "User record inserts correctly");
         });
     });
 

@@ -1,36 +1,53 @@
-const DBManager = require("./DBManager.js");
-const Logging = require("./Logging.js");
+// @flow
+import {InfractionRecord} from './DBManager';
+import Logging from './Logging';
 
-module.exports = function (userid, timestamp, increasedNotoriety, actionType, actionMeta, filterData) {
+export type $FilterData = {
+    displayName: string,
+    triggerMessage: string
+}
 
-    //Input checks
-    if (filterData) {
-        if (!filterData.hasOwnProperty("displayName")) throw "displayName field not specified in filterdata";
-        if (!filterData.hasOwnProperty("triggerMessage")) throw "triggerMessage field not specified in filterdata";
+export type $InfractionAction = {
+    type: 'WARN',
+    increasedNotoriety: boolean
+
+} | {
+    type: 'MUTE',
+    increasedNotoriety: boolean,
+    meta: number
+} | {
+    type: 'NONE',
+    increasedNotoriety: boolean
+}
+
+class Infraction {
+    userid : string;
+    timestamp : number;
+    action : $InfractionAction;
+    filter :
+        ? $FilterData;
+    save : Function;
+
+    constructor(userid : string, timestamp : number, action : $InfractionAction, filter :
+        ? $FilterData) {
+        this.userid = userid;
+        this.timestamp = timestamp;
+        this.action = action;
+        this.filter = (filter)
+            ? filter
+            : null;
+        this.save = this.save.bind(this);
     }
-    if (!userid || !timestamp || typeof(increasedNotoriety) !== "boolean" || !actionType)
-        throw "Missing required parameters";
 
-    let infraction = {
-        userid: userid,
-        timestamp: timestamp,
-        action: {
-            increasedNotoriety: increasedNotoriety,
-            type: actionType,
-            meta: actionMeta || null
-        },
-        filter: (!filterData) ? null : {
-            displayName: filterData.displayName,
-            triggerMessage: filterData.triggerMessage
-        }
-    };
-
-    infraction.save = (function () {
-        let infraction = new DBManager.Infraction(this);
+    save() {
+        let infraction = new InfractionRecord(this);
         infraction.save(err => {
-            if (err) Logging.error("LOG_INFRACTION_SAVE", err);
-        });
-    }).bind(infraction);
+            if (err)
+                Logging.error("LOG_INFRACTION_SAVE", err);
+            }
+        );
+    }
 
-    return infraction;
-};
+}
+
+export default Infraction;

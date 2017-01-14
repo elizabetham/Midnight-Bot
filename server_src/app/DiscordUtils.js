@@ -1,28 +1,36 @@
-'use strict';
-let config = require('../config.js');
+// @flow
 
-let DiscordUtils = function () {
+import Config from '../config';
+import {Client, Guild} from 'discord.js';
 
-    //Initialize fields
-    const Discord = require('discord.js');
-    this.client = new Discord.Client();
+class DiscordUtils {
+
+    client : Client;
+    start : Function;
+
+    //Constructor
+    constructor() {
+        this.client = new Client();
+        this.start = this.start.bind(this);
+    }
 
     //Functions
-    this.getTextChannel = (guild, name) => {
+    getTextChannel(guild : Guild, name : string) {
         return new Promise(resolve => {
             resolve(guild.channels.array().find(c => c.type == 'text' && c.name == name));
         });
     };
 
-    this.getRole = (guild, rolename) => {
+    getRole(guild : Guild, rolename : string) {
         return new Promise(resolve => {
             resolve(guild.roles.array().find(r => r.name == rolename));
         });
     };
 
-    this.start = async() => {
-        return await this.client.login(config.botToken);
+    async start() {
+        return await this.client.login(Config.botToken);
     }
-};
 
-module.exports = new DiscordUtils();
+}
+
+export default new DiscordUtils();
