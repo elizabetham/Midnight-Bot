@@ -89,7 +89,7 @@ class InfractionsContainer extends Component {
         }));
 
         //Dispatch action to search for the user
-        InfractionActions.searchUser(query);
+        InfractionActions.searchUser(query.trim());
     };
 
     render() {
@@ -103,7 +103,7 @@ class InfractionsContainer extends Component {
                 <Col lg={12}>
                     <InfractionSearchBox searchResults={this.state.searchResults} fetchingData={this.state.fetchingData} onSearchChange={this.onSearchChange} searchValue={this.state.searchValue}/>
                     <div style={messageStyle}>{this.state.showMessage && <h2>{this.state.message}</h2>}</div>
-                    < InfractionList infractions={this.state.infractions}/>
+                    <InfractionList infractions={this.state.infractions}/>
                 </Col>
             </Row>
         );

@@ -67,17 +67,32 @@ InfractionStore.dispatchToken = AppDispatcher.register((action : $Action) => {
             setFetchStatus(true);
             break;
         case "RECEIVE_INFRACTION_USER_SEARCH":
+
+            //We're no longer fetching
             setFetchStatus(false);
+            //Store the search results
             setUserSearchResults(action.results);
-            if (InfractionStore.getUserSearchResults().length == 1) {
+
+            //Check if we have an exact match
+            let searchQuery = action.query.toLowerCase().trim();
+            let exactMatch = InfractionStore.getUserSearchResults().filter(result => {
+                return result.username.toLowerCase() == searchQuery || result.userid == searchQuery;
+            });
+
+            //If we have an exact match or there is just one result, retrieve infractions for that result
+            if (InfractionStore.getUserSearchResults().length == 1 || exactMatch.length > 0) {
                 //TODO: Find alternative for chaining events
-                const userid = action.results[0].userid;
+                const userid = exactMatch.length > 0
+                    ? exactMatch[0].userid
+                    : action.results[0].userid;
                 setTimeout(() => {
                     InfractionActions.retrieveInfractions(userid);
                 }, 0);
-            } else {
+            } else { //If there is no single applicable result, clear out the infractions
                 setInfractions([]);
             }
+
+            //Let listening components know there's an update
             InfractionStore.emitChange();
             break;
         case "RECEIVE_INFRACTION_USER_SEARCH_ERROR":

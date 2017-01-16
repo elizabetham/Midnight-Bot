@@ -17,9 +17,9 @@ export default {
         AppDispatcher.dispatch({actionType: "RETRIEVING_USER_SEARCH"});
         try {
             let results = await MidnightAPI.userSearch(query);
-            AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTION_USER_SEARCH", results});
+            AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTION_USER_SEARCH", results, query});
         } catch (response) {
-            AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTION_USER_SEARCH_ERROR", response});
+            AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTION_USER_SEARCH_ERROR", response, query});
         }
     }
 }
