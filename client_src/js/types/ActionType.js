@@ -13,10 +13,12 @@ export type $Action = {
     response: Object
 } | {
     actionType: "RECEIVE_INFRACTION_USER_SEARCH",
-    results: Array < $User >
+    results: Array < $User >,
+    query: string
 } | {
     actionType: "RECEIVE_INFRACTION_USER_SEARCH_ERROR",
-    response: Object
+    response: Object,
+    query: string
 } | {
     actionType: "RETRIEVING_INFRACTIONS"
 } | {

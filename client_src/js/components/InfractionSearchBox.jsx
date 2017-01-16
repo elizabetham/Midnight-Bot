@@ -63,8 +63,7 @@ class InfractionSearchBoxComponent extends Component {
                 }
             });
 
-        let exactSuggestionMatch = this.props.searchResults.length == 1 && (this.props.searchResults[0].username.toLowerCase() == this.props.searchValue.toLowerCase().trim() || this.props.searchResults[0].userid.toLowerCase() == this.props.searchValue.toLowerCase().trim());
-        let suggestionsVisible = this.props.fetchingData || (this.props.searchResults.length > 0 && this.state.searchFocused && !exactSuggestionMatch);
+        let suggestionsVisible = this.props.fetchingData || (this.props.searchResults.length > 0 && this.state.searchFocused);
 
         return (
             <div style={blockStyle}>
