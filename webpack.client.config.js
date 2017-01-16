@@ -14,7 +14,14 @@ module.exports = {
         path: path.join(__dirname, 'dist/app/res/htdocs'),
         filename: 'bundle.js'
     },
-    plugins: [new HtmlWebpackPlugin({template: './client_src/index.html'})],
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': '"DEVELOPMENT"'
+            }
+        }),
+        new HtmlWebpackPlugin({template: './client_src/index.html'})
+    ],
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
