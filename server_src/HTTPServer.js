@@ -34,7 +34,6 @@ app.use('/api', apiRouter);
 import path from 'path';
 app.use(express.static('res/htdocs'));
 app.get('*', (req : $Request, res : $Response) => {
-    console.log("DIRNAME", __dirname);
     res.sendFile('res/htdocs/index.html', {root: __dirname});
 });
 
