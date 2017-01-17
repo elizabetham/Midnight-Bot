@@ -43,7 +43,7 @@ class StatisticsLayout extends Component {
 
     render() {
 
-        let chartColours = ["rgba(255, 0, 0, 0.5)", "rgba(64, 23, 109, 0.5)", "rgba(0, 255, 46, 0.5)"];
+        let chartColours = ["rgba(64, 23, 109, 0.5)", "rgba(255, 0, 0, 0.5)", "rgba(0, 255, 46, 0.5)"];
 
         let hourdata = {
             labels: _.map(this.state.rawData.hours, 'key'),
