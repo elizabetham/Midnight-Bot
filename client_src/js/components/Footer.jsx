@@ -16,7 +16,7 @@ class FooterComponent extends Component {
                 <p className="pull-left">©<a href="http://bemacized.net/">BeMacized</a>
                     &nbsp;{new Date().getFullYear()}</p>
                 <p className="pull-right">
-                    <a href="https://github.com/BeMacized/Midnight-Bot">Sourcecode @ GitHub</a>
+                    <a href="https://github.com/BeMacized/Midnight-Bot">Source code @ GitHub</a>
                 </p>
             </footer>
         )
