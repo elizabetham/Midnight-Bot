@@ -4,6 +4,8 @@ import type {$Infraction}
 from './InfractionType';
 import type {$User}
 from '../types/UserType';
+import type {$StatisticsData}
+from '../types/StatisticsDataType';
 
 export type $Action = {
     actionType: "RECEIVE_INFRACTIONS",
@@ -20,7 +22,13 @@ export type $Action = {
     response: Object,
     query: string
 } | {
-    actionType: "RETRIEVING_INFRACTIONS"
+    actionType: "RETRIEVE_INFRACTIONS"
 } | {
-    actionType: "RETRIEVING_USER_SEARCH"
+    actionType: "RETRIEVE_USER_SEARCH"
+} | {
+    actionType: "RECEIVE_STATISTICS_DATA",
+    data: $StatisticsData
+} | {
+    actionType: "RECEIVE_STATISTICS_DATA_ERROR",
+    response: Object
 };

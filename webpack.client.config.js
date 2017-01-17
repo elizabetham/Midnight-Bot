@@ -11,10 +11,17 @@ module.exports = {
         'babel-polyfill', './client_src/js/main.js'
     ],
     output: {
-        path: path.join(__dirname, 'dist/app/res/htdocs'),
+        path: path.join(__dirname, 'dist/res/htdocs'),
         filename: 'bundle.js'
     },
-    plugins: [new HtmlWebpackPlugin({template: './client_src/index.html'})],
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': '"DEVELOPMENT"'
+            }
+        }),
+        new HtmlWebpackPlugin({template: './client_src/index.html'})
+    ],
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
@@ -39,5 +46,8 @@ module.exports = {
             }
         ]
     },
-    target: 'web'
+    target: 'web',
+    devServer: {
+        historyApiFallback: true
+    }
 }

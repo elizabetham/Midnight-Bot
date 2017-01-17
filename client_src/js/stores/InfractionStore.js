@@ -63,7 +63,7 @@ let InfractionStore : InfractionStoreClass = new InfractionStoreClass();
 //Action handler
 InfractionStore.dispatchToken = AppDispatcher.register((action : $Action) => {
     switch (action.actionType) {
-        case "RETRIEVING_USER_SEARCH":
+        case "RETRIEVE_USER_SEARCH":
             setFetchStatus(true);
             break;
         case "RECEIVE_INFRACTION_USER_SEARCH":
@@ -102,7 +102,7 @@ InfractionStore.dispatchToken = AppDispatcher.register((action : $Action) => {
             setInfractions([]);
             InfractionStore.emitChange();
             break;
-        case "RETRIEVING_INFRACTIONS":
+        case "RETRIEVE_INFRACTIONS":
             setFetchStatus(true);
             break;
         case "RECEIVE_INFRACTIONS":
