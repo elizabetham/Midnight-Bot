@@ -7,6 +7,7 @@ class DiscordUtils {
 
     client : Client;
     start : Function;
+    stop : Function;
 
     //Constructor
     constructor() {

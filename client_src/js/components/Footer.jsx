@@ -13,8 +13,11 @@ class FooterComponent extends Component {
 
         return (
             <footer style={style}>
-                <p>©<a href="http://bemacized.net/">BeMacized</a>
+                <p className="pull-left">©<a href="http://bemacized.net/">BeMacized</a>
                     &nbsp;{new Date().getFullYear()}</p>
+                <p className="pull-right">
+                    <a href="https://github.com/BeMacized/Midnight-Bot">Sourcecode @ GitHub</a>
+                </p>
             </footer>
         )
     }
