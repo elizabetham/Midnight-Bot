@@ -12,6 +12,7 @@ class DiscordUtils {
     constructor() {
         this.client = new Client();
         this.start = this.start.bind(this);
+        this.stop = this.stop.bind(this);
     }
 
     //Functions
@@ -28,7 +29,13 @@ class DiscordUtils {
     };
 
     async start() {
+        if (!this.client)
+            this.client = new Client();
         return await this.client.login(Config.botToken);
+    }
+
+    async stop() {
+        return await this.client.destroy();
     }
 
 }

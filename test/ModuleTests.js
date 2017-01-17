@@ -19,14 +19,19 @@ const cleanDB = async() => {
     await InfractionRecord.remove({});
     assert.equal(await InfractionRecord.count(), 0, "The Infractions collection is not empty.");
     assert.equal(await UserRecord.count(), 0, "The UserRecords collection is not empty.");
-};
-
-before(DiscordUtils.start);
-beforeEach(cleanDB);
-after(cleanDB);
+}
 
 //Tests
 describe("UserUtils", () => {
+
+    before(DiscordUtils.start);
+
+    after(async() => {
+        cleanDB();
+        DiscordUtils.stop();
+    });
+    beforeEach(cleanDB);
+
     describe("assertUserRecord", () => {
         it("Should save a user record", async() => {
             //Assure there is no record yet

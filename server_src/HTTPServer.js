@@ -34,10 +34,11 @@ app.use('/api', apiRouter);
 import path from 'path';
 app.use(express.static('res/htdocs'));
 app.get('*', (req : $Request, res : $Response) => {
-    res.sendFile('res/htdocs/index.html', {root: __dirname});
+    try {
+        res.sendFile('res/htdocs/index.html', {root: __dirname});
+    } catch (e) {
+        res.status(404).json({error: "Frontend not yet installed."});
+    }
 });
 
-//Start HTTP server
-app.listen(Config.HTTP_PORT, () => {
-    console.log("Express listening on port " + Config.HTTP_PORT);
-});
+export default app;

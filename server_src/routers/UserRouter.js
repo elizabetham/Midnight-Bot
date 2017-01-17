@@ -13,7 +13,7 @@ from 'express';
 const router = express.Router();
 
 //Endpoints
-router.post('/user/search', async function(req : $Request, res : $Response) {
+router.post('/search', async function(req : $Request, res : $Response) {
     //Make sure query parameter is present
     if (!req.query.hasOwnProperty("q")) {
         res.status(400).json({error: "missing 'q' query parameter"});
@@ -43,7 +43,7 @@ router.post('/user/search', async function(req : $Request, res : $Response) {
     res.status(200).json(records);
 });
 
-router.get('/user/:id', async function(req : $Request, res : $Response) {
+router.get('/:id', async function(req : $Request, res : $Response) {
     //Retrieve user record
     let userRecord = await UserRecord.findOne({userid: req.params.id});
 
@@ -57,7 +57,7 @@ router.get('/user/:id', async function(req : $Request, res : $Response) {
     res.status(200).json({userid: userRecord.userid, username: userRecord.username, username_lower: userRecord.username_lower, notoriety: userRecord.notoriety});
 });
 
-router.get('/user/:id/infractions', async function(req : $Request, res : $Response) {
+router.get('/:id/infractions', async function(req : $Request, res : $Response) {
     //Retrieve user record
     let userRecord = await UserRecord.findOne({userid: req.params.id});
 
