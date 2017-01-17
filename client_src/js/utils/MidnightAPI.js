@@ -25,5 +25,17 @@ export default {
                 resolve(JSON.parse(response.text));
             })
         });
+    },
+
+    getInfractionActivityStats : async() => {
+        return new Promise((resolve, reject) => {
+            request.get((process.env.NODE_ENV == 'PRODUCTION'
+                ? ""
+                : "http://127.0.0.1:8080") + "/api/stats/infractionactivity").end((err, response) => {
+                if (err)
+                    reject(err);
+                resolve(JSON.parse(response.text));
+            })
+        });
     }
 }

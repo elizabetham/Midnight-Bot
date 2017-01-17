@@ -1,37 +1,19 @@
 // @flow
 
-//Modules
-import {UserRecord, InfractionRecord} from './DBManager';
-import DiscordUtils from './DiscordUtils';
-import Logging from './Logging';
-
-//Config
-import Config from '../config';
-
 //Dependencies
 import express from 'express';
+import {UserRecord, InfractionRecord} from '../DBManager';
 import escapeStringRegexp from 'escape-string-regexp';
 
 //Types
 import type {$Request, $Response}
 from 'express';
 
-//Initialize express
-const app = express();
+//Create api router
+const router = express.Router();
 
-const apiRouter = express.Router();
-
-//Register static content
-app.use(express.static('app/res/htdocs'));
-
-//Allow CORS
-if (Config.allowCORS) {
-    console.log("Warning: Allowing CORS!");
-    app.use(require("cors")());
-}
-
-//API FUNCTIONS
-apiRouter.post('/user/search', async function(req : $Request, res : $Response) {
+//Endpoints
+router.post('/user/search', async function(req : $Request, res : $Response) {
     //Make sure query parameter is present
     if (!req.query.hasOwnProperty("q")) {
         res.status(400).json({error: "missing 'q' query parameter"});
@@ -61,7 +43,7 @@ apiRouter.post('/user/search', async function(req : $Request, res : $Response) {
     res.status(200).json(records);
 });
 
-apiRouter.get('/user/:id', async function(req : $Request, res : $Response) {
+router.get('/user/:id', async function(req : $Request, res : $Response) {
     //Retrieve user record
     let userRecord = await UserRecord.findOne({userid: req.params.id});
 
@@ -75,7 +57,7 @@ apiRouter.get('/user/:id', async function(req : $Request, res : $Response) {
     res.status(200).json({userid: userRecord.userid, username: userRecord.username, username_lower: userRecord.username_lower, notoriety: userRecord.notoriety});
 });
 
-apiRouter.get('/user/:id/infractions', async function(req : $Request, res : $Response) {
+router.get('/user/:id/infractions', async function(req : $Request, res : $Response) {
     //Retrieve user record
     let userRecord = await UserRecord.findOne({userid: req.params.id});
 
@@ -97,10 +79,4 @@ apiRouter.get('/user/:id/infractions', async function(req : $Request, res : $Res
     res.status(200).json(infractions);
 });
 
-//Add API router;
-app.use('/api', apiRouter);
-
-//Start HTTP server
-app.listen(Config.HTTP_PORT, () => {
-    console.log("Express listening on port " + Config.HTTP_PORT);
-});;;
+export default router;

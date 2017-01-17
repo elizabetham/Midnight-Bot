@@ -1,11 +1,12 @@
 // @flow
 //Dependencies
 import React, {Component} from 'react';
-import {Router, Route, IndexRoute} from 'react-router';
+import {Router, Route, IndexRedirect} from 'react-router';
 
 //Import layouts
-import App from './App.jsx';
-import Infractions from './Infractions.jsx';
+import App from './App';
+import Infractions from './Infractions';
+import Statistics from './Statistics';
 
 class Root extends Component {
 
@@ -13,7 +14,9 @@ class Root extends Component {
         return (
             <Router history={this.props.history}>
                 <Route path='/' component={App}>
-                    <IndexRoute component={Infractions}/>
+                    <IndexRedirect to="/infractions"/>
+                    <Route path="/infractions" component={Infractions}/>
+                    <Route path="/statistics" component={Statistics}/>
                 </Route>
             </Router>
         );

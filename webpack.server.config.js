@@ -16,7 +16,7 @@ fs.readdirSync('node_modules').filter(function(x) {
 module.exports = {
     name: 'Main App',
     entry: [
-        'babel-polyfill', './server_src/Midnight.js'
+        'babel-polyfill', './Midnight.js'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
@@ -28,6 +28,10 @@ module.exports = {
             }
         })],
     target: 'node',
+    node: {
+        __dirname: false,
+        __filename: false
+    },
     devtool: 'sourcemap',
     module: {
         loaders: [

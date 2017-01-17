@@ -11,7 +11,7 @@ module.exports = {
         'babel-polyfill', './client_src/js/main.js'
     ],
     output: {
-        path: path.join(__dirname, 'dist/app/res/htdocs'),
+        path: path.join(__dirname, 'dist/res/htdocs'),
         filename: 'bundle.js'
     },
     plugins: [
@@ -46,5 +46,8 @@ module.exports = {
             }
         ]
     },
-    target: 'web'
+    target: 'web',
+    devServer: {
+        historyApiFallback: true
+    }
 }

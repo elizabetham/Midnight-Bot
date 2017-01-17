@@ -4,7 +4,7 @@ import MidnightAPI from '../utils/MidnightAPI';
 
 export default {
     retrieveInfractions : async(userid : string) => {
-        AppDispatcher.dispatch({actionType: "RETRIEVING_INFRACTIONS"});
+        AppDispatcher.dispatch({actionType: "RETRIEVE_INFRACTIONS"});
         try {
             let infractions = await MidnightAPI.getInfractions(userid);
             AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTIONS", infractions});
@@ -14,7 +14,7 @@ export default {
     },
 
     searchUser : async(query : string) => {
-        AppDispatcher.dispatch({actionType: "RETRIEVING_USER_SEARCH"});
+        AppDispatcher.dispatch({actionType: "RETRIEVE_USER_SEARCH"});
         try {
             let results = await MidnightAPI.userSearch(query);
             AppDispatcher.dispatch({actionType: "RECEIVE_INFRACTION_USER_SEARCH", results, query});

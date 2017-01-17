@@ -1,6 +1,7 @@
 // @flow
 import React, {Component} from 'react';
 import {Nav, Navbar, NavItem, Header, Brand} from 'react-bootstrap';
+import {Link} from 'react-router';
 
 class HeaderComponent extends Component {
 
@@ -13,7 +14,12 @@ class HeaderComponent extends Component {
                     </Navbar.Brand>
                 </Navbar.Header>
                 <Nav>
-                    <NavItem>Infractions</NavItem>
+                    <NavItem>
+                        <Link to="/infractions">Infractions</Link>
+                    </NavItem>
+                    <NavItem>
+                        <Link to="/statistics">Statistics</Link>
+                    </NavItem>
                 </Nav>
             </Navbar>
         );
