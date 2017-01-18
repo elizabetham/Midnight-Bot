@@ -10,7 +10,7 @@ import moment from 'moment';
 
 //configure chai
 chai.use(chaiSubset);
-const assert = chai.assert;
+const assert = (chai.assert : Object); //TODO: Research creation of flow-typed libdef for chai-subset
 
 //Modules
 import {UserRecord, InfractionRecord} from '../server_src/DBManager';
