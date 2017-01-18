@@ -284,7 +284,7 @@ let filters : Array < Filter > = [
         displayName: "Flood-Spam Filter",
         check: async(message : Message) => {
             const MESSAGES = 5; //messages per
-            const SECONDS = 10; //period of seconds
+            const SECONDS = 6; //period of seconds
             //Define key
             let key = message.author.id + ":floodcount";
 
