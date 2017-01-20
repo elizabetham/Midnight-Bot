@@ -15,16 +15,17 @@ import type {$User}
 from '../types/UserType';
 
 //Components
-import {Grid, Row, Col} from 'react-bootstrap';
 import InfractionSearchBox from '../components/InfractionSearchBox.jsx';
 import InfractionList from '../components/InfractionList.jsx';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
+
+//Animations
+import TransitionGroup from 'react-addons-css-transition-group';
+import '../styles/infractions.css';
 
 type $State = {
     infractions: Array < $Infraction >,
     searchResults: Array < $User >,
-    showMessage: boolean,
-    message: string,
-    searchValue: string,
     fetchingData: boolean
 };
 
@@ -35,19 +36,26 @@ class InfractionsContainer extends Component {
         this.state = {
             infractions: [],
             searchResults: [],
-            message: "Enter a username or user ID above to view their infractions",
-            showMessage: true,
-            searchValue: "",
             fetchingData: false
         }
+
         //Bind methods
+        this.componentWillMount = this.componentWillMount.bind(this);
+        this.componentWillUnmount = this.componentWillUnmount.bind(this);
+
         this.onStoreChange = this.onStoreChange.bind(this);
         this.onSearchChange = this.onSearchChange.bind(this);
     }
 
+    componentWillMount : Function;
+
     componentWillMount() {
         InfractionStore.addChangeListener(this.onStoreChange);
-    }
+        if (this.props.params.userid)
+            this.onSearchChange(this.props.params.userid);
+        }
+
+    componentWillUnmount : Function;
 
     componentWillUnmount() {
         InfractionStore.removeChangeListener(this.onStoreChange);
@@ -56,26 +64,14 @@ class InfractionsContainer extends Component {
     onStoreChange : Function;
 
     onStoreChange() {
-        //Check if we need to show a message
-        let message;
-        if (InfractionStore.isFetchingData()) {
-            message = "Searching...";
-        } else if (InfractionStore.getInfractions().length == 0 && InfractionStore.getUserSearchResults().length == 1) {
-            message = InfractionStore.getUserSearchResults()[0].username + " has not received any infractions yet!";
-        } else if (InfractionStore.getUserSearchResults().length == 0 && this.state.searchValue.length > 0) {
-            message = "No users have been found with this name or ID";
-        }
 
         //Construct & set the new state
         const newState = Object.assign({}, this.state, {
             infractions: InfractionStore.getInfractions(),
             searchResults: InfractionStore.getUserSearchResults(),
-            showMessage: Boolean(message),
-            message: message
-                ? message
-                : "",
             fetchingData: InfractionStore.isFetchingData()
         });
+
         this.setState(newState);
     };
 
@@ -83,33 +79,54 @@ class InfractionsContainer extends Component {
 
     onSearchChange(query : string) {
         //Set the searchValue on the state so we can re-render it
-        this.setState(Object.assign({}, this.state, {
-            searchValue: query,
-            fetchingData: true
-        }));
+        if (!this.state.fetchingData)
+            this.setState(Object.assign({}, this.state, {fetchingData: true}));
 
         //Dispatch action to search for the user
-        InfractionActions.searchUser(query.trim());
+        //Delay search to lower request count with rapid typing
+        if (this.searchTimeout)
+            clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+            InfractionActions.searchUser(query.trim());
+        }, 200);
     };
 
     render() {
 
-        let messageStyle = {
-            textAlign: "center"
+        const style = {
+            layout: {
+                margin: "48px 72px 48px 72px"
+            },
+            refresh: {
+                display: 'inline-block',
+                marginLeft: '50%',
+                position: 'relative'
+            },
+            refreshContainer: {
+                position: 'relative',
+                height: 0,
+                top: '30px'
+            }
         };
 
         return (
-            <Row>
-                <Col lg={12}>
-                    <InfractionSearchBox searchResults={this.state.searchResults} fetchingData={this.state.fetchingData} onSearchChange={this.onSearchChange} searchValue={this.state.searchValue}/>
-                    <div style={messageStyle}>{this.state.showMessage && <h2>{this.state.message}</h2>}</div>
-                    <InfractionList infractions={this.state.infractions}/>
-                </Col>
-            </Row>
+            <div style={style.layout}>
+                <TransitionGroup transitionName="infraction-load" transitionAppear={true} transitionAppearTimeout={200} transitionEnter={true} transitionLeave={true} transitionEnterTimeout={200} transitionLeaveTimeout={200}>
+                    {this.state.fetchingData && (
+                        <div style={style.refreshContainer} key="loadingInfractions">
+                            <RefreshIndicator loadingColor="#FF9800" top={0} left={-25} size={50} status="loading" style={style.refresh}/>
+                        </div>
+                    )}
+                </TransitionGroup>
+                <InfractionSearchBox searchResults={this.state.searchResults} initialSearch={this.props.params.userid} onSearchChange={this.onSearchChange} fetchingData={this.state.fetchingData}/>
+                <InfractionList infractions={this.state.infractions} highlightInfraction={this.props.params.infractionid}/>
+            </div>
         );
     }
 
     state : $State;
+
+    searchTimeout : number;
 }
 
 export default InfractionsContainer;

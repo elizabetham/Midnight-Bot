@@ -35,7 +35,9 @@ export const mod = (msg : string) => {
 
 export const format = (prefix : string, text : string) => "**[" + prefix + "]** " + text;
 
-export const infractionLog = async(infraction : InfractionRecord) => {
+export const infractionLog = async(infraction : ?InfractionRecord) => {
+    if (!infraction) return;
+
     let msg = "";
     switch (infraction.action.type) {
         case "MUTE":
@@ -46,7 +48,8 @@ export const infractionLog = async(infraction : InfractionRecord) => {
     }
     try {
         let user = await DiscordUtils.client.fetchUser(infraction.userid);
-        msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction.";
+        let permalink = Config.baseURL + "/#/infractions/" + infraction.userid + "/" + infraction._id;
+        msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction: " + permalink;
         if (infraction.filter)
             msg += "\nFilter: " + infraction.filter.displayName;
 

@@ -1,37 +1,60 @@
 // @flow
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {Component} from 'react';
-import Header from '../components/Header.jsx';
-import Footer from '../components/Footer.jsx';
+import MenuContents from '../components/MenuContents';
+import Footer from '../components/Footer';
 import {Grid, Row, Col} from 'react-bootstrap';
+
+//Material-UI
+import AppBar from 'material-ui/AppBar';
+import Drawer from 'material-ui/Drawer';
 
 class AppContainer extends Component {
 
-    render() {
-        let style = {
-            paddingTop: "1.5rem",
-            paddingBottom: "1.5rem"
+    state : {
+        menuOpen: boolean;
+    }
+
+    constructor() {
+        super();
+        this.state = {
+            menuOpen: false
         };
+        this.handleMenuToggle = this.handleMenuToggle.bind(this);
+    }
+
+    handleMenuToggle : Function;
+
+    handleMenuToggle = () => this.setState(Object.assign({}, this.state, {
+        menuOpen: !this.state.menuOpen
+    }));
+
+    render() {
+
+        let style = {
+            appBarStyle: {
+                position: "fixed",
+                top: "0px",
+                zIndex: 1400,
+                width: "100%"
+            },
+            containerStyle: {
+                paddingTop: "64px"
+            }
+        }
 
         return (
-            <div className="container" style={style}>
-                <Grid>
-                    <Row>
-                        <Col md={12}>
-                            <Header/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            {this.props.children}
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <Footer/>
-                        </Col>
-                    </Row>
-                </Grid>
+            <div>
+                <div style={style.appBarStyle}>
+                    <AppBar title="Midnight" iconClassNameRight="muidocs-icon-navigation-expand-more" onLeftIconButtonTouchTap={this.handleMenuToggle}/>
+                </div>
+                <div style={style.containerStyle}>
+                    <Drawer docked={false} containerStyle={style.containerStyle} open={this.state.menuOpen}>
+                        <MenuContents menuToggle={this.handleMenuToggle}/>
+                    </Drawer>
+                    {this.props.children}
+                    <Footer/>
+                </div>
             </div>
         );
     }
