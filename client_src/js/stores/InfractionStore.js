@@ -116,6 +116,7 @@ InfractionStore.dispatchToken = AppDispatcher.register((action : $Action) => {
                 case 404: //User does not exist
                     break;
                 default: //Some error went down
+                    console.log(action.response);
                     console.log("Unknown error occurred while receiving infractions.");
                     break;
             }

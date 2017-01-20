@@ -6,6 +6,7 @@ from '../types/InfractionType';
 import InfractionStore from '../stores/InfractionStore';
 import InfractionActions from '../actions/InfractionActions';
 
+
 class InfractionListComponent extends Component {
 
     constructor() {
@@ -13,7 +14,7 @@ class InfractionListComponent extends Component {
     }
 
     render() {
-        let infractionListItems = this.props.infractions.map((infraction : $Infraction) => <Infraction key={infraction._id} infraction={infraction}/>);
+        let infractionListItems : Array < $JSXIntrinsics > = this.props.infractions.map((infraction : $Infraction) => (<Infraction key={infraction._id} infraction={infraction} highlighted={infraction._id == this.props.highlightInfraction}/>));
 
         return (
             <div>
@@ -24,7 +25,8 @@ class InfractionListComponent extends Component {
 
     //Type references
     props : {
-        infractions: Array < $Infraction >
+        infractions: Array < $Infraction >,
+        highlightInfraction: string
     };
 }
 

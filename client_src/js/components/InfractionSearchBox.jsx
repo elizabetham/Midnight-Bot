@@ -2,7 +2,16 @@
 import React, {Component} from 'react';
 
 //Components
-import SuggestionBox from './SuggestionBox.jsx';
+import {
+    Card,
+    CardActions,
+    CardHeader,
+    CardMedia,
+    CardTitle,
+    CardText
+} from 'material-ui/Card';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import AutoComplete from 'material-ui/AutoComplete';
 
 //Types
 import type {$User}
@@ -10,33 +19,36 @@ from '../types/UserType';
 
 class InfractionSearchBoxComponent extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            searchFocused: false
-        };
-        this.handleSearchChange = this.handleSearchChange.bind(this);
-        this.onFocus = this.onFocus.bind(this);
-        this.onBlur = this.onBlur.bind(this);
+    state : {
+        currentInput: string
     }
 
-    handleSearchChange : Function;
+    //types
+    props : {
+        searchResults: Array < $User >,
+        onSearchChange: Function,
+        initialSearch:
+            ? string,
+        fetchingData: boolean
+    }
 
-    handleSearchChange(event : SyntheticInputEvent) {
-        this.props.onSearchChange(event.target.value);
-    };
+    constructor(props : Object) {
+        super();
+        this.state = {
+            currentInput: props.initialSearch
+                ? props.initialSearch
+                : ""
+        };
 
-    onBlur : Function;
+        this.onSearchChange = this.onSearchChange.bind(this);
+    }
 
-    onBlur() {
-        this.setState(Object.assign({}, this.state, {searchFocused: false}));
-    };
+    onSearchChange : Function;
 
-    onFocus : Function;
-
-    onFocus() {
-        this.setState(Object.assign({}, this.state, {searchFocused: true}));
-    };
+    onSearchChange(query : string) {
+        this.state.currentInput = query;
+        this.props.onSearchChange(query);
+    }
 
     render() {
         const self = this;
@@ -45,45 +57,20 @@ class InfractionSearchBoxComponent extends Component {
             width: "100%"
         };
 
-        let blockStyle = {
-            borderBottom: ".05rem solid #e5e5e5",
-            paddingBottom: "1.5rem",
-            marginBottom: "1.5rem"
-        };
-
-        let suggestions = this.props.fetchingData
-            ? [
-                {
-                    displayText: "Searching..."
-                }
-            ]
-            : this.props.searchResults.map(r => {
-                return {
-                    displayText: r.username + " (" + r.userid + ")"
-                }
-            });
-
-        let suggestionsVisible = this.props.fetchingData || (this.props.searchResults.length > 0 && this.state.searchFocused);
-
         return (
-            <div style={blockStyle}>
-                <h2>Username or ID:</h2>
-                <input type="text" className="form-control" value={this.props.searchValue} style={inputStyle} onChange={this.handleSearchChange} onFocus={this.onFocus} onBlur={this.onBlur}/>
-                <SuggestionBox visible={suggestionsVisible} suggestions={suggestions}/>
-            </div>
+            <Card>
+                <Toolbar><ToolbarTitle text="User infraction search"/></Toolbar>
+                <CardText>
+                    <AutoComplete searchText={this.props.initialSearch
+                        ? this.props.initialSearch
+                        : ""} filter={AutoComplete.fuzzyFilter} hintText="Username or user ID" dataSource={this.props.searchResults.map(user => user.username)} onUpdateInput={this.onSearchChange} floatingLabelText="Search for a user" fullWidth={true}/>
+                    <p>
+                        <b>{(this.state.currentInput.length > 0 && this.props.searchResults.length == 0 && !this.props.fetchingData) && "No results have been found."}</b>
+                    </p>
+                </CardText>
+
+            </Card>
         );
-    }
-
-    //types
-    state : {
-        searchFocused: boolean
-    }
-
-    props : {
-        searchResults: Array < $User >,
-        onSearchChange: Function,
-        searchValue: string,
-        fetchingData: boolean
     }
 
 }
