@@ -30,7 +30,7 @@ let filters : Array < Filter > = [
         displayName: "Mention Filter",
         check: (message : Message) => {
             return new Promise(resolve => {
-                resolve(message.mentions.users.array().filter(u => Config.prohibitedMentions.indexOf(u.username) > -1).length > 0);
+                resolve(message.mentions.users.array().filter(u => Config.prohibitedMentions.indexOf(u.id) > -1).length > 0);
             });
         },
         action: async(message : Message) => {
