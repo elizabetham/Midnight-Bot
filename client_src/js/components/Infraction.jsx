@@ -158,7 +158,7 @@ class InfractionComponent extends Component {
                                     ? "Copied!"
                                     : "Permalink"} secondary={true} icon={< LinkIcon />}/>
                             </CopyToClipboard>
-                            <Snackbar open={this.state.openSnackbar} message={"Permalink copied to your clipboard!"} autoHideDuration={4000} onRequestClose={this.handleSnackbarClose}/>
+                            <Snackbar open={this.state.openSnackbar} message={"Permalink copied to the clipboard!"} autoHideDuration={4000} onRequestClose={this.handleSnackbarClose}/>
                         </CardActions>
                     </CardText>
                 </Card>
