@@ -1,7 +1,6 @@
 // @flow
 //Dependencies
 import React, {Component} from 'react';
-import {Row, Col} from 'react-bootstrap';
 import {Line} from 'react-chartjs-2';
 import moment from 'moment';
 import _ from 'lodash';
@@ -71,19 +70,25 @@ class StatisticsLayout extends Component {
             })
         };
 
-        let centerText = {
-            textAlign: "center"
-        }
+        const style = {
+            layout: {
+                padding: "48px 72px 48px 72px",
+                width: "100%",
+                margin: "0 auto",
+                maxWidth: "1154px"
+            },
+            centerText: {
+                textAlign: "center"
+            }
+        };
 
         return (
-            <Row>
-                <Col lg={12}>
-                    <h2 style={centerText}>Last 48 hours</h2>
-                    <Line data={hourdata}/>
-                    <h2 style={centerText}>Last 7 days</h2>
-                    <Line data={daydata}/>
-                </Col>
-            </Row>
+            <div style={style.layout}>
+                <h2 style={style.centerText}>Last 48 hours</h2>
+                <Line data={hourdata}/>
+                <h2 style={style.centerText}>Last 7 days</h2>
+                <Line data={daydata}/>
+            </div>
         );
     }
 

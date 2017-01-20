@@ -3,22 +3,32 @@
 import React, {Component} from 'react';
 import {Router, Route, IndexRedirect} from 'react-router';
 
+//Material UI
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import midnightTheme from '../styles/midnightTheme';
+
 //Import layouts
 import App from './App';
 import Infractions from './Infractions';
 import Statistics from './Statistics';
 
+//Import font
+import 'roboto-npm-webfont';
+
 class Root extends Component {
 
     render() {
         return (
-            <Router history={this.props.history}>
-                <Route path='/' component={App}>
-                    <IndexRedirect to="/infractions"/>
-                    <Route path="/infractions" component={Infractions}/>
-                    <Route path="/statistics" component={Statistics}/>
-                </Route>
-            </Router>
+            <MuiThemeProvider muiTheme={getMuiTheme(midnightTheme)}>
+                <Router history={this.props.history}>
+                    <Route path='/' component={App}>
+                        <IndexRedirect to="/infractions"/>
+                        <Route path="/infractions(/:userid(/:infractionid))" component={Infractions}/>
+                        <Route path="/statistics" component={Statistics}/>
+                    </Route>
+                </Router>
+            </MuiThemeProvider>
         );
     }
 }
