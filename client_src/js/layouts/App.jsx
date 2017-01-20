@@ -1,9 +1,7 @@
 // @flow
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {Component} from 'react';
 import MenuContents from '../components/MenuContents';
 import Footer from '../components/Footer';
-import {Grid, Row, Col} from 'react-bootstrap';
 
 //Material-UI
 import AppBar from 'material-ui/AppBar';

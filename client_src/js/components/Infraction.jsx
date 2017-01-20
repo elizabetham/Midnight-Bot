@@ -5,7 +5,6 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import scrollToComponent from 'react-scroll-to-component';
 
 //Material-UI
 import {List, ListItem} from 'material-ui/List';
