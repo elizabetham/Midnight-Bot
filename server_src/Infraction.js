@@ -1,4 +1,5 @@
 // @flow
+
 import {InfractionRecord} from './DBManager';
 import Logging from './Logging';
 
@@ -39,13 +40,14 @@ class Infraction {
         this.save = this.save.bind(this);
     }
 
-    save() {
+    async save() : InfractionRecord {
         let infraction = new InfractionRecord(this);
-        infraction.save(err => {
-            if (err)
-                Logging.error("LOG_INFRACTION_SAVE", err);
-            }
-        );
+        try {
+            return await infraction.save();
+        } catch (err) {
+            Logging.error("LOG_INFRACTION_SAVE", err);
+        }
+        return null;
     }
 
 }

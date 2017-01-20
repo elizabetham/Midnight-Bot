@@ -44,9 +44,8 @@ let filters : Array < Filter > = [
                     displayName: "Mention Filter",
                     triggerMessage: message.content
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("MENTION_FILTER_ACTION", err);
             }
@@ -68,9 +67,8 @@ let filters : Array < Filter > = [
                 displayName: "Repeated Character Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Bazza Filter",
@@ -91,9 +89,8 @@ let filters : Array < Filter > = [
                 displayName: "Bazza Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Emoji Spam Filter",
@@ -115,9 +112,8 @@ let filters : Array < Filter > = [
                 displayName: "Emoji Spam Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Bulk Mention Filter",
@@ -137,9 +133,8 @@ let filters : Array < Filter > = [
                     displayName: "Bulk Mention Filter",
                     triggerMessage: message.content
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("BULK_MENTION_FILTER_ACTION", err);
             }
@@ -162,9 +157,8 @@ let filters : Array < Filter > = [
                     displayName: "Discord Invite Filter",
                     triggerMessage: message.content
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("DISCORD_INVITE_FITLER_ACTION", err);
             }
@@ -192,9 +186,8 @@ let filters : Array < Filter > = [
                     displayName: "Racism Filter",
                     triggerMessage: message.content
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("RACISM_FILTER_ACTION", err);
             }
@@ -220,9 +213,8 @@ let filters : Array < Filter > = [
                     displayName: "Offensive Behavior Filter",
                     triggerMessage: message.content
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("OFFENSIVE_FILTER_ACTION", err);
             }
@@ -250,9 +242,8 @@ let filters : Array < Filter > = [
                 displayName: "Lobby Link Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Scam Link Filter",
@@ -276,17 +267,14 @@ let filters : Array < Filter > = [
                 displayName: "Scam Link Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Pornographic Link Filter",
         check: (message : Message) => {
             return new Promise(resolve => {
                 let rules = [
-                    // I appreaciate the effort you put into this, Ana, but...
-                    // TODO: This list is so humongously large that it needs to be an emojiRegex();-esque module or something in the future
                     /.*\/r\/rule34.*/gi,  // /r/rule34
                     /.*https{0,1}:\/\/rule34\.paheal\.net.*/gi,  // rule34.paheal.net
                     /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)youporn\.com.*/gi, // YouPorn
@@ -331,7 +319,7 @@ let filters : Array < Filter > = [
                     /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)gay-lounge\.net.*/gi,  // Gay Lounge
                     /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)bdsmstreak\.com.*/gi // bdsmstreak
                 ];
-                resolve(filters.filter(regex => message.content.match(regex)).length > 0);
+                resolve(rules.filter(regex => message.content.match(regex)).length > 0);
             });
         },
         action: async(message : Message) => {
@@ -344,9 +332,8 @@ let filters : Array < Filter > = [
                 displayName: "Pornographic Link Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }, {
         displayName: "Flood-Spam Filter",
@@ -386,9 +373,8 @@ let filters : Array < Filter > = [
                     displayName: "Flood-Spam Filter",
                     triggerMessage: "MULTIPLE MESSAGES"
                 });
-                infraction.save();
                 UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(infraction);
+                Logging.infractionLog(await infraction.save());
             } catch (err) {
                 Logging.error("FLOOD_FILTER_ACTION", err);
             }
@@ -421,9 +407,8 @@ let filters : Array < Filter > = [
                 displayName: "Duplicate Message Filter",
                 triggerMessage: message.content
             });
-            infraction.save();
             UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(infraction);
+            Logging.infractionLog(await infraction.save());
         }
     }
 ];
