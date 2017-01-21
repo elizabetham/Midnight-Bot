@@ -24,9 +24,6 @@ import {Message} from 'discord.js';
 
 //FILTERS
 const filters : Array < AbstractFilter > = [
-    //Message quantity
-    DuplicateMessageFilter,
-    FloodSpamFilter,
     //Mentions
     MentionFilter,
     BulkMentionFilter,
@@ -41,14 +38,16 @@ const filters : Array < AbstractFilter > = [
     DiscordInviteFilter,
     //Toxicity
     OffensiveBehaviourFilter,
-    RacismFilter
+    RacismFilter,
+    //Message quantity
+    DuplicateMessageFilter,
+    FloodSpamFilter
 ];
 
 //FUNCTIONS
 export const processMessage = async(message : Message, takeAction : boolean) => {
     for (let filter of filters) {
         let applies = await filter.check(message);
-        console.log(applies, filter.displayName, message.content);
         if (!applies) {
             continue;
         }

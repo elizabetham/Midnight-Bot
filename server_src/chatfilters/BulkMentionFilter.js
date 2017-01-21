@@ -15,7 +15,7 @@ class BulkMentionFilter extends AbstractFilter {
     }
 
     async check(message : Message) : Promise < boolean > {
-        return message.content.match(/.*@{5,}.*/gi);
+        return message.content.match(/(.*@.*){5,}/gi);
     }
 
     async action(message : Message) : Promise < void > {

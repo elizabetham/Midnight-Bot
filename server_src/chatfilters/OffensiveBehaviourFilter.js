@@ -16,7 +16,7 @@ class OffensiveBehaviour extends AbstractFilter {
 
     async check(message : Message) : Promise < boolean > {
         let rules = [ //Potentially expand this later
-            /.*\bk+y+s\b.*/gi //kys
+            /.*\bk+y+s+\b.*/gi //kys
         ];
         return rules.filter(rule => message.content.match(rule)).length > 0;
     }

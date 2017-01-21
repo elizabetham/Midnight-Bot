@@ -18,7 +18,7 @@ class RacismFilter extends AbstractFilter {
         let rules = [
             /.*\bn+(i|1|e|3)+(g|6)+(r+(0|o)+|(a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, //nigger
             /.*\bj+(e|3)+w+s*\b.*/gi, //jew
-            /.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi //fag
+            /.*\bf+(4|a)*(g|6)+(e|3|o|0)*t*s*\b.*/gi //fag
         ];
         return rules.filter(rule => message.content.match(rule)).length > 0;
     }
