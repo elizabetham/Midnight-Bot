@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 //Material-UI
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
+import {grey900} from 'material-ui/styles/colors';
 
 class AppContainer extends Component {
 
@@ -38,6 +39,9 @@ class AppContainer extends Component {
             },
             containerStyle: {
                 paddingTop: "64px"
+            },
+            footer: {
+                backgroundColor: grey900
             }
         }
 
@@ -51,7 +55,7 @@ class AppContainer extends Component {
                         <MenuContents menuToggle={this.handleMenuToggle}/>
                     </Drawer>
                     {this.props.children}
-                    <Footer/>
+                    <Footer style={style.footer}/>
                 </div>
             </div>
         );
