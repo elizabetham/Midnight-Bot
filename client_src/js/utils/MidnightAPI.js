@@ -1,7 +1,8 @@
 // @flow
+
 import request from 'superagent/lib/client';
 
-import Config from '../../../config';
+import Config from '../../../shared_src/publicConfig';
 
 export default {
 

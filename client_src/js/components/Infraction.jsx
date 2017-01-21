@@ -26,7 +26,7 @@ import type {$Infraction}
 from '../types/InfractionType';
 
 //config
-import Config from '../../../config';
+import Config from '../../../shared_src/publicConfig';
 
 class InfractionComponent extends Component {
 
