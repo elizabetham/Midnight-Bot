@@ -13,9 +13,6 @@ import App from './App';
 import Infractions from './Infractions';
 import Statistics from './Statistics';
 
-//Import font
-import 'roboto-npm-webfont';
-
 class Root extends Component {
 
     render() {
