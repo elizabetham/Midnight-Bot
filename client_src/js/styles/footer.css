@@ -1,0 +1,24 @@
+.footer-container p {
+    margin: 0;
+    padding: 0;
+}
+
+.footer-container p a {
+    color: white;
+}
+
+.footer-container p:first-child {
+    float:left;
+}
+
+.footer-container p:last-child {
+    float:right;
+}
+
+.footer-container {
+    width: calc(100% - 40px);
+    padding: 20px 20px 20px 20px;
+    color: #FFF;
+    bottom: 0;
+    position: absolute;
+}
