@@ -11,7 +11,7 @@ import Infraction from '../Infraction';
 class LobbyLinkFilter extends AbstractLinkFilter {
 
     constructor() {
-        super("Bazza Filter");
+        super("Lobby Link Filter");
     }
 
     domains() : Array < string > {

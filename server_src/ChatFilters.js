@@ -12,7 +12,7 @@ import DuplicateMessageFilter from './chatfilters/DuplicateMessageFilter';
 import EmojiSpamFilter from './chatfilters/EmojiSpamFilter';
 import FloodSpamFilter from './chatfilters/FloodSpamFilter';
 import LobbyLinkFilter from './chatfilters/LobbyLinkFilter';
-import MentionFilter from './chatfilters/LobbyLinkFilter';
+import MentionFilter from './chatfilters/MentionFilter';
 import OffensiveBehaviourFilter from './chatfilters/OffensiveBehaviourFilter';
 import PornLinkFilter from './chatfilters/PornLinkFilter';
 import RacismFilter from './chatfilters/RacismFilter';
@@ -46,14 +46,16 @@ const filters : Array < AbstractFilter > = [
 
 //FUNCTIONS
 export const processMessage = async(message : Message, takeAction : boolean) => {
-    for (let filter : AbstractFilter of filters) {
+    for (let filter of filters) {
         let applies = await filter.check(message);
-        if (applies) {
-            if (takeAction) {
-                filter.action(message);
-            }
-            return filter;
+        console.log(applies, filter.displayName, message.content);
+        if (!applies) {
+            continue;
         }
+        if (takeAction) {
+            await filter.action(message);
+        }
+        return filter;
     }
     return null;
 };
