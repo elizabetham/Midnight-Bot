@@ -2,6 +2,8 @@
 //MODULES
 import Logging from './Logging';
 
+import AbstractFilter from './chatfilters/AbstractFilter'
+
 //Chat filters
 import BazzaFilter from './chatfilters/BazzaFilter';
 import BulkMentionFilter from './chatfilters/BulkMentionFilter';
@@ -41,27 +43,6 @@ const filters : Array < AbstractFilter > = [
     OffensiveBehaviourFilter,
     RacismFilter
 ];
-
-//Filter class
-export class AbstractFilter {
-
-    displayName : string;
-
-    constructor(displayName : string) {
-        this.displayName = displayName;
-        (this : any).check = this.check.bind(this);
-        (this : any).action = this.action.bind(this);
-    }
-
-    async check(message : Message) : Promise < boolean > {
-        Logging.error("Check method not implemented for filter '" + this.displayName + "'");
-        return false;
-    }
-
-    async action(message : Message) : Promise < void > {
-        Logging.error("Action method not implemented for filter '" + this.displayName + "'");
-    }
-}
 
 //FUNCTIONS
 export const processMessage = async(message : Message, takeAction : boolean) => {

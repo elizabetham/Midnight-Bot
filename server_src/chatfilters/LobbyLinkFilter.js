@@ -1,6 +1,6 @@
 // @flow
 
-import LinkFilter from './LinkFilter';
+import AbstractLinkFilter from './AbstractLinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class LobbyLinkFilter extends LinkFilter {
+class LobbyLinkFilter extends AbstractLinkFilter {
 
     constructor() {
         super("Bazza Filter");
@@ -24,6 +24,7 @@ class LobbyLinkFilter extends LinkFilter {
             "252543317844295680", //Main Guild #lobby_2
             "257564280725962753" //Test Guild #development
         ];
+        //TODO: UNCOMMENT SUPER CHECK
         return channels.indexOf(message.channel.id) > -1 && await super.check(message);
     }
 

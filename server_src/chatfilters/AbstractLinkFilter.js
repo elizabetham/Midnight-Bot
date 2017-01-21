@@ -1,10 +1,14 @@
 // @flow
 
-import {AbstractFilter} from '../ChatFilters';
+import AbstractFilter from './AbstractFilter';
 import escapeStringRegexp from 'escape-string-regexp';
 import {Message} from 'discord.js';
 
-export default class LinkFilter extends AbstractFilter {
+export default class AbstractLinkFilter extends AbstractFilter {
+
+    constructor(displayName : string) {
+        super(displayName);
+    }
 
     domains() : Array < string > {
         return [];

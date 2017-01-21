@@ -1,6 +1,6 @@
 // @flow
 
-import {AbstractFilter} from '../ChatFilters';
+import AbstractFilter from './AbstractFilter';
 
 import {Redis} from '../DBManager';
 import moment from 'moment';

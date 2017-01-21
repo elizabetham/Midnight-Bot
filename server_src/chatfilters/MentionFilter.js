@@ -1,6 +1,6 @@
 // @flow
 
-import {AbstractFilter} from '../ChatFilters';
+import AbstractFilter from './AbstractFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';

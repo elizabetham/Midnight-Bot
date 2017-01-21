@@ -1,6 +1,6 @@
 // @flow
 
-import LinkFilter from './LinkFilter';
+import AbstractLinkFilter from './AbstractLinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class ScamLinkFilter extends LinkFilter {
+class ScamLinkFilter extends AbstractLinkFilter {
 
     constructor() {
         super("Scam Link Filter");
