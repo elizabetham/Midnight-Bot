@@ -8,7 +8,6 @@ import sleep from 'timeout-as-promise';
 import UserUtils from '../server_src/UserUtils';
 import {UserRecord, InfractionRecord} from '../server_src/DBManager';
 import DiscordUtils from '../server_src/DiscordUtils';
-import ChatFilters from '../server_src/ChatFilters';
 
 //Constants
 const userid = "250064170375053312" //Midnight-Test

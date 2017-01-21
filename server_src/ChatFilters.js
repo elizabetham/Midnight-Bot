@@ -1,431 +1,79 @@
 // @flow
 //MODULES
-import UserUtils from './UserUtils';
 import Logging from './Logging';
-import Infraction from './Infraction';
-import {UserRecord, InfractionRecord, Redis} from './DBManager';
 
-//Config
-import Config from '../config';
-
-//DEPENDENCIES
-import moment from 'moment';
-import emojiRegex from 'emoji-regex';
+//Chat filters
+import BazzaFilter from './chatfilters/BazzaFilter';
+import BulkMentionFilter from './chatfilters/BulkMentionFilter';
+import DiscordInviteFilter from './chatfilters/DiscordInviteFilter';
+import DuplicateMessageFilter from './chatfilters/DuplicateMessageFilter';
+import EmojiSpamFilter from './chatfilters/EmojiSpamFilter';
+import FloodSpamFilter from './chatfilters/FloodSpamFilter';
+import LobbyLinkFilter from './chatfilters/LobbyLinkFilter';
+import MentionFilter from './chatfilters/LobbyLinkFilter';
+import OffensiveBehaviourFilter from './chatfilters/OffensiveBehaviourFilter';
+import PornLinkFilter from './chatfilters/PornLinkFilter';
+import RacismFilter from './chatfilters/RacismFilter';
+import RepeatedCharacterFilter from './chatfilters/RepeatedCharacterFilter';
+import ScamLinkFilter from './chatfilters/ScamLinkFilter';
 
 //Types
 import {Message} from 'discord.js';
 
+//FILTERS
+const filters : Array < Filter > = [
+    //Message quantity
+    DuplicateMessageFilter,
+    FloodSpamFilter,
+    //Mentions
+    MentionFilter,
+    BulkMentionFilter,
+    //Content spam
+    BazzaFilter,
+    RepeatedCharacterFilter,
+    EmojiSpamFilter,
+    //Link spam
+    PornLinkFilter,
+    ScamLinkFilter,
+    LobbyLinkFilter,
+    DiscordInviteFilter,
+    //Toxicity
+    OffensiveBehaviourFilter,
+    RacismFilter
+];
+
 //Filter class
-interface Filter {
+export class Filter {
 
     displayName : string;
-    check(message : Message) : Promise < boolean >;
-    action(message : Message) : Promise < void >;
+
+    constructor(displayName : string) {
+        this.displayName = displayName;
+        (this : any).check = this.check.bind(this);
+        (this : any).action = this.action.bind(this);
+    }
+
+    async check(message : Message) : Promise < boolean > {
+        Logging.error("Check method not implemented for filter '" + this.displayName + "'");
+        return false;
+    }
+
+    async action(message : Message) : Promise < void > {
+        Logging.error("Action method not implemented for filter '" + this.displayName + "'");
+    }
 
 }
 
-//FILTERS
-let filters : Array < Filter > = [
-    {
-        displayName: "Mention Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                resolve(message.mentions.users.array().filter(u => Config.prohibitedMentions.indexOf(u.id) > -1).length > 0);
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: It is not permitted to mention members of the Grandmaster Gang directly."); //Grammar fix, not from but of
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Mention Filter",
-                    triggerMessage: message.content
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("MENTION_FILTER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Repeated Character Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                resolve(message.content.match(/.*([^.\s])\1{6,}.*/gi));
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Repeated Character Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Bazza Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                resolve(message.content.match(/.*b+a+z+a{4,}.*/gi));
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
-
-            //Punish
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Bazza Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Emoji Spam Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let matches = message.content.match(emojiRegex());
-                resolve(matches && matches.length >= 10);
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
-
-            //Punish
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Emoji Spam Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Bulk Mention Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                resolve(message.content.match(/.*@{5,}.*/gi));
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Mass mentioning people is not permitted.");
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Bulk Mention Filter",
-                    triggerMessage: message.content
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("BULK_MENTION_FILTER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Discord Invite Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                resolve(message.content.match(/.*discord\.gg\/.*/gi));
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: It is not allowed to advertise other Discord servers in our guild.");
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Discord Invite Filter",
-                    triggerMessage: message.content
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("DISCORD_INVITE_FITLER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Racism Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let rules = [
-                    /.*\bn+(i|1|e|3)+(g|6)+(r+(0|o)+|(a|4)+|(e|3)+r*|u+)h*s*\b.*/gi, //nigger
-                    /.*\bj+(e|3)+w+s*\b.*/gi, //jew
-                    /.*\bf+(4|a)*g+(e|3|o|0)*t*s*\b.*/gi //fag
-                ];
-                resolve(rules.filter(rule => message.content.match(rule)).length > 0)
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: The use of racist or discriminative terms is not permitted here.");
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Racism Filter",
-                    triggerMessage: message.content
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("RACISM_FILTER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Offensive Behavior Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let rules = [ //Potentially expand this later
-                    /.*\bk+y+s\b.*/gi //kys
-                ];
-                resolve(rules.filter(rule => message.content.match(rule)).length > 0)
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted here.");
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Offensive Behavior Filter",
-                    triggerMessage: message.content
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("OFFENSIVE_FILTER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Lobby Link Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let channels = [
-                    "249323706285948928", //Main Guild #lobby_1
-                    "252543317844295680", //Main Guild #lobby_2
-                    "257564280725962753" //Test Guild #development
-                ];
-                let filters = [/.*https{0,1}:\/\/.*/gi, /.*www[0-9]*\.[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}.*/gi];
-                resolve(channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0);
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting links in the lobby channels is prohibited.");
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Lobby Link Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Scam Link Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let rules = [
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)giftsofsteam\.com.*/gi, //Giftsofsteam scam
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)give-aways\.net.*/gi, //Riot Points scam
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)steamdigitalgift\.com.*/gi //Steam Digital Gift scam
-                ];
-                resolve(rules.filter(rule => message.content.match(rule)).length > 0)
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting scam links is prohibited.\nIf you did this unknowingly, your login details to whatever site (Steam etc. ) may be compromised. Change them immediately!");
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Scam Link Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Pornographic Link Filter",
-        check: (message : Message) => {
-            return new Promise(resolve => {
-                let rules = [
-                    /.*\/r\/rule34.*/gi,  // /r/rule34
-                    /.*https{0,1}:\/\/rule34\.paheal\.net.*/gi,  // rule34.paheal.net
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)youporn\.com.*/gi, // YouPorn
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)xnxx\.com.*/gi, // xnxx
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)porn\.com.*/gi,  // porn.com
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)ixxx\.com.*/gi,  // ixxx
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)xvideos\.com.*/gi,  // xVideos
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)cliti\.com.*/gi,  // Cliti
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)fuq\.com.*/gi,  // Fuq
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)alohatube\.com.*/gi,  // AlohaTube
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)dinotube\.com.*/gi,  // DinoTube
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)rule34\.xxx.*/gi,  // Rule34
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)xhamster\.com.*/gi,  // xHamster
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)youjizz\.com.*/gi,  // YouJizz
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)hclips\.com.*/gi,  // hclips
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)tnaflix\.com.*/gi,  // tnaflix
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)tube8\.com.*/gi,  // Tube8
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)spankbang\.com.*/gi,  // Spankbang
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)theporndude\.com.*/gi,  // ThePornDude
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)drtuber\.com.*/gi,  // DrTuber
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)spankwire\.com.*/gi,  // SpankWire
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)keezmovies\.com.*/gi,  // KeezMovies
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)nuvid\.com.*/gi,  // nuvid
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)sunporno\.com.*/gi,  // SunPorno
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)mofosex\.com.*/gi,  // mofosex
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)xxcartoon\.com.*/gi,  // xxcartoon
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)simply-hentai\.com.*/gi,  // Simply Hentai
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)hentaigasm\.com.*/gi,  // HentaiGasm
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)fakku\.net.*/gi,  // Fakku
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)gelbooru\.com.*/gi,  // Gelbooru
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)myhentaicomics\.com.*/gi,  // MyHentaiComics
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)extremetube\.com.*/gi,  // ExtremeTube
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)largeporntube\.com.*/gi,  // LargePornTube
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)hardhotsex\.com.*/gi,  // hardhotsex
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)ipunishteens\.com.*/gi,  // ipunishteens
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)livejasmin\.com.*/gi,  // LiveJasmin
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)pornhub\.com.*/gi,  // PornHub
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)imlive\.com.*/gi,  // IMlive
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)evilangel\.com.*/gi,  // EvilAngel
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)justusboys\.com.*/gi,  // JustUsBoys
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)zzgays\.com.*/gi,  // zzGays
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)gay-lounge\.net.*/gi,  // Gay Lounge
-                    /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)bdsmstreak\.com.*/gi // bdsmstreak
-                ];
-                resolve(rules.filter(regex => message.content.match(regex)).length > 0);
-            });
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Posting pornographic content is prohibited.");
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: true
-            }, {
-                displayName: "Pornographic Link Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }, {
-        displayName: "Flood-Spam Filter",
-        check: async(message : Message) => {
-            const MESSAGES = 5; //messages per
-            const SECONDS = 6; //period of seconds
-            //Define key
-            let key = message.author.id + ":floodcount";
-
-            let res = await Redis.existsAsync(key);
-
-            //Create key if it does not exist yet
-            if (!res) {
-                Redis.set(key, 0);
-                Redis.expire(key, SECONDS);
-            }
-            //Increment message count
-            Redis.incr(key);
-            res = await Redis.getAsync(key);
-            return res > MESSAGES;
-        },
-        action: async(message : Message) => {
-            message.author.sendMessage("Your messages were removed: Rapid message spam is not permitted.");
-
-            //Reset floodcount & remove messages
-            let key = message.author.id + ":floodcount";
-            const msgCount = await Redis.getAsync(key);
-            let res = await message.channel.fetchMessages({limit: 40});
-            res.array().filter(msg => msg.author.id == message.author.id).sort((a, b) => b - a).slice(0, msgCount).forEach(msg => msg.delete());
-
-            Redis.del(key);
-
-            //Punish
-            try {
-                let infractionAction = await UserUtils.increaseNotoriety(message.author.id);
-                let infraction = new Infraction(message.author.id, moment().unix(), infractionAction, {
-                    displayName: "Flood-Spam Filter",
-                    triggerMessage: "MULTIPLE MESSAGES"
-                });
-                UserUtils.assertUserRecord(message.author.id);
-                Logging.infractionLog(await infraction.save());
-            } catch (err) {
-                Logging.error("FLOOD_FILTER_ACTION", err);
-            }
-        }
-    }, {
-        displayName: "Duplicate Message Filter",
-        check: async(message) => {
-            //Define key
-            let key = message.author.id + ":lastMessage";
-
-            let res = await Redis.existsAsync(key);
-            //Create key if it does not exist yet and stop here
-            if (!res) {
-                Redis.set(key, message.content);
-                Redis.expire(key, 20);
-                return false;
-            }
-            //Check if content matches
-            res = await Redis.getAsync(key);
-            //TODO: Add check that covers slight variations
-            return message.content === res;
-        },
-        action: async(message : Message) => {
-            message.delete();
-            message.author.sendMessage("Your message was removed: Identical consecutive messages are not permitted.");
-            let infraction = new Infraction(message.author.id, moment().unix(), {
-                type: 'WARN',
-                increasedNotoriety: false
-            }, {
-                displayName: "Duplicate Message Filter",
-                triggerMessage: message.content
-            });
-            UserUtils.assertUserRecord(message.author.id);
-            Logging.infractionLog(await infraction.save());
-        }
-    }
-];
-
 //FUNCTIONS
-export const process = async function(message : Message, takeAction : boolean) {
-    for (let filter of filters) {
+export const processMessage = async(message : Message, takeAction : boolean) => {
+    for (let filter : Filter of filters) {
         let applies = await filter.check(message);
         if (applies) {
-            if (takeAction)
+            if (takeAction) {
                 filter.action(message);
+            }
             return filter;
         }
     }
     return null;
-};
-
-export default {
-    process
 };

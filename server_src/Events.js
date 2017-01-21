@@ -4,7 +4,7 @@
 import DiscordUtils from './DiscordUtils';
 import {UserRecord, InfractionRecord} from './DBManager';
 import Logging from './Logging';
-import ChatFilters from './ChatFilters';
+import {processMessage} from './ChatFilters';
 
 //Config
 import Config from '../config';
@@ -54,7 +54,7 @@ DiscordUtils.client.on('message', message => {
 
     //Check if user is on role whitelist
     if (message.member && message.member.roles.array().filter(r => Config.whitelistedRoles.indexOf(r.id) > -1).length == 0)
-        ChatFilters.process(message, true);
+        processMessage(message, true);
     }
 );
 
