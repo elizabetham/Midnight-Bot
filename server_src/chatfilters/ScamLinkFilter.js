@@ -18,7 +18,8 @@ class ScamLinkFilter extends AbstractLinkFilter {
         return [
             "giftsofsteam.com", //Giftsofsteam scam
             "give-aways.net", //Riot Points scam
-            "steamdigitalgift.com" //Steam Digital Gift scam
+            "steamdigitalgift.com", //Steam Digital Gift scam
+            "lolfreerpcodes.com" //LoL Free RP codes scam
         ];
     }
 

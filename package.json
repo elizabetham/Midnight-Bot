@@ -5,8 +5,8 @@
   "main": "Midnight.js",
   "scripts": {
     "init": "rm -rf node_modules && rm -rf flow-typed && npm install && flow-typed update",
-    "test": "mocha --compilers js:babel-register --require babel-polyfill",
-    "test-jenkins": "JUNIT_REPORT_PATH=report.xml mocha --colors --compilers js:babel-register --require babel-polyfill --reporter mocha-jenkins-reporter",
+    "test": "flow check && mocha --compilers js:babel-register --require babel-polyfill",
+    "test-jenkins": "flow check && JUNIT_REPORT_PATH=report.xml mocha --colors --compilers js:babel-register --require babel-polyfill --reporter mocha-jenkins-reporter",
     "build": "webpack --config webpack.prod.config.js",
     "start": "npm run build && cd dist && node Midnight.js",
     "debug": "npm-run-all --parallel debug:*",
