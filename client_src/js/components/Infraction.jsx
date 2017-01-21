@@ -78,55 +78,53 @@ class InfractionComponent extends Component {
         //Reference infraction
         const infraction : $Infraction = this.props.infraction;
 
-        //Construct header
+        //Reformat data
         let action = infraction.action.type;
         if (infraction.action.type === "MUTE" && infraction.action.meta !== undefined) {
             action += " (" + ((infraction.action.meta == Number.MAX_SAFE_INTEGER)
                 ? "Permanent"
                 : readableTime((infraction.action.meta : number))) + ")"
         }
-
-        let panelHeader = (
-            <h4>
-                <b>{action}</b>
-                &nbsp;-&nbsp;{this.props.infraction.username}&nbsp;({this.props.infraction.userid})
-            </h4>
-        )
-
-        //Reformat data
         let timestamp : string = moment.unix(infraction.timestamp).format('MMMM Do YYYY, h:mm:ss a');
         let increasedNotoriety : string = infraction.action.increasedNotoriety
             ? "Increased notoriety"
             : "Did not increase notoriety";
-
-        let cardTextStyle = {
-            margin: 0,
-            padding: 0
-        };
 
         const style = {
             cardStyle: {
                 backgroundColor: this.props.highlighted
                     ? deepPurple100
                     : "#FFF"
-                }
+            },
+            cardTextStyle: {
+                margin: 0,
+                padding: 0
             }
-
+        }
         let permalink = Config.baseURL + "/#/infractions/" + this.props.infraction.userid + "/" + this.props.infraction._id;
+
+        let filterData = infraction.filter
+            ? (
+                <span>
+                    {infraction.filter !== undefined && <ListItem primaryText={infraction.filter.displayName} secondaryText="Filter"/>}
+                    {infraction.filter !== undefined && <ListItem primaryText="Offending message:" secondaryText={(
+                        <pre style={{height:"auto"}}>{infraction.filter.triggerMessage}</pre>
+                    )}/>}
+                </span>
+            )
+            : (
+                <span></span>
+            );
 
         //Return JSX
         if (infraction.filter !== undefined) {
             return (
                 <Card initiallyExpanded={this.props.highlighted} style={style.cardStyle}>
                     <CardTitle showExpandableButton={true} actAsExpander={true} title={action} subtitle={this.props.infraction.username + " (" + this.props.infraction.userid + ")"}/>
-                    <CardText expandable={true} style={cardTextStyle}>
+                    <CardText expandable={true} style={style.cardTextStyle}>
                         <List>
                             <ListItem primaryText={timestamp} secondaryText="Timestamp"/>
-                            <ListItem primaryText={increasedNotoriety} secondaryText="Notoriety"/>
-                            <ListItem primaryText={infraction.filter.displayName} secondaryText="Filter"/>
-                            <ListItem primaryText="Offending message:" secondaryText={< pre style = {{height:"auto"}} > {
-                                infraction.filter.triggerMessage
-                            } < /pre>}/>
+                            <ListItem primaryText={increasedNotoriety} secondaryText="Notoriety"/> {filterData}
                         </List>
                         <CardActions expandable={true} style={{
                             textAlign: "right"
@@ -140,26 +138,6 @@ class InfractionComponent extends Component {
                         </CardActions>
                     </CardText>
 
-                </Card>
-            );
-        } else {
-            return (
-                <Card>
-                    <CardTitle actAsExpander={true} title={action} subtitle={this.props.infraction.username + " (" + this.props.infraction.userid + ")"}/>
-                    <CardText expandable={true} style={cardTextStyle}>
-                        <List >
-                            <ListItem primaryText={timestamp} secondaryText="Timestamp"/>
-                            <ListItem primaryText={increasedNotoriety}/>
-                        </List>
-                        <CardActions expandable={true}>
-                            <CopyToClipboard text={permalink} onCopy={this.copied}>
-                                <RaisedButton label={this.state.copied
-                                    ? "Copied!"
-                                    : "Permalink"} secondary={true} icon={< LinkIcon />}/>
-                            </CopyToClipboard>
-                            <Snackbar open={this.state.openSnackbar} message={"Permalink copied to the clipboard!"} autoHideDuration={4000} onRequestClose={this.handleSnackbarClose}/>
-                        </CardActions>
-                    </CardText>
                 </Card>
             );
         }
