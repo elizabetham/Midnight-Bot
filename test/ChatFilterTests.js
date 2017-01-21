@@ -55,7 +55,7 @@ describe("Chat Filters", () => {
 
     describe(ScamLinkFilter.displayName, () => {
 
-        const inside = ["http://www.giftsofsteam.com/L3A8xjm5", "http://riotpoints.give-aways.net/?id=CsMOKN75", "http://www.steamdigitalgift.com/B9gJxb5"];
+        const inside = ["http://www.giftsofsteam.com/L3A8xjm5", "http://lolfreerpcodes.com/?ref=cDGFSgsne", "http://riotpoints.give-aways.net/?id=CsMOKN75", "http://www.steamdigitalgift.com/B9gJxb5"];
         const outside = ["http://store.steampowered.com/app/359050/"];
 
         inside.forEach(message => {
