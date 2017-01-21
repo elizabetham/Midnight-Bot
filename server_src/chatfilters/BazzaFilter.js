@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class BazzaFilter extends Filter {
+class BazzaFilter extends AbstractFilter {
 
     constructor() {
         super("Bazza Filter");
@@ -30,7 +30,6 @@ class BazzaFilter extends Filter {
             displayName: "Bazza Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import LinkFilter from './LinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,10 +8,14 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class LobbyLinkFilter extends Filter {
+class LobbyLinkFilter extends LinkFilter {
 
     constructor() {
         super("Bazza Filter");
+    }
+
+    domains() : Array < string > {
+        return [""]; //Match any
     }
 
     async check(message : Message) : Promise < boolean > {
@@ -20,8 +24,7 @@ class LobbyLinkFilter extends Filter {
             "252543317844295680", //Main Guild #lobby_2
             "257564280725962753" //Test Guild #development
         ];
-        let filters = [/.*https{0,1}:\/\/.*/gi, /.*www[0-9]*\.[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}.*/gi];
-        return channels.indexOf(message.channel.id) > -1 && filters.filter(regex => message.content.match(regex)).length > 0;
+        return channels.indexOf(message.channel.id) > -1 && await super.check(message);
     }
 
     async action(message : Message) : Promise < void > {
@@ -34,7 +37,6 @@ class LobbyLinkFilter extends Filter {
             displayName: "Lobby Link Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

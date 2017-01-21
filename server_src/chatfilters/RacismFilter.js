@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class RacismFilter extends Filter {
+class RacismFilter extends AbstractFilter {
 
     constructor() {
         super("Racism Filter");
@@ -34,7 +34,6 @@ class RacismFilter extends Filter {
                 displayName: "Racism Filter",
                 triggerMessage: message.content
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("RACISM_FILTER_ACTION", err);

@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class OffensiveBehaviour extends Filter {
+class OffensiveBehaviour extends AbstractFilter {
 
     constructor() {
         super("Offensive Behaviour Filter");
@@ -32,7 +32,6 @@ class OffensiveBehaviour extends Filter {
                 displayName: "Offensive Behavior Filter",
                 triggerMessage: message.content
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("OFFENSIVE_FILTER_ACTION", err);

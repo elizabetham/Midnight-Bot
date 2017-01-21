@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import {Redis} from '../DBManager';
 import moment from 'moment';
@@ -9,7 +9,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class BulkMentionFilter extends Filter {
+class BulkMentionFilter extends AbstractFilter {
 
     constructor() {
         super("Duplicate Message Filter");
@@ -42,7 +42,6 @@ class BulkMentionFilter extends Filter {
             displayName: "Duplicate Message Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

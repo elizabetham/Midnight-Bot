@@ -2,6 +2,7 @@
 
 import {InfractionRecord} from './DBManager';
 import Logging from './Logging';
+import UserUtils from './UserUtils';
 
 export type $FilterData = {
     displayName: string,
@@ -43,7 +44,10 @@ class Infraction {
     async save() : InfractionRecord {
         let infraction = new InfractionRecord(this);
         try {
-            return await infraction.save();
+            return (await Promise.all([
+                UserUtils.assertUserRecord(this.userid),
+                infraction.save()
+            ]))[1];
         } catch (err) {
             Logging.error("LOG_INFRACTION_SAVE", err);
         }

@@ -21,7 +21,7 @@ import ScamLinkFilter from './chatfilters/ScamLinkFilter';
 import {Message} from 'discord.js';
 
 //FILTERS
-const filters : Array < Filter > = [
+const filters : Array < AbstractFilter > = [
     //Message quantity
     DuplicateMessageFilter,
     FloodSpamFilter,
@@ -43,7 +43,7 @@ const filters : Array < Filter > = [
 ];
 
 //Filter class
-export class Filter {
+export class AbstractFilter {
 
     displayName : string;
 
@@ -61,12 +61,11 @@ export class Filter {
     async action(message : Message) : Promise < void > {
         Logging.error("Action method not implemented for filter '" + this.displayName + "'");
     }
-
 }
 
 //FUNCTIONS
 export const processMessage = async(message : Message, takeAction : boolean) => {
-    for (let filter : Filter of filters) {
+    for (let filter : AbstractFilter of filters) {
         let applies = await filter.check(message);
         if (applies) {
             if (takeAction) {

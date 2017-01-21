@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import LinkFilter from './LinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,14 +8,16 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class DiscordInviteFilter extends Filter {
+class DiscordInviteFilter extends LinkFilter {
 
     constructor() {
         super("Discord Invite Filter");
     }
 
-    async check(message : Message) : Promise < boolean > {
-        return message.content.match(/.*discord\.gg\/.*/gi);
+    domains() : Array < string > {
+        return [
+            "discord.gg"
+        ];
     }
 
     async action(message : Message) : Promise < void > {
@@ -29,7 +31,6 @@ class DiscordInviteFilter extends Filter {
                 displayName: "Discord Invite Filter",
                 triggerMessage: message.content
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("DISCORD_INVITE_FITLER_ACTION", err);

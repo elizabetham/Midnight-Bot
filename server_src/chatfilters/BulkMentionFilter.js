@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class BulkMentionFilter extends Filter {
+class BulkMentionFilter extends AbstractFilter {
 
     constructor() {
         super("Bulk Mention Filter");
@@ -27,7 +27,6 @@ class BulkMentionFilter extends Filter {
                 displayName: "Bulk Mention Filter",
                 triggerMessage: message.content
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("BULK_MENTION_FILTER_ACTION", err);

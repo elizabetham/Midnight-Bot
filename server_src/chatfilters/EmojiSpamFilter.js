@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -9,7 +9,7 @@ import Logging from '../Logging';
 import Infraction from '../Infraction';
 import emojiRegex from 'emoji-regex';
 
-class EmojiSpamFilter extends Filter {
+class EmojiSpamFilter extends AbstractFilter {
 
     constructor() {
         super("Emoji Spam Filter");
@@ -32,7 +32,6 @@ class EmojiSpamFilter extends Filter {
             displayName: "Emoji Spam Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

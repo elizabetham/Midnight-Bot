@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -9,7 +9,7 @@ import Logging from '../Logging';
 import Infraction from '../Infraction';
 import Config from '../../config';
 
-class MentionFilter extends Filter {
+class MentionFilter extends AbstractFilter {
 
     constructor() {
         super("Mention Filter");
@@ -30,7 +30,6 @@ class MentionFilter extends Filter {
                 displayName: "Mention Filter",
                 triggerMessage: message.content
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("MENTION_FILTER_ACTION", err);

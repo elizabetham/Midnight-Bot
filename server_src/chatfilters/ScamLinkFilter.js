@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import LinkFilter from './LinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,19 +8,18 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class ScamLinkFilter extends Filter {
+class ScamLinkFilter extends LinkFilter {
 
     constructor() {
         super("Scam Link Filter");
     }
 
-    async check(message : Message) : Promise < boolean > {
-        let rules = [
-            /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)giftsofsteam\.com.*/gi, //Giftsofsteam scam
-            /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)give-aways\.net.*/gi, //Riot Points scam
-            /.*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)steamdigitalgift\.com.*/gi //Steam Digital Gift scam
+    domains() : Array < string > {
+        return [
+            "giftsofsteam.com", //Giftsofsteam scam
+            "give-aways.net", //Riot Points scam
+            "steamdigitalgift.com" //Steam Digital Gift scam
         ];
-        return rules.filter(rule => message.content.match(rule)).length > 0;
     }
 
     async action(message : Message) : Promise < void > {
@@ -33,7 +32,6 @@ class ScamLinkFilter extends Filter {
             displayName: "Scam Link Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

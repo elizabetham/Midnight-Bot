@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -8,7 +8,7 @@ import UserUtils from '../UserUtils';
 import Logging from '../Logging';
 import Infraction from '../Infraction';
 
-class RepeatedCharacterFilter extends Filter {
+class RepeatedCharacterFilter extends AbstractFilter {
 
     constructor() {
         super("Repeated Character Filter");
@@ -28,7 +28,6 @@ class RepeatedCharacterFilter extends Filter {
             displayName: "Repeated Character Filter",
             triggerMessage: message.content
         });
-        UserUtils.assertUserRecord(message.author.id);
         Logging.infractionLog(await infraction.save());
     }
 }

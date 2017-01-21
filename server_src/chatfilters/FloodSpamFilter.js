@@ -1,6 +1,6 @@
 // @flow
 
-import {Filter} from '../ChatFilters';
+import {AbstractFilter} from '../ChatFilters';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
@@ -9,7 +9,7 @@ import Logging from '../Logging';
 import Infraction from '../Infraction';
 import {Redis} from '../DBManager';
 
-class FloodSpamFilter extends Filter {
+class FloodSpamFilter extends AbstractFilter {
 
     constructor() {
         super("Flood Spam Filter");
@@ -52,7 +52,6 @@ class FloodSpamFilter extends Filter {
                 displayName: "Flood-Spam Filter",
                 triggerMessage: "MULTIPLE MESSAGES"
             });
-            UserUtils.assertUserRecord(message.author.id);
             Logging.infractionLog(await infraction.save());
         } catch (err) {
             Logging.error("FLOOD_FILTER_ACTION", err);
