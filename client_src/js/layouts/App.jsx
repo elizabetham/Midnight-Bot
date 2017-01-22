@@ -39,6 +39,9 @@ class AppContainer extends Component {
             },
             containerStyle: {
                 paddingTop: "64px"
+                        },
+            content: {
+                marginBottom: "100px"
             },
             footer: {
                 backgroundColor: grey900
@@ -54,7 +57,9 @@ class AppContainer extends Component {
                     <Drawer docked={false} containerStyle={style.containerStyle} open={this.state.menuOpen}>
                         <MenuContents menuToggle={this.handleMenuToggle}/>
                     </Drawer>
-                    {this.props.children}
+                    <div style={style.content}>
+                        {this.props.children}
+                    </div>
                     <Footer style={style.footer}/>
                 </div>
             </div>

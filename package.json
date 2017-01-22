@@ -18,6 +18,8 @@
   "dependencies": {
     "apicache": "^0.8.1",
     "bluebird": "^3.4.6",
+    "bootstrap": "^3.3.7",
+    "bootswatch": "^3.3.7",
     "chart.js": "^2.4.0",
     "cors": "^2.8.1",
     "discord.js": "^11.0.0",
@@ -38,6 +40,7 @@
     "randomstring": "^1.1.5",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
+    "react-bootstrap": "^0.30.7",
     "react-chartjs-2": "^2.0.0",
     "react-copy-to-clipboard": "^4.2.3",
     "react-dom": "^15.4.2",

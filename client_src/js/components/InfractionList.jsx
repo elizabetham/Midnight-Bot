@@ -16,14 +16,9 @@ class InfractionListComponent extends Component {
     render() {
         let infractionListItems : Array < $JSXIntrinsics > = this.props.infractions.map((infraction : $Infraction) => (<Infraction key={infraction._id} infraction={infraction} highlighted={infraction._id == this.props.highlightInfraction}/>));
 
-        let style = {
-            container : {
-                marginBottom: "100px"
-            }
-        }
 
         return (
-            <div style={style.container}>
+            <div>
                 {infractionListItems}
             </div>
         );

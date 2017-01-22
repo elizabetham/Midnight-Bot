@@ -21,7 +21,7 @@ import RefreshIndicator from 'material-ui/RefreshIndicator';
 
 //Animations
 import TransitionGroup from 'react-addons-css-transition-group';
-import '../styles/infractions.css';
+import '../../css/infractions.css';
 
 type $State = {
     infractions: Array < $Infraction >,
@@ -95,7 +95,10 @@ class InfractionsContainer extends Component {
 
         const style = {
             layout: {
-                margin: "48px 72px 48px 72px"
+                margin: "48px 72px 48px 72px",
+                maxWidth: "1154px",
+                width: "100%",
+                margin: "48px auto"
             },
             refresh: {
                 display: 'inline-block',
