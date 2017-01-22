@@ -65,7 +65,7 @@ export default class AbstractCommand {
         this.exec(args, message.reply.bind(message), message.member, message);
     }
 
-    async exec(args : Array < string >, reply: (msg : string) => void, user : GuildMember, msg : Message) : Promise<void> {
+    async exec(args : Array < string >, reply: (msg : string) => Promise<Message>, user : GuildMember, msg : Message) : Promise<void> {
         //Override me
     }
 

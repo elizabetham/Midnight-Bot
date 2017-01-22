@@ -15,11 +15,11 @@ class BanCommand extends AbstractCommand {
         super("ban", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
-    async exec(args : Array < string >, reply : (msg : string) => void, user : GuildMember, msg : Message) {
+    async exec(args : Array < string >, reply : (msg : string) => Promise<Message>, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 1) {
-            reply("The correct usage for the ban command is `ban <user> [reason]`");
+            this.tools.volatileReply(reply, "The correct usage for the ban command is `ban <user> [reason]`", 5000, msg);
             return;
         }
 
@@ -29,7 +29,7 @@ class BanCommand extends AbstractCommand {
 
         //If the UID is invalid, let the user know and stop here
         if (!uid) {
-            reply("The given user is not a valid target. Please use a mention or UID format.");
+            this.tools.volatileReply(reply, "The given user is not a valid target. Please use a mention or UID format.", 5000, msg);
             return;
         }
 
@@ -39,7 +39,7 @@ class BanCommand extends AbstractCommand {
 
         //If we found a reference, make sure we're not banning superiors
         if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
-            reply(_.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked equally or higher than you.");
+            this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked equally or higher than you.", 5000, msg);
             return;
         }
 
@@ -51,7 +51,7 @@ class BanCommand extends AbstractCommand {
             : reasonArr.join(" ");
 
         //Confirm action
-        reply(_.sample(Lang.AFFIRMATIVE));
+        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000, msg);
 
         //Save an infraction and log it
         await Logging.infractionLog(await new Infraction(uid, moment().unix(), {

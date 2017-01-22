@@ -12,8 +12,8 @@ class RestartCommand extends AbstractCommand {
         super("restart", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
-    async exec(args : Array < string >, reply: (msg : string) => void, user : GuildMember, msg : Message) {
-        reply(_.sample(Lang.AFFIRMATIVE) + " I'll be right back.");
+    async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
+        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " I'll be right back.", 5000, msg);
         setTimeout(() => {
             process.exit();
         }, 1000);

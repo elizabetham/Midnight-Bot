@@ -1,6 +1,6 @@
 // @flow
 
-import {Role, GuildMember} from 'discord.js';
+import {Role, GuildMember, Message} from 'discord.js';
 import _ from 'lodash';
 
 export default {
@@ -38,5 +38,12 @@ export default {
                 : split[1];
 
             return units[unit] * value;
-        }
+        },
+    volatileReply : async(reply : (message : string) => Message, message : string, delay : number, originalMsg:?Message) => {
+        const msg = await reply(message);
+        setTimeout(() => {
+            msg.delete();
+            if (originalMsg) originalMsg.delete();
+        }, delay);
+    }
 }

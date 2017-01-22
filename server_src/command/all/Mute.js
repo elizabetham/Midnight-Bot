@@ -17,11 +17,11 @@ class MuteCommand extends AbstractCommand {
         super("mute", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
-    async exec(args : Array < string >, reply : (msg : string) => void, user : GuildMember, msg : Message) {
+    async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 2) {
-            reply("The correct usage for the mute command is `mute <user> <duration|forever> [reason]`");
+            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000,msg);
             return;
         }
 
@@ -31,7 +31,7 @@ class MuteCommand extends AbstractCommand {
 
         //If the UID is invalid, let the user know and stop here
         if (!uid) {
-            reply("The given user is not a valid target. Please use a mention or UID format.");
+            this.tools.volatileReply(reply, "The given user is not a valid target. Please use a mention or UID format.", 5000,msg);
             return;
         }
 
@@ -41,13 +41,13 @@ class MuteCommand extends AbstractCommand {
 
         //If we found a reference, make sure we're not muting superiors
         if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
-            reply(_.sample(Lang.NO_PERMISSION) + " It's not possible to mute users ranked equally or higher than you.");
+            this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to mute users ranked equally or higher than you.", 5000,msg);
             return;
         }
 
         //Obtain duration:
         if (args[1].toLowerCase() != 'forever' && args.length < 3) {
-            reply("The correct usage for the mute command is `mute <user> <duration|forever> [reason]`");
+            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000,msg);
             return;
         }
 
@@ -57,7 +57,7 @@ class MuteCommand extends AbstractCommand {
                 : this.tools.parseTime(args[1] + " " + args[2]);
 
         if (!duration) {
-            reply("I don't understand your duration definition of '" + args[1] + " " + args[2] + "'!");
+            this.tools.volatileReply(reply, "I don't understand your duration definition of '" + args[1] + " " + args[2] + "'!", 5000, msg);
             return;
         }
 
@@ -65,13 +65,14 @@ class MuteCommand extends AbstractCommand {
         let reasonArr = args[1].toLowerCase() == 'forever'
             ? args.slice(2, args.length)
             : args.slice(3, args.length);
-        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i)) reasonArr.shift();
+        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i))
+            reasonArr.shift();
         const reason = reasonArr.length == 0
             ? null
             : reasonArr.join(" ");
 
         //Confirm action
-        reply(_.sample(Lang.AFFIRMATIVE));
+        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000,msg);
 
         //Save an infraction and log it
         await Logging.infractionLog(await new Infraction(uid, moment().unix(), {
