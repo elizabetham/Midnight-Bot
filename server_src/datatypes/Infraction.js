@@ -61,10 +61,14 @@ class Infraction {
     async save() : InfractionRecord {
         let infraction = new InfractionRecord(this);
         try {
-            return (await Promise.all([
-                UserUtils.assertUserRecord(this.userid),
-                infraction.save()
-            ]))[1];
+            let actions = [
+                infraction.save(),
+                UserUtils.assertUserRecord(this.userid)
+            ];
+            if (this.manual) {
+                actions.push(UserUtils.assertUserRecord(this.manual.executor));
+            }
+            return (await Promise.all(actions))[0];
         } catch (err) {
             Logging.error("LOG_INFRACTION_SAVE", err);
         }

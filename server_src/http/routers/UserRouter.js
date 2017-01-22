@@ -71,9 +71,16 @@ router.get('/:id/infractions', async function(req : $Request, res : $Response) {
     let infractions = await InfractionRecord.find({userid: userRecord.userid}).sort({timestamp: -1}).lean();
 
     //Add username data to infractions
-    infractions.forEach(i => {
+    await Promise.all(infractions.map(async(i) => {
         i.username = userRecord.username;
-    });
+        if (i.manual) {
+            i.manual.executor = {
+                userid: i.manual.executor,
+                username: (await UserRecord.findOne({userid: i.manual.executor})).username
+            }
+        }
+        console.log(i);
+    }));
 
     //Return the data
     res.status(200).json(infractions);

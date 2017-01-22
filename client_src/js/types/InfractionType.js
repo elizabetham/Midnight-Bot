@@ -12,5 +12,12 @@ export type $Infraction = {
         displayName: string,
         triggerMessage: string
     },
-    username: string
+    username: string,
+    manual?: {
+        executor: {
+            userid: string,
+            username: string
+        },
+        reason?: string
+    }
 };
