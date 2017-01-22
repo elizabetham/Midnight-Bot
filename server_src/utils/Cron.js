@@ -5,6 +5,7 @@ import Logging from './Logging';
 import DiscordUtils from './DiscordUtils.js';
 import moment from 'moment';
 import Config from '../../config';
+import Infraction from '../datatypes/Infraction';
 
 //Schedule the job
 schedule.scheduleJob('*/10 * * * * *', () => {
@@ -39,9 +40,14 @@ const unmuteApplicableUsers = () => {
                 let member = guild[1].members.get(doc.userid);
                 if (!member)
                     continue;
-                Logging.mod(Logging.format("MUTE LIFT", "issued to _" + member.user.username + " (" + member.user.id + ")_"));
                 let role = await DiscordUtils.getRole(guild[1], "Muted");
                 member.removeRole(role);
+                const record = await new Infraction(member.user.id, moment().unix(), {
+                    type: 'MUTE_LIFT',
+                    increasedNotoriety: false
+                }).save();
+                let permalink = Config.baseURL + "/#/infractions/" + record.userid + "/" + record._id;
+                Logging.mod(Logging.format("MUTE LIFT", "issued to _" + member.user.username + " (" + member.user.id + ")_: " + permalink));
             }
 
             //Save user record

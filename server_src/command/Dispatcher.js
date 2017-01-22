@@ -3,8 +3,9 @@ import AbstractCommand from './AbstractCommand';
 import RestartCommand from './all/Restart';
 import BanCommand from './all/Ban';
 import MuteCommand from './all/Mute';
+import UnmuteCommand from './all/Unmute';
 
-const commands = [RestartCommand, BanCommand, MuteCommand];
+const commands = [RestartCommand, BanCommand, MuteCommand, UnmuteCommand];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data

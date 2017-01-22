@@ -12,11 +12,13 @@ export type $FilterData = {
 export type $InfractionAction = {
     type: 'WARN',
     increasedNotoriety: boolean
-
 } | {
     type: 'MUTE',
     increasedNotoriety: boolean,
     meta: number
+} | {
+    type: 'MUTE_LIFT',
+    increasedNotoriety: boolean
 } | {
     type: 'BAN',
     increasedNotoriety: boolean
@@ -27,8 +29,7 @@ export type $InfractionAction = {
 
 export type $ManualData = {
     executor: string,
-    reason:
-        ? string
+    reason?: ?string
 }
 
 class Infraction {
