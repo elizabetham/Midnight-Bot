@@ -57,7 +57,8 @@ class ModDocsLayout extends Component {
                         <code>&lt;@USERID&gt;</code>
                         as a replacement, where you replace
                         <code>USERID</code>
-                        with the user's ID. An example would be like the following: <pre>
+                        with the user's ID. An example would be like the following:
+                        <pre>
                             @Midnight mute &lt;@156504894604312577&gt; 5 days for spamming profanity
                         </pre>
                         You can obtain this ID by right clicking a user in another guild and choosing
@@ -82,7 +83,8 @@ class ModDocsLayout extends Component {
                     <h5>Usage:
                         <code>!mute &lt;user&gt; &lt;duration&gt; [[for]reason]</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Moderator</code></p>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code>
+                    </p>
                     <p>The &nbsp;<i>duration</i>&nbsp; parameter expects a combination of a numeric value and a time unit. Here are a few examples:
                         <pre>
                             @Midnight mute @BeMacized 5 days for being inconsiderate<br/>
@@ -100,9 +102,10 @@ class ModDocsLayout extends Component {
                     <h5 style={style.commandHeader}>
                         &nbsp;- Manually ban a user permanently.</h5>
                     <h5>Usage:
-                        <code>!mute &lt;user&gt; [[for]reason]</code>
+                        <code>!ban &lt;user&gt; [[for]reason]</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Moderator</code></p>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code>
+                    </p>
                 </Row>
                 <Row>
                     <hr/>
@@ -110,9 +113,10 @@ class ModDocsLayout extends Component {
                     <h5 style={style.commandHeader}>
                         &nbsp;- Manually lift a mute.</h5>
                     <h5>Usage:
-                        <code>!mute &lt;user&gt; [[for]reason]</code>
+                        <code>!unmute &lt;user&gt;</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Moderator</code></p>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code>
+                    </p>
                 </Row>
                 <Row>
                     <hr/>
@@ -122,7 +126,8 @@ class ModDocsLayout extends Component {
                     <h5>Usage:
                         <code>!playing [status]</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Master Moderator</code></p>
+                    <p>Minimum role required:&nbsp;<code>Master Moderator</code>
+                    </p>
                     <p>In case of no status being provided, the playing status shall be disabled</p>
                 </Row>
                 <Row>
@@ -133,7 +138,8 @@ class ModDocsLayout extends Component {
                     <h5>Usage:
                         <code>!restart</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Master Moderator</code></p>
+                    <p>Minimum role required:&nbsp;<code>Master Moderator</code>
+                    </p>
                 </Row>
 
             </div>
