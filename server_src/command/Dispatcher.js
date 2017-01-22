@@ -2,12 +2,13 @@ import AbstractCommand from './AbstractCommand';
 
 import RestartCommand from './all/Restart';
 import BanCommand from './all/Ban';
+import MuteCommand from './all/Mute';
 
-const commands = [RestartCommand, BanCommand];
+const commands = [RestartCommand, BanCommand, MuteCommand];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
-    const args = message.content.replace(new RegExp("^<@[0-9]*> ", "gi"), "").split(/\s+/gi);
+    const args = message.content.replace(new RegExp("(^<@[0-9]*> )|(^\!)", "gi"), "").split(/\s+/gi);
 
     //If no command was supplied quit here
     if (args.length == 0)

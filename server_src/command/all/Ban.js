@@ -39,14 +39,16 @@ class BanCommand extends AbstractCommand {
 
         //If we found a reference, make sure we're not banning superiors
         if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
-            reply(_.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked higher than you.");
+            reply(_.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked equally or higher than you.");
             return;
         }
 
         //Obtain a reason if it exists
-        const reason = args.length == 1
+        let reasonArr = args.length == 1 ? [] : args.slice(1, args.length);
+        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i)) reasonArr.shift();
+        const reason = reasonArr.length == 0
             ? null
-            : args.slice(1, args.length).join(" ");
+            : reasonArr.join(" ");
 
         //Confirm action
         reply(_.sample(Lang.AFFIRMATIVE));

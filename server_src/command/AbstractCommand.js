@@ -18,7 +18,7 @@ export default class AbstractCommand {
 
     call : (message : Message) => void;
 
-    tools: Tools;
+    tools: typeof Tools;
 
     constructor(command : string, minRoles : Array < Permission >) {
         this.command = command;
