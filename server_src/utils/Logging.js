@@ -35,8 +35,10 @@ export const mod = (msg : string) => {
 
 export const format = (prefix : string, text : string) => "**[" + prefix + "]** " + text;
 
-export const infractionLog = async(infraction : ?InfractionRecord) => {
-    if (!infraction) return;
+export const infractionLog = async(infraction :
+    ? InfractionRecord) => {
+    if (!infraction)
+        return;
 
     let msg = "";
     switch (infraction.action.type) {
@@ -52,8 +54,13 @@ export const infractionLog = async(infraction : ?InfractionRecord) => {
         msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction: " + permalink;
         if (infraction.filter)
             msg += "\nFilter: " + infraction.filter.displayName;
-
-        //TODO: Add link url to infraction information here
+        if (infraction.manual) {
+            let executor = await DiscordUtils.client.fetchUser(infraction.manual.executor);
+            msg += "\nIssued by **" + executor.username + "**";
+            if (infraction.manual.reason) {
+                msg += " for reason: *" + infraction.manual.reason + "*";
+            }
+        }
         mod(format(infraction.action.type, msg));
     } catch (err) {
         if (err)

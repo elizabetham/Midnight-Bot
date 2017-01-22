@@ -1,8 +1,9 @@
 import AbstractCommand from './AbstractCommand';
 
 import RestartCommand from './all/Restart';
+import BanCommand from './all/Ban';
 
-const commands = [RestartCommand];
+const commands = [RestartCommand, BanCommand];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
@@ -17,7 +18,7 @@ export const processMessage = (message : Message) : boolean => {
 
     //Attempt finding a relevant command class
     const cmdObj :
-        ? AbstractCommand = commands.find(c => c.command == cmd);
+        ? AbstractCommand = commands.find(c => c.command.toLowerCase() == cmd.toLowerCase());
 
     //If none found, stop here
     if (!cmdObj)

@@ -60,8 +60,21 @@ export const InfractionRecord = mongoose.model('Infraction', new mongoose.Schema
         required: true
     },
     filter: {
-        displayName: String,
-        triggerMessage: String
+        type: {
+            displayName: String,
+            triggerMessage: String
+        },
+        required: false
+    },
+    manual: {
+        type: {
+            executor: {
+                type: String,
+                required: true
+            },
+            reason: String
+        },
+        required: false
     },
     action: {
         increasedNotoriety: {

@@ -31,6 +31,8 @@ DiscordUtils.client.on('ready', () => {
             DiscordUtils.client.user.setGame(Config.playing);
         }
     , 1000);
+
+    //DiscordUtils.client.guilds.array().forEach(guild => guild.roles.array().sort((r1, r2) => r1.position - r2.position).forEach(role => console.log(role.position, role.name, role.id)));
 });
 
 //Handle member joining
@@ -50,26 +52,15 @@ DiscordUtils.client.on('message', (message : Message) => {
         return;
 
     if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi"))) {
-        if (CommandDispatcher.processMessage(message)) return;
-    }
+        if (CommandDispatcher.processMessage(message))
+            return;
+        }
 
     //Check if user is on role whitelist
     if (message.member && message.member.roles.array().filter(r => Config.whitelistedRoles.indexOf(r.id) > -1).length == 0)
         processMessage(message, true);
     }
 );
-
-//Log ban event
-//TODO: Write proper ban and reason system with command
-//TODO: Save these as infractions
-DiscordUtils.client.on('guildBanAdd', (guild, user) => {
-    Logging.mod(Logging.format("MANUAL BAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
-});
-
-//Log unban event
-DiscordUtils.client.on('guildBanRemove', (guild, user) => {
-    Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
-});
 
 let processCommand = message => {
     //TODO: Implement command framework

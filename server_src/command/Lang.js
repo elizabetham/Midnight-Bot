@@ -2,8 +2,8 @@
 
 export default {
     NO_PERMISSION: [
-        "I'm sorry Dave, I'm afraid I can't do that",
-        "Permission denied m8",
+        "I'm sorry Dave, I'm afraid I can't do that. ",
+        "Permission denied m8.",
         "Your power level is too low.",
         "You do not have permission to do this.",
         "Sorry, your permission to do this is in another castle.",

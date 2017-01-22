@@ -18,8 +18,17 @@ export type $InfractionAction = {
     increasedNotoriety: boolean,
     meta: number
 } | {
+    type: 'BAN',
+    increasedNotoriety: boolean
+} | {
     type: 'NONE',
     increasedNotoriety: boolean
+}
+
+export type $ManualData = {
+    executor: string,
+    reason:
+        ? string
 }
 
 class Infraction {
@@ -28,16 +37,23 @@ class Infraction {
     action : $InfractionAction;
     filter :
         ? $FilterData;
+    manual :
+        ? $ManualData;
     save : Function;
 
     constructor(userid : string, timestamp : number, action : $InfractionAction, filter :
-        ? $FilterData) {
+        ? $FilterData, manual :
+        ? $ManualData) {
         this.userid = userid;
         this.timestamp = timestamp;
         this.action = action;
         this.filter = (filter)
             ? filter
             : null;
+        this.manual = (manual)
+            ? manual
+            : null;
+
         this.save = this.save.bind(this);
     }
 
