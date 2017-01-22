@@ -1,19 +1,22 @@
 // @flow
 
 //Modules
-import DiscordUtils from './DiscordUtils';
-import {UserRecord, InfractionRecord} from './DBManager';
-import Logging from './Logging';
-import {processMessage} from './ChatFilters';
+import DiscordUtils from './utils/DiscordUtils';
+import {UserRecord, InfractionRecord} from './utils/DBManager';
+import Logging from './utils/Logging';
+import {processMessage} from './chatfilters/ChatFilters';
+import CommandDispatcher from './command/Dispatcher';
 
 //Config
 import Config from '../config';
 
 //Dependencies
 import moment from 'moment';
-import {GuildMember} from 'discord.js';
 import pastebinJs from 'pastebin-js'
 const pastebin = new pastebinJs(Config.PASTEBIN_DEV_KEY);
+
+//Types
+import {GuildMember, Message} from 'discord.js';
 
 //Files
 const avatar = require("./res/img/avatar.png");
@@ -36,7 +39,7 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 });
 
 //Handle message receive event
-DiscordUtils.client.on('message', message => {
+DiscordUtils.client.on('message', (message : Message) => {
 
     //Prevent bot from using itself
     if (message.author.bot)
@@ -46,10 +49,8 @@ DiscordUtils.client.on('message', message => {
     if (!message.guild)
         return;
 
-    //Command detection
-    if (message.content.startsWith("!")) {
-        processCommand(message);
-        return;
+    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi"))) {
+        if (CommandDispatcher.processMessage(message)) return;
     }
 
     //Check if user is on role whitelist

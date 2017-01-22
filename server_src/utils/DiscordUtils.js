@@ -1,6 +1,6 @@
 // @flow
 
-import Config from '../config';
+import Config from '../../config';
 import {Client, Guild} from 'discord.js';
 
 class DiscordUtils {

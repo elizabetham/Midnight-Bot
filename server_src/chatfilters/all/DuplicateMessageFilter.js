@@ -1,13 +1,13 @@
 // @flow
 
-import AbstractFilter from './AbstractFilter';
+import AbstractFilter from '../AbstractFilter';
 
-import {Redis} from '../DBManager';
+import {Redis} from '../../utils/DBManager';
 import moment from 'moment';
 import {Message} from 'discord.js';
-import UserUtils from '../UserUtils';
-import Logging from '../Logging';
-import Infraction from '../Infraction';
+import UserUtils from '../../utils/UserUtils';
+import Logging from '../../utils/Logging';
+import Infraction from '../../datatypes/Infraction';
 
 class BulkMentionFilter extends AbstractFilter {
 

@@ -2,7 +2,7 @@
 
 //Dependencies
 import express from 'express';
-import {UserRecord, InfractionRecord} from '../DBManager';
+import {UserRecord, InfractionRecord} from '../../utils/DBManager';
 import escapeStringRegexp from 'escape-string-regexp';
 
 //Types

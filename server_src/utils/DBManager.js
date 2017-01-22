@@ -6,7 +6,7 @@ import redis from 'redis';
 import bluebird from 'bluebird';
 
 import Logging from './Logging';
-import Config from '../config';
+import Config from '../../config';
 
 //Replace mpromise with ES6 promises within Mongoose
 mongoose.Promise = global.Promise;

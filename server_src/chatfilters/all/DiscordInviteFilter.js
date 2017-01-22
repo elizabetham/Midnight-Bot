@@ -1,12 +1,12 @@
 // @flow
 
-import AbstractLinkFilter from './AbstractLinkFilter';
+import AbstractLinkFilter from '../AbstractLinkFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
-import UserUtils from '../UserUtils';
-import Logging from '../Logging';
-import Infraction from '../Infraction';
+import UserUtils from '../../utils/UserUtils';
+import Logging from '../../utils/Logging';
+import Infraction from '../../datatypes/Infraction';
 
 class DiscordInviteFilter extends AbstractLinkFilter {
 

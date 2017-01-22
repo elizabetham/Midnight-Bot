@@ -2,7 +2,7 @@
 
 //Dependencies
 import express from 'express';
-import {InfractionRecord} from '../DBManager';
+import {InfractionRecord} from '../../utils/DBManager';
 import moment from 'moment';
 import _ from 'lodash';
 import {middleware as cache} from 'apicache';

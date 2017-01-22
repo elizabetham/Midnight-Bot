@@ -1,12 +1,12 @@
 // @flow
 
 //Config
-import Config from "../config";
+import Config from "../../config";
 
 //Import dependencies
 import moment from 'moment';
 import type {$InfractionAction}
-from './Infraction';
+from '../datatypes/Infraction';
 
 //Import modules
 import {UserRecord} from './DBManager';

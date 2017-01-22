@@ -1,13 +1,13 @@
 // @flow
 
-import AbstractFilter from './AbstractFilter';
+import AbstractFilter from '../AbstractFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
-import UserUtils from '../UserUtils';
-import Logging from '../Logging';
-import Infraction from '../Infraction';
-import {Redis} from '../DBManager';
+import UserUtils from '../../utils/UserUtils';
+import Logging from '../../utils/Logging';
+import Infraction from '../../datatypes/Infraction';
+import {Redis} from '../../utils/DBManager';
 
 class FloodSpamFilter extends AbstractFilter {
 

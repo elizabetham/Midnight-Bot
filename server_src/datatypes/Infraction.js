@@ -1,8 +1,8 @@
 // @flow
 
-import {InfractionRecord} from './DBManager';
-import Logging from './Logging';
-import UserUtils from './UserUtils';
+import {InfractionRecord} from '../utils/DBManager';
+import Logging from '../utils/Logging';
+import UserUtils from '../utils/UserUtils';
 
 export type $FilterData = {
     displayName: string,

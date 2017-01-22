@@ -1,39 +1,35 @@
 // @flow
 
-import AbstractFilter from './AbstractFilter';
+import AbstractFilter from '../AbstractFilter';
 
 import moment from 'moment';
 import {Message} from 'discord.js';
-import UserUtils from '../UserUtils';
-import Logging from '../Logging';
-import Infraction from '../Infraction';
-import emojiRegex from 'emoji-regex';
+import UserUtils from '../../utils/UserUtils';
+import Logging from '../../utils/Logging';
+import Infraction from '../../datatypes/Infraction';
 
-class EmojiSpamFilter extends AbstractFilter {
+class RepeatedCharacterFilter extends AbstractFilter {
 
     constructor() {
-        super("Emoji Spam Filter");
+        super("Repeated Character Filter");
     }
 
     async check(message : Message) : Promise < boolean > {
-        let matches = message.content.match(emojiRegex());
-        return matches && matches.length >= 9;
+        return message.content.match(/.*([^.\s])\1{6,}.*/gi);
     }
 
     async action(message : Message) : Promise < void > {
         message.delete();
         message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
-
-        //Punish
         let infraction = new Infraction(message.author.id, moment().unix(), {
             type: 'WARN',
             increasedNotoriety: false
         }, {
-            displayName: "Emoji Spam Filter",
+            displayName: "Repeated Character Filter",
             triggerMessage: message.content
         });
         Logging.infractionLog(await infraction.save());
     }
 }
 
-export default new EmojiSpamFilter();
+export default new RepeatedCharacterFilter();

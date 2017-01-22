@@ -13,8 +13,8 @@ chai.use(chaiSubset);
 const assert = (chai.assert : Object); //TODO: Research creation of flow-typed libdef for chai-subset
 
 //Modules
-import {UserRecord, InfractionRecord} from '../server_src/DBManager';
-import app from '../server_src/HTTPServer';
+import {UserRecord, InfractionRecord} from '../server_src/utils/DBManager';
+import app from '../server_src/http/HTTPServer';
 
 //Buildup
 const cleanDB = async() => {

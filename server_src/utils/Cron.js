@@ -4,7 +4,7 @@ import {UserRecord, InfractionRecord} from './DBManager';
 import Logging from './Logging';
 import DiscordUtils from './DiscordUtils.js';
 import moment from 'moment';
-import Config from '../config';
+import Config from '../../config';
 
 //Schedule the job
 schedule.scheduleJob('*/10 * * * * *', () => {

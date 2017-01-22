@@ -1,15 +1,15 @@
 // @flow
 
 //Modules
-import {UserRecord, InfractionRecord} from './DBManager';
-import DiscordUtils from './DiscordUtils';
-import Logging from './Logging';
+import {UserRecord, InfractionRecord} from '../utils/DBManager';
+import DiscordUtils from '../utils/DiscordUtils';
+import Logging from '../utils/Logging';
 
 //Routers
 import apiRouter from './routers/APIRouter';
 
 //Config
-import Config from '../config';
+import Config from '../../config';
 
 //Dependencies
 import express from 'express';

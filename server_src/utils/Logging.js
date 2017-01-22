@@ -6,7 +6,7 @@ import TimeUtils from './TimeUtils';
 import {InfractionRecord} from './DBManager';
 
 //Config
-import Config from '../config';
+import Config from '../../config';
 
 //Dependencies
 const pastebin = new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY);
