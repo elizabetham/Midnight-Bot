@@ -47,7 +47,7 @@ export default class AbstractCommand {
             //If it's not found, log an error and let the user know
             if (!minRole) {
                 Logging.error("COMMAND_RANK_CHECK", "No Role instance has been found for role '" + minPerm.roleId + "' in guild '" + minPerm.guildId + "'");
-                message.reply("Due to a change in this guild's role configuration, I cannot comply. Please try again when I am updated.");
+                this.tools.volatileReply(message.reply.bind(message),"Due to a change in this guild's role configuration, I cannot comply. Please try again when I am updated.", 5000, message);
                 return;
             }
 
