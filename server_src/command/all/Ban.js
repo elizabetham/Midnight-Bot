@@ -12,7 +12,7 @@ import _ from 'lodash';
 class BanCommand extends AbstractCommand {
 
     constructor() {
-        super("ban", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("ban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise<Message>, user : GuildMember, msg : Message) {
