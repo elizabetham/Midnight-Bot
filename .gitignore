@@ -22,3 +22,7 @@ dist/
 
 #Mocha output
 report.xml
+
+#Dev scripts for Windows
+test_win.bat
+resetdeps_win.bat

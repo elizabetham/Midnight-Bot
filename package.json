@@ -10,7 +10,7 @@
     "build": "webpack --config webpack.prod.config.js",
     "start": "npm run build && cd dist && node Midnight.js",
     "debug": "npm-run-all --parallel debug:*",
-    "debug:server": "webpack --config webpack.server.config.js && cd dist && node Midnight.js",
+    "debug:server": "webpack --config webpack.server.config.js && cd dist && nodemon Midnight.js",
     "debug:client": "webpack-dev-server --hot --inline -d --config webpack.client.config.js --port 8081"
   },
   "author": "BeMacized",
@@ -18,6 +18,8 @@
   "dependencies": {
     "apicache": "^0.8.1",
     "bluebird": "^3.4.6",
+    "bootstrap": "^3.3.7",
+    "bootswatch": "^3.3.7",
     "chart.js": "^2.4.0",
     "cors": "^2.8.1",
     "discord.js": "^11.0.0",
@@ -38,6 +40,7 @@
     "randomstring": "^1.1.5",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
+    "react-bootstrap": "^0.30.7",
     "react-chartjs-2": "^2.0.0",
     "react-copy-to-clipboard": "^4.2.3",
     "react-dom": "^15.4.2",
@@ -71,6 +74,7 @@
     "html-webpack-plugin": "^2.26.0",
     "mocha": "^3.2.0",
     "mocha-jenkins-reporter": "^0.3.5",
+    "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.0",
     "react-hot-loader": "^1.3.1",
     "style-loader": "^0.13.1",

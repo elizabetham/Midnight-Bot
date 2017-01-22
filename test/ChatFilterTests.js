@@ -3,25 +3,25 @@
 import {assert} from 'chai';
 
 //Dependencies
-import {Redis} from '../server_src/DBManager';
+import {Redis} from '../server_src/utils/DBManager';
 
 //All filters
-import {processMessage} from '../server_src/ChatFilters'
+import {processMessage} from '../server_src/chatfilters/ChatFilters';
 
 //Individual filters
-import BazzaFilter from '../server_src/chatfilters/BazzaFilter';
-import BulkMentionFilter from '../server_src/chatfilters/BulkMentionFilter';
-import DiscordInviteFilter from '../server_src/chatfilters/DiscordInviteFilter';
-import DuplicateMessageFilter from '../server_src/chatfilters/DuplicateMessageFilter';
-import EmojiSpamFilter from '../server_src/chatfilters/EmojiSpamFilter';
-import LobbyLinkFilter from '../server_src/chatfilters/LobbyLinkFilter';
-import MentionFilter from '../server_src/chatfilters/MentionFilter';
-import OffensiveBehaviourFilter from '../server_src/chatfilters/OffensiveBehaviourFilter';
-import PornLinkFilter from '../server_src/chatfilters/PornLinkFilter';
-import RacismFilter from '../server_src/chatfilters/RacismFilter';
-import RepeatedCharacterFilter from '../server_src/chatfilters/RepeatedCharacterFilter';
-import ScamLinkFilter from '../server_src/chatfilters/ScamLinkFilter';
-import FloodSpamFilter from '../server_src/chatfilters/FloodSpamFilter';
+import BazzaFilter from '../server_src/chatfilters/all/BazzaFilter';
+import BulkMentionFilter from '../server_src/chatfilters/all/BulkMentionFilter';
+import DiscordInviteFilter from '../server_src/chatfilters/all/DiscordInviteFilter';
+import DuplicateMessageFilter from '../server_src/chatfilters/all/DuplicateMessageFilter';
+import EmojiSpamFilter from '../server_src/chatfilters/all/EmojiSpamFilter';
+import LobbyLinkFilter from '../server_src/chatfilters/all/LobbyLinkFilter';
+import MentionFilter from '../server_src/chatfilters/all/MentionFilter';
+import OffensiveBehaviourFilter from '../server_src/chatfilters/all/OffensiveBehaviourFilter';
+import PornLinkFilter from '../server_src/chatfilters/all/PornLinkFilter';
+import RacismFilter from '../server_src/chatfilters/all/RacismFilter';
+import RepeatedCharacterFilter from '../server_src/chatfilters/all/RepeatedCharacterFilter';
+import ScamLinkFilter from '../server_src/chatfilters/all/ScamLinkFilter';
+import FloodSpamFilter from '../server_src/chatfilters/all/FloodSpamFilter';
 
 describe("Chat Filters", () => {
 

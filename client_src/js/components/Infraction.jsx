@@ -116,6 +116,20 @@ class InfractionComponent extends Component {
                 <span></span>
             );
 
+        console.log(infraction.manual);
+
+        let manualData = infraction.manual
+            ? (
+                <span>
+                    {infraction.manual !== undefined && <ListItem primaryText={infraction.manual.executor.username} secondaryText="Issued by"/>}
+                    {infraction.manual !== undefined && infraction.manual.reason !== undefined && <ListItem primaryText={infraction.manual.reason} secondaryText="Reason"/>}
+
+                </span>
+            )
+            : (
+                <span></span>
+            )
+
         //Return JSX
         if (infraction.filter !== undefined) {
             return (
@@ -124,7 +138,8 @@ class InfractionComponent extends Component {
                     <CardText expandable={true} style={style.cardTextStyle}>
                         <List>
                             <ListItem primaryText={timestamp} secondaryText="Timestamp"/>
-                            <ListItem primaryText={increasedNotoriety} secondaryText="Notoriety"/> {filterData}
+                            <ListItem primaryText={increasedNotoriety} secondaryText="Notoriety"/> {manualData}
+                            {filterData}
                         </List>
                         <CardActions expandable={true} style={{
                             textAlign: "right"

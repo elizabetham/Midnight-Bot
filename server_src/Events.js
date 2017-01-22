@@ -1,19 +1,22 @@
 // @flow
 
 //Modules
-import DiscordUtils from './DiscordUtils';
-import {UserRecord, InfractionRecord} from './DBManager';
-import Logging from './Logging';
-import {processMessage} from './ChatFilters';
+import DiscordUtils from './utils/DiscordUtils';
+import {UserRecord, InfractionRecord} from './utils/DBManager';
+import Logging from './utils/Logging';
+import {processMessage} from './chatfilters/ChatFilters';
+import CommandDispatcher from './command/Dispatcher';
 
 //Config
 import Config from '../config';
 
 //Dependencies
 import moment from 'moment';
-import {GuildMember} from 'discord.js';
 import pastebinJs from 'pastebin-js'
 const pastebin = new pastebinJs(Config.PASTEBIN_DEV_KEY);
+
+//Types
+import {GuildMember, Message} from 'discord.js';
 
 //Files
 const avatar = require("./res/img/avatar.png");
@@ -28,6 +31,8 @@ DiscordUtils.client.on('ready', () => {
             DiscordUtils.client.user.setGame(Config.playing);
         }
     , 1000);
+
+    //DiscordUtils.client.guilds.array().forEach(guild => guild.roles.array().sort((r1, r2) => r1.position - r2.position).forEach(role => console.log(role.position, role.name, role.id)));
 });
 
 //Handle member joining
@@ -36,7 +41,7 @@ DiscordUtils.client.on('guildMemberAdd', guildMember => {
 });
 
 //Handle message receive event
-DiscordUtils.client.on('message', message => {
+DiscordUtils.client.on('message', (message : Message) => {
 
     //Prevent bot from using itself
     if (message.author.bot)
@@ -46,29 +51,16 @@ DiscordUtils.client.on('message', message => {
     if (!message.guild)
         return;
 
-    //Command detection
-    if (message.content.startsWith("!")) {
-        processCommand(message);
-        return;
-    }
+    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi")) || message.content.substring(0,1) == "!") {
+        if (CommandDispatcher.processMessage(message))
+            return;
+        }
 
     //Check if user is on role whitelist
     if (message.member && message.member.roles.array().filter(r => Config.whitelistedRoles.indexOf(r.id) > -1).length == 0)
         processMessage(message, true);
     }
 );
-
-//Log ban event
-//TODO: Write proper ban and reason system with command
-//TODO: Save these as infractions
-DiscordUtils.client.on('guildBanAdd', (guild, user) => {
-    Logging.mod(Logging.format("MANUAL BAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
-});
-
-//Log unban event
-DiscordUtils.client.on('guildBanRemove', (guild, user) => {
-    Logging.mod(Logging.format("MANUAL UNBAN", "issued to **" + user.username + "** (**" + user.id + "**)"));
-});
 
 let processCommand = message => {
     //TODO: Implement command framework

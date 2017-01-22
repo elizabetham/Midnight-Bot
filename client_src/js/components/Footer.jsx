@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 
 import {grey900} from 'material-ui/styles/colors'
 
-import '../styles/footer.css';
+import '../../css/footer.css';
 
 class FooterComponent extends Component {
 

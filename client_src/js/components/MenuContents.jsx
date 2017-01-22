@@ -9,6 +9,7 @@ import AppBar from 'material-ui/AppBar';
 //icons
 import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import PollIcon from 'material-ui/svg-icons/social/poll';
+import FileIcon from 'material-ui/svg-icons/editor/insert-drive-file';
 
 class HeaderComponent extends Component {
 
@@ -21,6 +22,7 @@ class HeaderComponent extends Component {
             <div>
                 <MenuItem leftIcon={<WarningIcon />} containerElement={< Link to = '/infractions' />} primaryText="Infractions" onTouchTap={this.props.menuToggle}/>
                 <MenuItem leftIcon={<PollIcon />} containerElement={< Link to = '/statistics' />} primaryText="Statistics" onTouchTap={this.props.menuToggle}/>
+                <MenuItem leftIcon={<FileIcon />} containerElement={< Link to = '/moddocs' />} primaryText="Staff Documentation" onTouchTap={this.props.menuToggle}/>
             </div>
         );
     }
