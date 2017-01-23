@@ -98,22 +98,22 @@ class ModDocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!ban</h3>
+                    <h3 style={style.commandHeader}>!unmute</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually ban a user permanently.</h5>
+                        &nbsp;- Manually lift a mute.</h5>
                     <h5>Usage:
-                        <code>!ban &lt;user&gt; [[for]reason]</code>
+                        <code>!unmute &lt;user&gt;</code>
                     </h5>
                     <p>Minimum role required:&nbsp;<code>Moderator</code>
                     </p>
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!unmute</h3>
+                    <h3 style={style.commandHeader}>!ban</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually lift a mute.</h5>
+                        &nbsp;- Manually ban a user permanently.</h5>
                     <h5>Usage:
-                        <code>!unmute &lt;user&gt;</code>
+                        <code>!ban &lt;user&gt; [[for]reason]</code>
                     </h5>
                     <p>Minimum role required:&nbsp;<code>Moderator</code>
                     </p>
