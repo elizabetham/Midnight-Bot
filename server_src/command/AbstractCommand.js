@@ -18,7 +18,7 @@ export default class AbstractCommand {
 
     call : (message : Message) => void;
 
-    tools: typeof Tools;
+    tools : typeof Tools;
 
     constructor(command : string, minRoles : Array < Permission >) {
         this.command = command;
@@ -34,7 +34,7 @@ export default class AbstractCommand {
 
         //If there's none, let the user know.
         if (!minPerm) {
-            message.reply("This command is not enabled on this guild.");
+            this.tools.volatileReply(message.reply.bind(message), "This command is not enabled on this guild.", 5000, message);
             return;
         }
 
@@ -47,7 +47,7 @@ export default class AbstractCommand {
             //If it's not found, log an error and let the user know
             if (!minRole) {
                 Logging.error("COMMAND_RANK_CHECK", "No Role instance has been found for role '" + minPerm.roleId + "' in guild '" + minPerm.guildId + "'");
-                message.reply("Due to a change in this guild's role configuration, I cannot comply. Please try again when I am updated.");
+                this.tools.volatileReply(message.reply.bind(message), "Due to a change in this guild's role configuration, I cannot comply. Please try again when I am updated.", 5000, message);
                 return;
             }
 
@@ -56,7 +56,7 @@ export default class AbstractCommand {
 
             //If the user does not have permission
             if (!hasPermission) {
-                message.reply(_.sample(Lang.NO_PERMISSION));
+                this.tools.volatileReply(message.reply.bind(message), _.sample(Lang.NO_PERMISSION), 5000, message);
                 return;
             }
         }
@@ -65,10 +65,8 @@ export default class AbstractCommand {
         this.exec(args, message.reply.bind(message), message.member, message);
     }
 
-    async exec(args : Array < string >, reply: (msg : string) => Promise<Message>, user : GuildMember, msg : Message) : Promise<void> {
+    async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) : Promise < void > {
         //Override me
     }
-
-
 
 }

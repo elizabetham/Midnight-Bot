@@ -79,7 +79,6 @@ router.get('/:id/infractions', async function(req : $Request, res : $Response) {
                 username: (await UserRecord.findOne({userid: i.manual.executor})).username
             }
         }
-        console.log(i);
     }));
 
     //Return the data
