@@ -63,7 +63,7 @@ class BanCommand extends AbstractCommand {
         }).save());
 
         //Execute the ban
-        msg.guild.ban(uid);
+        msg.guild.ban(uid, [7]);
     };
 
 }
