@@ -62,15 +62,6 @@ DiscordUtils.client.on('message', (message : Message) => {
     }
 );
 
-let processCommand = message => {
-    //TODO: Implement command framework
-    // let split = message.content.trim().split(/\s+/);
-    // let cmd = split[0].substr(1, split[0].length);
-    // let args = split.splice(1, split.length);
-    // switch (cmd) {
-    // }
-};
-
 let combatMuteEvasion = async(guildMember : GuildMember) => {
     //Verify mute state to combat mute evasion
     try {

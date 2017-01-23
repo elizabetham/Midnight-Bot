@@ -48,7 +48,7 @@ class BanCommand extends AbstractCommand {
         if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i)) reasonArr.shift();
         const reason = reasonArr.length == 0
             ? null
-            : reasonArr.join(" ");
+            : _.capitalize(reasonArr.join(" "));
 
         //Confirm action
         this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000, msg);
@@ -63,7 +63,7 @@ class BanCommand extends AbstractCommand {
         }).save());
 
         //Execute the ban
-        msg.guild.ban(uid, [7]);
+        msg.guild.ban(uid, 7);
     };
 
 }

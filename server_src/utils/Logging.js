@@ -58,7 +58,7 @@ export const infractionLog = async(infraction :
             let executor = await DiscordUtils.client.fetchUser(infraction.manual.executor);
             msg += "\nIssued by **" + executor.username + "**";
             if (infraction.manual.reason) {
-                msg += " for reason: *" + infraction.manual.reason + "*";
+                msg += " for reason: **" + infraction.manual.reason + "**";
             }
         }
         mod(format(infraction.action.type, msg));

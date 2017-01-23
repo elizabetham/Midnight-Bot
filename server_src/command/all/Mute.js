@@ -69,7 +69,7 @@ class MuteCommand extends AbstractCommand {
             reasonArr.shift();
         const reason = reasonArr.length == 0
             ? null
-            : reasonArr.join(" ");
+            : _.capitalize(reasonArr.join(" "));
 
         //Confirm action
         this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000,msg);

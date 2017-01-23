@@ -63,7 +63,7 @@ class UnmuteCommand extends AbstractCommand {
 
         //Make modlog
         let permalink = Config.baseURL + "/#/infractions/" + record.userid + "/" + record._id;
-        Logging.mod(Logging.format("MUTE LIFT", "issued to _" + targetMember.user.username + " (" + uid + ")_: " + permalink + "\n" + "Issued by **" + user.user.username + "**"));
+        Logging.mod(Logging.format("MUTE LIFT", "issued to **" + targetMember.user.username + "** (**" + uid + "**): " + permalink + "\n" + "Issued by **" + user.user.username + "**"));
 
         //Save it to the user record
         userRecord.mutedUntil = -1;
