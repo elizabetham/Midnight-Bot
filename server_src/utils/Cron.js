@@ -47,7 +47,7 @@ const unmuteApplicableUsers = () => {
                     increasedNotoriety: false
                 }).save();
                 let permalink = Config.baseURL + "/#/infractions/" + record.userid + "/" + record._id;
-                Logging.mod(Logging.format("MUTE LIFT", "issued to _" + member.user.username + " (" + member.user.id + ")_: " + permalink));
+                Logging.mod(Logging.format("MUTE LIFT", "issued to **" + member.user.username + "** (**" + member.user.id + "**): " + permalink));
             }
 
             //Save user record
