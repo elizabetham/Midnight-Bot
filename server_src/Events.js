@@ -2,7 +2,7 @@
 
 //Modules
 import DiscordUtils from './utils/DiscordUtils';
-import {UserRecord, InfractionRecord} from './utils/DBManager';
+import {UserRecord, InfractionRecord, Redis} from './utils/DBManager';
 import Logging from './utils/Logging';
 import {processMessage} from './chatfilters/ChatFilters';
 import CommandDispatcher from './command/Dispatcher';
@@ -24,12 +24,17 @@ const avatar = require("./res/img/avatar.png");
 //Notify when ready for use
 DiscordUtils.client.on('ready', () => {
     console.log('Discord connection ready.');
-    //Set the avatar of the bot
-    setTimeout(() => {
+    //Set the avatar and game of the bot
+    setTimeout(async() => {
         DiscordUtils.client.user.setAvatar(avatar);
-        if (Config.hasOwnProperty("playing"))
-            DiscordUtils.client.user.setGame(Config.playing);
+
+        const cachedGame : string = await DiscordUtils.getPlaying();
+        if (cachedGame) {
+            DiscordUtils.setPlaying(cachedGame);
+        } else if (Config.hasOwnProperty("playing"))
+            DiscordUtils.setPlaying(Config.playing, false);
         }
+
     , 1000);
 
     //DiscordUtils.client.guilds.array().forEach(guild => guild.roles.array().sort((r1, r2) => r1.position - r2.position).forEach(role => console.log(role.position, role.name, role.id)));
@@ -51,7 +56,7 @@ DiscordUtils.client.on('message', (message : Message) => {
     if (!message.guild)
         return;
 
-    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi")) || message.content.substring(0,1) == "!") {
+    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi")) || message.content.substring(0, 1) == "!") {
         if (CommandDispatcher.processMessage(message))
             return;
         }
