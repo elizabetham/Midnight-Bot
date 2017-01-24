@@ -128,7 +128,7 @@ class ModDocsLayout extends Component {
                     </h5>
                     <p>Minimum role required:&nbsp;<code>Master Moderator</code>
                     </p>
-                    <p>In case of no status being provided, the playing status shall be disabled</p>
+                    <p>In case of no status being provided, the playing status shall be cleared</p>  {/* Cannot be disabled in the actual sense of the word, just nulled*/}
                 </Row>
                 <Row>
                     <hr/>
