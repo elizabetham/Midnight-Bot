@@ -58,7 +58,8 @@ class PornLinkFilter extends AbstractLinkFilter {
             "justusboys.com",
             "zzgays.com",
             "gay-lounge.net",
-            "bdsmstreak.com"
+            "bdsmstreak.com",
+            "hentaihaven.org"
         ];
     }
 
