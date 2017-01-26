@@ -17,11 +17,8 @@ from '../types/UserType';
 //Components
 import InfractionSearchBox from '../components/InfractionSearchBox.jsx';
 import InfractionList from '../components/InfractionList.jsx';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
 
-//Animations
-import TransitionGroup from 'react-addons-css-transition-group';
-import '../../css/infractions.css';
+import FetchIndicator from '../components/FetchIndicator';
 
 type $State = {
     infractions: Array < $Infraction >,
@@ -99,28 +96,12 @@ class InfractionsContainer extends Component {
                 maxWidth: "1154px",
                 width: "100%",
                 margin: "48px auto"
-            },
-            refresh: {
-                display: 'inline-block',
-                marginLeft: '50%',
-                position: 'relative'
-            },
-            refreshContainer: {
-                position: 'relative',
-                height: 0,
-                top: '30px'
             }
         };
 
         return (
             <div style={style.layout}>
-                <TransitionGroup transitionName="infraction-load" transitionAppear={true} transitionAppearTimeout={200} transitionEnter={true} transitionLeave={true} transitionEnterTimeout={200} transitionLeaveTimeout={200}>
-                    {this.state.fetchingData && (
-                        <div style={style.refreshContainer} key="loadingInfractions">
-                            <RefreshIndicator loadingColor="#FF9800" top={0} left={-25} size={50} status="loading" style={style.refresh}/>
-                        </div>
-                    )}
-                </TransitionGroup>
+                <FetchIndicator visible={this.state.fetchingData}/>
                 <InfractionSearchBox searchResults={this.state.searchResults} initialSearch={this.props.params.userid} onSearchChange={this.onSearchChange} fetchingData={this.state.fetchingData}/>
                 <InfractionList infractions={this.state.infractions} highlightInfraction={this.props.params.infractionid}/>
             </div>
