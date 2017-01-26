@@ -1,0 +1,26 @@
+.fetch-indicator-enter {
+  opacity: 0.01;
+}
+
+.fetch-indicator-enter.fetch-indicator-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.fetch-indicator-leave {
+  opacity: 1;
+}
+
+.fetch-indicator-leave.fetch-indicator-leave-active {
+  opacity: 0.01;
+  transition: opacity 200ms ease-in;
+}
+
+.fetch-indicator-appear {
+  opacity: 0.01;
+}
+
+.fetch-indicator-appear.fetch-indicator-appear-active {
+  opacity: 1;
+  transition: opacity 200s ease-in;
+}

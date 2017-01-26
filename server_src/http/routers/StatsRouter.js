@@ -17,7 +17,7 @@ const router = express.Router();
 //Endpoints
 router.get('/infractionactivity', cache('1 hour'), async function(req : $Request, res : $Response) {
 
-    let getData = async(buckets : number, interval : number, labelformat : string) => {
+    let getData = async(buckets : number, interval : number) => {
         const current : number = new Date(Math.ceil(new Date().getTime() / 1000 / interval) * interval * 1000).getTime() / 1000;
 
         const data = [];
@@ -39,7 +39,7 @@ router.get('/infractionactivity', cache('1 hour'), async function(req : $Request
             }).lean();
 
             data.push({
-                key: moment.unix(current - interval * (i + 1)).format(labelformat),
+                key: moment.unix(current - interval * (i + 1)),
                 values: _.chain(selectiveResults).groupBy('action.type').mapValues('length').value()
             });
         }
@@ -48,8 +48,9 @@ router.get('/infractionactivity', cache('1 hour'), async function(req : $Request
     }
 
     res.json({
-        hours: (await getData(48, 3600, "LT")).reverse(),
-        days: (await getData(7, 3600 * 24, "dddd")).reverse()
+        hours: (await getData(48, 3600)).reverse(),
+        days: (await getData(7, 3600 * 24)).reverse(),
+        month: (await getData(31, 3600 * 24)).reverse()
     });
 
 });
