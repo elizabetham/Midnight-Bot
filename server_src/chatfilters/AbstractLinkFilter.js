@@ -3,6 +3,7 @@
 import AbstractFilter from './AbstractFilter';
 import escapeStringRegexp from 'escape-string-regexp';
 import {Message} from 'discord.js';
+import _ from 'lodash';
 
 export default class AbstractLinkFilter extends AbstractFilter {
 
@@ -15,11 +16,31 @@ export default class AbstractLinkFilter extends AbstractFilter {
     }
 
     async check(message : Message) : Promise < boolean > {
-        const getURLRegex = (domain:string) : RegExp => {
-            domain = (domain && domain.length > 0) ? escapeStringRegexp(domain) : "([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)";
-            return new RegExp(".*https{0,1}:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)" + domain + ".*",'gi');
+        const getURLRegex = (url : string): Array < RegExp > => {
+
+            let domain = (url && url.length == 0)
+                ? "([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.|)" //Match any domain
+                : ((url.indexOf('/') == -1)
+                    ? escapeStringRegexp(url)
+                    : escapeStringRegexp(url.substring(0, url.indexOf('/'))));
+
+            let uri = (url.indexOf('/') == -1)
+                ? "(/|)"
+                : escapeStringRegexp(url.substring(url.indexOf('/'), url.length));
+
+            const subdomain = "[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|)\.";
+            const http = "https{0,1}:\/\/";
+
+            return [
+                new RegExp(".*" + http + "(" + subdomain + "|)" + domain + uri + ".*", 'gi'),
+                new RegExp(".*" +
+                    "(" + subdomain + "|)" + domain + (uri == "(/|)"
+                    ? "/"
+                    : uri) + ".*", 'gi')
+            ];
         }
-        return this.domains().map(domain => getURLRegex(domain)).filter(rule => message.content.match(rule)).length > 0;
+
+        return _.flatten(this.domains().map(domain => getURLRegex(domain))).filter(rule => message.content.match(rule)).length > 0;
     }
 
 }
