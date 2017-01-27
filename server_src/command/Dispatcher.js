@@ -5,8 +5,9 @@ import BanCommand from './all/Ban';
 import MuteCommand from './all/Mute';
 import UnmuteCommand from './all/Unmute';
 import PlayingCommand from './all/Playing';
+import UnbanCommand from './all/Unban'
 
-const commands = [RestartCommand, BanCommand, MuteCommand, UnmuteCommand, PlayingCommand];
+const commands = [RestartCommand, BanCommand, MuteCommand, UnmuteCommand, PlayingCommand, UnbanCommand];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
