@@ -26,9 +26,9 @@ export default {
         });
     },
 
-    getInfractionActivityStats : async() => {
+    getInfractionStats : async() => {
         return new Promise((resolve, reject) => {
-            request.get(Config.apiHost + "/api/stats/infractionactivity").end((err, response) => {
+            request.get(Config.apiHost + "/api/stats/infractionstats").end((err, response) => {
                 if (err)
                     reject(err);
                 resolve(JSON.parse(response.text));

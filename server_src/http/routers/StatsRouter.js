@@ -15,9 +15,9 @@ from 'express';
 const router = express.Router();
 
 //Endpoints
-router.get('/infractionactivity', cache('1 hour'), async function(req : $Request, res : $Response) {
+router.get('/infractionstats', cache('1 hour'), async function(req : $Request, res : $Response) {
 
-    let getData = async(buckets : number, interval : number) => {
+    let getTimeData = async(buckets : number, interval : number) => {
         const current : number = new Date(Math.ceil(new Date().getTime() / 1000 / interval) * interval * 1000).getTime() / 1000;
 
         const data = [];
@@ -47,11 +47,26 @@ router.get('/infractionactivity', cache('1 hour'), async function(req : $Request
         return data;
     }
 
-    res.json({
-        hours: (await getData(48, 3600)).reverse(),
-        days: (await getData(7, 3600 * 24)).reverse(),
-        month: (await getData(31, 3600 * 24)).reverse()
-    });
+    let data = {
+        hoursChart: (await getTimeData(48, 3600)).reverse(),
+        daysChart: (await getTimeData(7, 3600 * 24)).reverse(),
+        monthChart: (await getTimeData(31, 3600 * 24)).reverse(),
+        infractionCount: await InfractionRecord.count({}),
+        autoInfractionCount: await InfractionRecord.count({"manual": null}),
+        manualInfractionCount: await InfractionRecord.count({
+            "manual": {
+                "$ne": null
+            }
+        }),
+        actionTypeChart: await Promise.all((await InfractionRecord.find().distinct("action.type")).map(async(actionType) => {
+            return {
+                "type": actionType,
+                "count": await InfractionRecord.count({"action.type": actionType})
+            };
+        }))
+    };
+
+    res.json(data);
 
 });
 
