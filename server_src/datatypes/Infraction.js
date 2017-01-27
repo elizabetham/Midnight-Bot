@@ -23,6 +23,9 @@ export type $InfractionAction = {
     type: 'BAN',
     increasedNotoriety: boolean
 } | {
+    type: 'UNBAN',
+    increasedNotoriety: boolean
+} | {
     type: 'NONE',
     increasedNotoriety: boolean
 }

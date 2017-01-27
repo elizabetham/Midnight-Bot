@@ -320,12 +320,12 @@ describe("Chat Filters", () => {
 
         //Priority checks
 
-        it ("Should trigger the '"+BazzaFilter.displayName+"' and not the '"+RepeatedCharacterFilter.displayName+"'", async() => {
+        it("Should trigger the '" + BazzaFilter.displayName + "' and not the '" + RepeatedCharacterFilter.displayName + "'", async() => {
             let result = await processMessage(getMessageMock("bazzaaaaa", "TEST_USER", "RANDOM_USER", "TEST_CHANNEL"), false);
             assert.isOk(result === BazzaFilter);
         });
 
-        it ("Should trigger the '"+PornLinkFilter.displayName+"' and not the '"+LobbyLinkFilter.displayName+"'", async() => {
+        it("Should trigger the '" + PornLinkFilter.displayName + "' and not the '" + LobbyLinkFilter.displayName + "'", async() => {
             let result = await processMessage(getMessageMock("http://pornhub.com/ http://giftsofsteam.com/", "TEST_USER", "RANDOM_USER", "TEST_CHANNEL"), false);
             assert.isOk(result === PornLinkFilter);
         });
