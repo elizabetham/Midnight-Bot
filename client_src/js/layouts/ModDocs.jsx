@@ -120,6 +120,18 @@ class ModDocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
+                    <h3 style={style.commandHeader}>!unban</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Manually unban a user.</h5>
+                    <h5>Usage:
+                        <code>!ban &lt;user&gt; [[for]reason]</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code>
+                    </p>
+                    <p>Requires a plain user ID being passed for user as the member is most likely banned and not a member of the guild</p>
+                </Row>
+                <Row>
+                    <hr/>
                     <h3 style={style.commandHeader}>!playing</h3>
                     <h5 style={style.commandHeader}>
                         &nbsp;- Set Midnight's 'playing' status.</h5>
