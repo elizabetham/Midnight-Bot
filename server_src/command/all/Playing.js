@@ -18,7 +18,7 @@ class PlayingCommand extends AbstractCommand {
         this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Setting play status...", 5000, msg);
 
         //Set playing status
-        DiscordUtils.setPlaying(args.join(" "));
+        DiscordUtils.setPlaying(args.join(" "), true);
     };
 
 }

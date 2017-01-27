@@ -56,10 +56,7 @@ class DiscordUtils {
 
     async setPlaying(game : string, save?: boolean = true) {
         if (save) {
-            let res = await Redis.existsAsync("bot:game");
-            if (!res) {
-                Redis.set("bot:game", game);
-            }
+            Redis.set("bot:game", game);
         }
         this.client.user.setGame(game);
     }
