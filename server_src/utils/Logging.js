@@ -7,6 +7,7 @@ import {InfractionRecord} from './DBManager';
 
 //Config
 import Config from '../../config';
+import moment from 'moment';
 
 //Dependencies
 const pastebin = new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY);
@@ -68,9 +69,16 @@ export const infractionLog = async(infraction :
         }
     };
 
+let errorTimeData = {};
+
 export const error = async(identifier : string, err : any) => {
     //Log error to console
     console.error("[" + identifier + "]", err);
+
+    //Prevent botlog spam
+    if (errorTimeData[identifier] != undefined && moment().unix() - errorTimeData[identifier] < 300)
+        return;
+    errorTimeData[identifier] = moment().unix();
 
     //Create pastebin & post in client log channel
     try {

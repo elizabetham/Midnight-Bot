@@ -204,14 +204,25 @@ describe('API Tests', function() {
         describe('GET /api/stats/infractionactivity', function() {
 
             it('Should respond with the correct data', function(done) {
-                request(app).get('/api/stats/infractionactivity').set('Accept', 'application/json').expect(200).end(function(err, res) {
+                request(app).get('/api/stats/infractionstats').set('Accept', 'application/json').expect(200).end(function(err, res) {
                     if (err)
                         return done(err);
 
-                    assert.property(res.body, 'hours', "Response does not contain 'hours' property.");
-                    assert.property(res.body, 'days', "Response does not contain 'days' property.");
-                    assert.typeOf(res.body.hours, 'array', "'hours' property is not an array.");
-                    assert.typeOf(res.body.days, 'array', "'days' property is not an array.");
+                    assert.property(res.body, 'hoursChart', "Response does not contain 'hoursChart' property.");
+                    assert.property(res.body, 'daysChart', "Response does not contain 'daysChart' property.");
+                    assert.property(res.body, 'monthChart', "Response does not contain 'monthChart' property.");
+                    assert.property(res.body, 'infractionCount', "Response does not contain 'infractionCount' property.");
+                    assert.property(res.body, 'autoInfractionCount', "Response does not contain 'autoInfractionCount' property.");
+                    assert.property(res.body, 'manualInfractionCount', "Response does not contain 'manualInfractionCount' property.");
+                    assert.property(res.body, 'actionTypeChart', "Response does not contain 'actionTypeChart' property.");
+
+                    assert.typeOf(res.body.hoursChart, 'array', "'hoursChart' property is not an array.");
+                    assert.typeOf(res.body.daysChart, 'array', "'daysChart' property is not an array.");
+                    assert.typeOf(res.body.monthChart, 'array', "'monthChart' property is not an array.");
+                    assert.typeOf(res.body.infractionCount, 'number', "'infractionCount' property is not a number.");
+                    assert.typeOf(res.body.autoInfractionCount, 'number', "'autoInfractionCount' property is not a number.");
+                    assert.typeOf(res.body.manualInfractionCount, 'number', "'manualInfractionCount' property is not a number.");
+                    assert.typeOf(res.body.actionTypeChart, 'array', "'actionTypeChart' property is not a number.");
 
                     //TODO: Code way to reliably check actual data against example data
 

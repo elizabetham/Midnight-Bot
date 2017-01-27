@@ -22,7 +22,7 @@ import {GuildMember, Message} from 'discord.js';
 const avatar = require("./res/img/avatar.png");
 
 //Notify when ready for use
-DiscordUtils.client.on('ready', () => {
+DiscordUtils.client.on('ready', async() => {
     console.log('Discord connection ready.');
     //Set the avatar and game of the bot
     setTimeout(async() => {
@@ -34,10 +34,7 @@ DiscordUtils.client.on('ready', () => {
         } else if (Config.hasOwnProperty("playing"))
             DiscordUtils.setPlaying(Config.playing, false);
         }
-
     , 1000);
-
-    //DiscordUtils.client.guilds.array().forEach(guild => guild.roles.array().sort((r1, r2) => r1.position - r2.position).forEach(role => console.log(role.position, role.name, role.id)));
 });
 
 //Handle member joining
