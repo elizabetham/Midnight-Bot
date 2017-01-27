@@ -14,8 +14,7 @@ class UnbanCommand extends AbstractCommand {
     constructor() {
         super("unban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
-    async exec(args : Array < string >, reply : (msg : string) => Promise<Message>, user : GuildMember, msg : Message) {
-
+    async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
         //Verify argument length
         if (args.length < 1) {
             this.tools.volatileReply(reply, "The correct usage for the unban command is `unban <user> [reason]`", 5000, msg);
@@ -41,7 +40,7 @@ class UnbanCommand extends AbstractCommand {
         }
 
         //Make sure user is banned
-        const isBanned = bans.exists(uid);
+        const isBanned = bans.has(uid);
 
         //If user is not banned, cannot unban, let user know and stop
         if (!isBanned) {
@@ -49,8 +48,11 @@ class UnbanCommand extends AbstractCommand {
         }
 
         //Obtain a reason if it exists
-        let reasonArr = args.length == 1 ? [] : args.slice(1, args.length);
-        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i)) reasonArr.shift();
+        let reasonArr = args.length == 1
+            ? []
+            : args.slice(1, args.length);
+        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i))
+            reasonArr.shift();
         const reason = reasonArr.length == 0
             ? null
             : _.capitalize(reasonArr.join(" "));
@@ -68,13 +70,7 @@ class UnbanCommand extends AbstractCommand {
         }).save());
 
         //Perform unban
-        console.log("UNBAN UID", uid);
-        try {
-            await msg.guild.unban(uid);
-        }
-        catch (ex) {
-            console.log("UNBAN EX",ex);
-        }
+        await msg.guild.unban(uid);
 
     };
 
