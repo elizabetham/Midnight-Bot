@@ -16,7 +16,13 @@ import Logging from './Logging';
 export async function assertUserRecord(userid : string) : UserRecord {
     let userRecord: UserRecord = await UserRecord.findOne({userid: userid});
     if (!userRecord) {
-        let user = await DiscordUtils.client.fetchUser(userid);
+        let user = {};
+        try {
+            user = await DiscordUtils.client.fetchUser(userid);
+        } catch (err) {
+            Logging.error("ASSERT_USER_RECORD_USERNAME_LOOKUP", err);
+            throw "USERNAME_LOOKUP_ERROR";
+        }
         userRecord = new UserRecord({
             userid: userid,
             mutedUntil: -1,
@@ -26,8 +32,10 @@ export async function assertUserRecord(userid : string) : UserRecord {
             username_lower: user.username.toLowerCase()
         });
         await userRecord.save(err => {
-            if (err)
+            if (err) {
                 Logging.error("ASSERT_USER_RECORD_SAVE", err)
+                throw "USER_RECORD_SAVE_ERROR";
+            }
         });
     }
     return userRecord;

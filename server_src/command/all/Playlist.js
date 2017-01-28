@@ -32,11 +32,9 @@ class PlaylistCommand extends AbstractCommand {
 
             if (status.queue) {
                 response += "\n\n";
-                await Promise.all(status.queue.map(async(item, index) => {
-                    response += "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (status.currentItem.requestedBy
-                        ? (await UserUtils.assertUserRecord(status.currentItem.requestedBy)).username
-                        : "Midnight") + "**\n";
-                }));
+                (await Promise.all(status.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
+                    ? (await UserUtils.assertUserRecord(item.requestedBy)).username
+                    : "Midnight") + "**\n"))).forEach(line => response += line);
             }
 
             reply(response);
