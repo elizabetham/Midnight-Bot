@@ -15,7 +15,7 @@ const pastebin = new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY);
 export const bot = (msg : string) => {
     DiscordUtils.client.guilds.array().forEach(async(guild) => {
         try {
-            let channel = await DiscordUtils.getTextChannel(guild, Config.botLogChannel);
+            let channel = await DiscordUtils.getTextChannelByName(guild, Config.botLogChannel);
             channel.sendMessage(msg);
         } catch (err) {
             error("MOD_LOG", err);
@@ -26,7 +26,7 @@ export const bot = (msg : string) => {
 export const mod = (msg : string) => {
     DiscordUtils.client.guilds.array().forEach(async(guild) => {
         try {
-            let channel = await DiscordUtils.getTextChannel(guild, Config.botModChannel);
+            let channel = await DiscordUtils.getTextChannelByName(guild, Config.botModChannel);
             channel.sendMessage(msg);
         } catch (err) {
             error("MOD_LOG", err);
