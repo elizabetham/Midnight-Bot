@@ -13,16 +13,16 @@ import FileIcon from 'material-ui/svg-icons/editor/insert-drive-file';
 
 class HeaderComponent extends Component {
 
-    props: {
+    props : {
         menuToggle: Function
     }
 
     render() {
         return (
             <div>
-                <MenuItem leftIcon={<WarningIcon />} containerElement={< Link to = '/infractions' />} primaryText="Infractions" onTouchTap={this.props.menuToggle}/>
-                <MenuItem leftIcon={<PollIcon />} containerElement={< Link to = '/statistics' />} primaryText="Statistics" onTouchTap={this.props.menuToggle}/>
-                <MenuItem leftIcon={<FileIcon />} containerElement={< Link to = '/moddocs' />} primaryText="Staff Documentation" onTouchTap={this.props.menuToggle}/>
+                <MenuItem leftIcon={< WarningIcon />} containerElement={< Link to = '/infractions' />} primaryText="Infractions" onTouchTap={this.props.menuToggle}/>
+                <MenuItem leftIcon={< PollIcon />} containerElement={< Link to = '/statistics' />} primaryText="Statistics" onTouchTap={this.props.menuToggle}/>
+                <MenuItem leftIcon={< FileIcon />} containerElement={< Link to = '/docs' />} primaryText="Documentation" onTouchTap={this.props.menuToggle}/>
             </div>
         );
     }
