@@ -2,10 +2,10 @@
 //Dependencies
 import React, {Component} from 'react';
 
-import '../../css/moddocs.css';
+import '../../css/docs.css';
 import {Grid, Row, Col} from 'react-bootstrap';
 
-class ModDocsLayout extends Component {
+class DocsLayout extends Component {
 
     render() {
 
@@ -36,8 +36,8 @@ class ModDocsLayout extends Component {
         return (
             <div style={style.layout}>
                 <Row>
-                    <h2>Staff Documentation</h2>
-                    <p>Below you'll find documentation on how to utilize Midnight's moderation capabilities as a staff member of The Convicts.</p>
+                    <h2>Midnight Documentation</h2>
+                    <p>Below you'll find documentation on how to make use of Midnight's feature set.</p>
                 </Row>
                 <Row>
                     <h3>Command usage</h3>
@@ -50,7 +50,7 @@ class ModDocsLayout extends Component {
                     <h3>Referencing users</h3>
                     <p>
                         <img className="img-thumbnail" style={style.imgLeft} src="http://i.imgur.com/llsZLSD.png"/>
-                        Most commands require a reference to a user in order to act upon that user. Normally you can reference a user by just using a regular Discord mention.
+                        Some commands require a reference to a user in order to act upon that user. Normally you can reference a user by just using a regular Discord mention.
                         <br/>
                         <br/>
                         To reference users that are not currently a member of the guild, either use their plain UID as a replacement, or use
@@ -74,6 +74,48 @@ class ModDocsLayout extends Component {
                 </Row>
                 <Row>
                     <h2>Commands</h2>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3>Music</h3>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!play</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Queue a song for the music voice chat.</h5>
+                    <h5>Usage:
+                        <code>!play &lt;youtubeURL/searchQuery&gt;</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
+                    </p>
+                    <p>You can either supply a valid URL to a youtube video, or you can just type in a search query and Midnight will pick the best result.</p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!skip</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Skip the currently playing song</h5>
+                    <h5>Usage:
+                        <code>!skip</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
+                    </p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!playlist</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Show the currently queued songs</h5>
+                    <h5>Usage:
+                        <code>!playlist</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
+                    </p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3>Moderation</h3>
                 </Row>
                 <Row>
                     <hr/>
@@ -131,6 +173,10 @@ class ModDocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
+                    <h3>Administration</h3>
+                </Row>
+                <Row>
+                    <hr/>
                     <h3 style={style.commandHeader}>!playing</h3>
                     <h5 style={style.commandHeader}>
                         &nbsp;- Set Midnight's 'playing' status.</h5>
@@ -159,4 +205,4 @@ class ModDocsLayout extends Component {
     }
 }
 
-export default ModDocsLayout;
+export default DocsLayout;

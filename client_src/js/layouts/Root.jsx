@@ -12,7 +12,7 @@ import midnightTheme from '../styles/midnightTheme';
 import App from './App';
 import Infractions from './Infractions';
 import Statistics from './Statistics';
-import ModDocs from './ModDocs';
+import Docs from './Docs';
 
 class Root extends Component {
 
@@ -24,7 +24,7 @@ class Root extends Component {
                         <IndexRedirect to="/statistics"/>
                         <Route path="/infractions(/:userid(/:infractionid))" component={Infractions}/>
                         <Route path="/statistics" component={Statistics}/>
-                        <Route path="/moddocs" component={ModDocs}/>
+                        <Route path="/docs" component={Docs}/>
                     </Route>
                 </Router>
             </MuiThemeProvider>
