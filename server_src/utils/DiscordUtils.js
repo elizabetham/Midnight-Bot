@@ -1,7 +1,9 @@
 // @flow
 
 import Config from '../../config';
-import {Client, Guild} from 'discord.js';
+import type {Guild, VoiceChannel, TextChannel}
+from 'discord.js';
+import {Client} from 'discord.js';
 import {Redis} from './DBManager';
 
 class DiscordUtils {
@@ -13,6 +15,8 @@ class DiscordUtils {
     setPlaying : (game : string, save
         ?
         : boolean) => Promise < void >;
+    getVoiceChannel : (id : string) => VoiceChannel;
+    getTextChannel : (id : string) => TextChannel;
 
     //Constructor
     constructor() {
@@ -21,13 +25,23 @@ class DiscordUtils {
         this.stop = this.stop.bind(this);
         this.getPlaying = this.getPlaying.bind(this);
         this.setPlaying = this.setPlaying.bind(this);
+        this.getVoiceChannel = this.getVoiceChannel.bind(this);
+        this.getTextChannel = this.getTextChannel.bind(this);
     }
 
     //Functions
-    getTextChannel(guild : Guild, name : string) {
+    getTextChannelByName(guild : Guild, name : string) {
         return new Promise(resolve => {
             resolve(guild.channels.array().find(c => c.type == 'text' && c.name == name));
         });
+    };
+
+    getTextChannel(id : string) {
+        return this.client.guilds.array().map(guild => guild.channels.find(channel => channel.type == 'text' && id == channel.id)).find(c => c);
+    };
+
+    getVoiceChannel(id : string) {
+        return this.client.guilds.array().map(guild => guild.channels.find(channel => channel.type == 'voice' && id == channel.id)).find(c => c);
     };
 
     getRole(guild : Guild, rolename : string) {
@@ -37,13 +51,11 @@ class DiscordUtils {
     };
 
     async start() {
-        if (!this.client)
-            this.client = new Client();
         return await this.client.login(Config.botToken);
     }
 
     async stop() {
-        return await this.client.destroy();
+        await this.client.destroy();
     }
 
     async getPlaying() : Promise < string > {

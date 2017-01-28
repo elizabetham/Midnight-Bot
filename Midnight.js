@@ -19,3 +19,6 @@ import expressApp from './server_src/http/HTTPServer';
 expressApp.listen(Config.HTTP_PORT, () => {
     console.log("Express listening on port " + Config.HTTP_PORT);
 });
+
+//Start music Module
+import './server_src/utils/MusicManager';

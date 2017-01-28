@@ -1,3 +1,7 @@
+// @flow
+import type {Message}
+from 'discord.js';
+
 import AbstractCommand from './AbstractCommand';
 
 import RestartCommand from './all/Restart';
@@ -6,8 +10,21 @@ import MuteCommand from './all/Mute';
 import UnmuteCommand from './all/Unmute';
 import PlayingCommand from './all/Playing';
 import UnbanCommand from './all/Unban'
+import PlayCommand from './all/Play';
+import SkipCommand from './all/Skip';
+import PlaylistCommand from './all/Playlist';
 
-const commands = [RestartCommand, BanCommand, MuteCommand, UnmuteCommand, PlayingCommand, UnbanCommand];
+const commands = [
+    RestartCommand,
+    BanCommand,
+    MuteCommand,
+    UnmuteCommand,
+    PlayingCommand,
+    UnbanCommand,
+    PlayCommand,
+    SkipCommand,
+    PlaylistCommand
+];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
