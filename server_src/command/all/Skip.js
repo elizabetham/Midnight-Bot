@@ -20,9 +20,9 @@ class SkipCommand extends AbstractCommand {
         }
 
         const skipped : boolean = await MusicManager.skip();
-        reply(skipped
+        this.tools.volatileReply(reply, skipped
             ? _.sample(Lang.AFFIRMATIVE) + " Skipping..."
-            : "There is no song to play next!");
+            : "There is no song to play next!", 5000, msg);
 
     };
 

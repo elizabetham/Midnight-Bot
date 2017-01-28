@@ -26,7 +26,7 @@ class PlayCommand extends AbstractCommand {
 
         const query = args.join(" ");
         try {
-            const playData = await MusicManager.play(query, user.user.id);
+            const playData = await MusicManager.play(query, user.id);
             reply("Added **" + playData.queueItem.videoInfo.title + "** to the queue. Position in queue: **" + playData.queuePosition + "** - estimated time until play: " + playData.eta);
         } catch (e) {
             switch (e) {
