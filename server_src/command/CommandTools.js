@@ -6,11 +6,15 @@ import _ from 'lodash';
 export default {
     extractUID : (argument : string) :
         ? string => {
-            return argument.match(/^<@[0-9]*>$/)
-                ? argument.substring(2, argument.length - 1)
-                : (argument.match(/^[0-9]*$/)
-                    ? argument
-                    : null);
+            if (argument.match(/^<@[0-9]*>$/)) {
+                return argument.substring(2, argument.length - 1)
+            } else if (argument.match(/^<@![0-9]*>$/)) {
+                return argument.substring(3, argument.length - 1)
+            } else if (argument.match(/^[0-9]*$/)) {
+                return argument;
+            } else {
+                return null;
+            }
         },
     hasPermission : (user : GuildMember, minRole : Role, inclusive : boolean = true) : boolean => {
         const userpos = _.max(user.roles.array().map(r => r.position));
