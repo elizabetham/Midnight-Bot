@@ -22,7 +22,14 @@ class UnbanCommand extends AbstractCommand {
         }
 
         //Extract UID from mention
-        const uid : string = this.tools.extractUID(args[0]) || args[0];
+        const uid :
+            ? string = this.tools.extractUID(args[0]);
+
+        //If the UID is invalid, let the user know and stop here
+        if (!uid) {
+            this.tools.volatileReply(reply, "The given user is not a valid target. Please use a mention or UID format.", 5000, msg);
+            return;
+        }
 
         //Retrieve bans from guild
         const bans = await msg.guild.fetchBans();
