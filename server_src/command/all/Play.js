@@ -37,11 +37,13 @@ class PlayCommand extends AbstractCommand {
                     this.tools.volatileReply(reply, "There are no results for '" + query + "'!", 5000, msg);
                     break;
                 case "SEARCH_ERROR":
-                    console.log(e);
-                    this.tools.volatileReply(reply, "An error has occurred when searching. Please notify a staff member!", 5000, msg);
+                    this.tools.volatileReply(reply, "An error has occurred while searching. Please notify a staff member!", 5000, msg);
                     break;
                 case "DUPLICATE_ENTRY":
                     this.tools.volatileReply(reply, "This song is already in the queue! Please wait for it to play before queuing it again.", 5000, msg);
+                    break;
+                case "SEARCH_RESOLVE_ERROR":
+                    this.tools.volatileReply(reply, "An error has occurred while resolving your search. Please notify a staff member!", 5000, msg);
                     break;
                 default:
                     console.log(e);

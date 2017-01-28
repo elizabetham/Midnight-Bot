@@ -80,7 +80,8 @@ class MusicQueue {
             try {
                 const searchRes = await yt.search(query, {
                     maxResults: 1,
-                    key: Config.YOUTUBE_API_KEY
+                    key: Config.YOUTUBE_API_KEY,
+                    type: 'video'
                 });
 
                 //Check if we found results
@@ -89,9 +90,17 @@ class MusicQueue {
                 }
 
                 //Obtain the video info of the found result
-                videoInfo = await yt.getInfo(searchRes[0][0].link);
+                try {
+                    videoInfo = await yt.getInfo(searchRes[0][0].link);
+                } catch (e) {
+                    console.log("ATTEMPTED RESOLVE", searchRes[0][0].link, e);
+                    throw "SEARCH_RESOLVE_ERROR";
+                }
             } catch (e) {
                 //We cannot find results. Quit here.
+                if (e == "SEARCH_RESOLVE_ERROR") {
+                    throw e;
+                }
                 console.log(e);
                 throw "SEARCH_ERROR";
             }
