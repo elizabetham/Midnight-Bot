@@ -8,7 +8,9 @@ export default {
         ? string => {
             return argument.match(/^<@[0-9]*>$/)
                 ? argument.substring(2, argument.length - 1)
-                : null;
+                : (argument.match(/^[0-9]*$/)
+                    ? argument
+                    : null);
         },
     hasPermission : (user : GuildMember, minRole : Role, inclusive : boolean = true) : boolean => {
         const userpos = _.max(user.roles.array().map(r => r.position));
@@ -39,11 +41,13 @@ export default {
 
             return units[unit] * value;
         },
-    volatileReply : async(reply : (message : string) => Message, message : string, delay : number, originalMsg:?Message) => {
+    volatileReply : async(reply : (message : string) => Message, message : string, delay : number, originalMsg :? Message) => {
         const msg = await reply(message);
         setTimeout(() => {
             msg.delete();
-            if (originalMsg) originalMsg.delete();
-        }, delay);
+            if (originalMsg)
+                originalMsg.delete();
+            }
+        , delay);
     }
 }
