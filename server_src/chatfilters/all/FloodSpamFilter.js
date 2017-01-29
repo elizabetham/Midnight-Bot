@@ -20,17 +20,8 @@ class FloodSpamFilter extends AbstractFilter {
         const SECONDS = 6; //period of seconds
         //Define key
         let key = message.author.id + ":floodcount";
-
-        let res = await Redis.existsAsync(key);
-
-        //Create key if it does not exist yet
-        if (!res) {
-            Redis.set(key, 0);
-            Redis.expire(key, SECONDS);
-        }
         //Increment message count
-        Redis.incr(key);
-        res = await Redis.getAsync(key);
+        let res = await Redis.incrAsync(key);
         return res > MESSAGES;
     }
 

@@ -17,7 +17,7 @@ import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
 import {yt} from './MusicTools';
 import {PERMISSION_PRESETS} from '../utils/Permission';
-import {Redis, UserRecord} from '../utils/DBManager';
+import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
 import moment from 'moment';
 import UserUtils from '../utils/UserUtils';
 import ordinal from 'ordinal-number-suffix';
@@ -65,6 +65,9 @@ class MusicManager {
         this.getShamePoints = this.getShamePoints.bind(this);
         this.incrShamePoints = this.incrShamePoints.bind(this);
         this.updateNowPlaying = this.updateNowPlaying.bind(this);
+        this.unblacklistVideo = this.unblacklistVideo.bind(this);
+        this.blacklistVideo = this.blacklistVideo.bind(this);
+        this.checkPermBlacklist = this.checkPermBlacklist.bind(this);
 
         (async() => {
             //Connect to voice channels when discord is ready
@@ -113,6 +116,7 @@ class MusicManager {
         Redis.expire(key, 3600 * 2 * value);
         return value;
     }
+
     getShamePoints : Function;
     async getShamePoints(userid : string) {
         const key = userid + ":MusicShamePoints";
@@ -121,18 +125,12 @@ class MusicManager {
             ? await Redis.getAsync(key)
             : 0;
     }
+
     incrShamePoints : Function;
     async incrShamePoints(userid : string) {
-        const key = userid + ":MusicShamePoints";
-
-        //Create key if it does not exist yet
-        let res = await Redis.existsAsync(key);
-        if (!res) {
-            Redis.set(key, 0);
-        }
-
         //Increment points
-        const value = Redis.incr(key);
+        const key = userid + ":MusicShamePoints";
+        const value = await Redis.incrAsync(key);
         Redis.expire(key, 3600 * 2 * value);
         return value;
     }
@@ -225,6 +223,21 @@ class MusicManager {
                 let cooldown = 3600 * 24;
                 Redis.set(key, (moment().unix() + cooldown));
                 Redis.expire(key, cooldown);
+            }
+
+            //Blacklist it permanently if skipped >= 3 times
+            if (this.activeItem) {
+                let key = this.activeItem.videoInfo.video_id + ":MusicVoteSkipped";
+                let skipped = await Redis.incrAsync(key);
+                if (skipped >= 3) {
+                    try {
+                        this.blacklistVideo(key);
+                    } catch (e) {
+                        if (e.e != "ALREADY_BLACKLISTED") {
+                            throw e;
+                        }
+                    }
+                }
             }
 
             //Send message
@@ -453,6 +466,46 @@ class MusicManager {
             currentItem: this.activeItem,
             queue: this.queue.getArray()
         };
+    }
+
+    unblacklistVideo : Function;
+
+    unblacklistVideo : Function;
+
+    async unblacklistVideo(ytid : string) {
+        let res = await this.checkPermBlacklist(ytid);
+        if (!res) {
+            throw "ALREADY_ALLOWED";
+        }
+        await res.remove();
+    }
+
+    blacklistVideo : Function;
+
+    async blacklistVideo(ytid : string, listedBy :
+        ? string) {
+        if (await this.checkPermBlacklist(ytid)) {
+            throw {e: "ALREADY_BLACKLISTED"};
+        }
+
+        let vidModel : {
+            ytid : string,
+            listedBy?: string
+        } = {
+            ytid
+        };
+
+        if (listedBy) {
+            vidModel['listedBy'] = listedBy;
+        }
+
+        await new BlacklistedVideo(vidModel).save();
+    }
+
+    checkPermBlacklist : Function;
+
+    async checkPermBlacklist(ytid : string) {
+        return (await BlacklistedVideo.findOne({ytid: ytid}));
     }
 
 };

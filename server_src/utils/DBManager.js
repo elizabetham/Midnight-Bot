@@ -93,6 +93,17 @@ export const InfractionRecord = mongoose.model('Infraction', new mongoose.Schema
     }
 }));
 
+export const BlacklistedVideo = mongoose.model('blacklistedvideo', new mongoose.Schema({
+    ytid: {
+        type: String,
+        required: true
+    },
+    listedBy: {
+        type: String,
+        required: false
+    }
+}));
+
 //Handle redis errors
 redisClient.on("error", err => {
     Logging.error("REDIS_GENERIC_ERROR", err);

@@ -3,7 +3,7 @@
 import QueueItem from './QueueItem';
 import {yt} from './MusicTools';
 import Config from '../../config';
-import {Redis} from '../utils/DBManager';
+import {Redis, BlacklistedVideo} from '../utils/DBManager';
 
 class MusicQueue {
 
@@ -87,11 +87,16 @@ class MusicQueue {
             throw {e: "DUPLICATE_ENTRY"};
         }
 
-        //Check if blacklisted
+        //Check if blacklisted temporarily
         let blacklistKey = videoInfo.video_id + ":MusicTmpBlacklist";
         let res = await Redis.existsAsync(blacklistKey);
         if (res) {
             throw {e: "BLACKLISTED_TEMPORARILY"};
+        }
+
+        //Check if blacklisted permanently
+        if (await BlacklistedVideo.findOne({ytid: videoInfo.video_id})) {
+            throw {e: "BLACKLISTED_PERMANENTLY"};
         }
 
         //Push new video onto queue

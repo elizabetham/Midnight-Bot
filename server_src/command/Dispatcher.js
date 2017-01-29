@@ -21,6 +21,7 @@ import SkipCommand from './all/music/Skip';
 import PlaylistCommand from './all/music/Playlist';
 import UpvoteCommand from './all/music/Upvote';
 import DownvoteCommand from './all/music/Downvote';
+import BlacklistCommand from './all/music/Blacklist';
 
 const commands = [
     RestartCommand,
@@ -34,6 +35,7 @@ const commands = [
     PlaylistCommand,
     DownvoteCommand,
     UpvoteCommand,
+    BlacklistCommand,
     Dbtools
 ];
 
