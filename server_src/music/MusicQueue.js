@@ -121,12 +121,14 @@ class MusicQueue {
 
     checkTitle : Function;
 
-    checkTitle(title : string) {
+    async checkTitle(title : string) {
         //Check with racism & offensive behaviour chat filters
-        if (OffensiveBehaviourFilter.check({content: title}))
+        if (await OffensiveBehaviourFilter.check({content: title})) {
             return false;
-        if (RacismFilter.check({content: title}))
+        }
+        if (await RacismFilter.check({content: title})) {
             return false;
+        }
 
         //Custom rules
         let rules = [];

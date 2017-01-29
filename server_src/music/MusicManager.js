@@ -301,7 +301,13 @@ class MusicManager {
             [
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
             ],
-            [PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3]
+            [
+                PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN, 5
+            ],
+            [
+                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3
+            ],
+            [PERMISSION_PRESETS.BOTDEV.MUTED, 3]
         ].find(lvl => {
             return lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true);
         }) || [null, 1])[1];
@@ -315,7 +321,13 @@ class MusicManager {
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 0
             ],
             [
+                PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN, 0
+            ],
+            [
                 PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
+            ],
+            [
+                PERMISSION_PRESETS.BOTDEV.MUTED, 8 * 60
             ]
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
             null, 15 * 60
@@ -350,6 +362,11 @@ class MusicManager {
         if (requiredCooldown > 0) {
             Redis.set(redisKey, (moment().unix() + requiredCooldown));
             Redis.expire(redisKey, requiredCooldown);
+        }
+
+        //Start playing if there's nothing else active
+        if (!this.activeItem) {
+            this.skip();
         }
 
         //Return info
