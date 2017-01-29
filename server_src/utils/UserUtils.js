@@ -83,7 +83,7 @@ export async function increaseNotoriety(userid : string) : Promise < $Infraction
             //Mute user
             userRecord.mutedUntil = moment().unix() + 300;
             DiscordUtils.client.guilds.array().forEach(async(guild) => {
-                let role = await DiscordUtils.getRole(guild, "Muted");
+                let role = await DiscordUtils.getRoleByName(guild, "Muted");
                 await guild.members.get(userid).addRole(role);
             });
             break;
@@ -98,7 +98,7 @@ export async function increaseNotoriety(userid : string) : Promise < $Infraction
             //Mute user
             userRecord.mutedUntil = moment().unix() + 3600 * 6;
             DiscordUtils.client.guilds.array().forEach(async(guild) => {
-                let role = await DiscordUtils.getRole(guild, "Muted");
+                let role = await DiscordUtils.getRoleByName(guild, "Muted");
                 await guild.members.get(userid).addRole(role);
             });
 
@@ -115,7 +115,7 @@ export async function increaseNotoriety(userid : string) : Promise < $Infraction
             //Mute user
             userRecord.mutedUntil = Number.MAX_SAFE_INTEGER;
             DiscordUtils.client.guilds.array().forEach(async(guild) => {
-                let role = await DiscordUtils.getRole(guild, "Muted");
+                let role = await DiscordUtils.getRoleByName(guild, "Muted");
                 await guild.members.get(userid).addRole(role);
             });
             break;

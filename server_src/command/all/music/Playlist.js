@@ -1,7 +1,7 @@
 // @flow
 
 import AbstractCommand from '../../AbstractCommand';
-import {PERMISSION_PRESETS} from '../../Permission';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import _ from 'lodash';

@@ -16,11 +16,6 @@ export default {
                 return null;
             }
         },
-    hasPermission : (user : GuildMember, minRole : Role, inclusive : boolean = true) : boolean => {
-        const userpos = _.max(user.roles.array().map(r => r.position));
-
-        return user.roles.array().find(role => role.name.toUpperCase() == "BOTDEV" || (inclusive && userpos >= minRole.position || userpos > minRole.position));
-    },
     parseTime : (time : string) :
         ? number => {
             //EXPECT "[value] [unit]";

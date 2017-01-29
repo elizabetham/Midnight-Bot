@@ -1,7 +1,7 @@
 // @flow
 
 import AbstractCommand from '../../AbstractCommand';
-import {PERMISSION_PRESETS} from '../../Permission';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import Infraction from '../../../datatypes/Infraction';
@@ -40,7 +40,7 @@ class MuteCommand extends AbstractCommand {
             ? GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
         //If we found a reference, make sure we're not muting superiors
-        if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
+        if (targetMember && !DiscordUtils.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
             this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to mute users ranked equally or higher than you.", 5000, msg);
             return;
         }
@@ -89,7 +89,7 @@ class MuteCommand extends AbstractCommand {
 
         //Apply the mute
         if (targetMember) {
-            targetMember.addRole(await DiscordUtils.getRole(msg.guild, "Muted"));
+            targetMember.addRole(await DiscordUtils.getRoleByName(msg.guild, "Muted"));
         }
 
         //Save it to the user record

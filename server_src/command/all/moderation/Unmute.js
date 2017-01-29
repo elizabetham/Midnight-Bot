@@ -1,7 +1,7 @@
 // @flow
 
 import AbstractCommand from '../../AbstractCommand';
-import {PERMISSION_PRESETS} from '../../Permission';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember, Role} from 'discord.js';
 import Lang from '../../Lang';
 import Infraction from '../../../datatypes/Infraction';
@@ -44,7 +44,7 @@ class UnmuteCommand extends AbstractCommand {
         const targetMember : GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
         //Fetch mute role
-        const muteRole : Role = await DiscordUtils.getRole(msg.guild, "Muted");
+        const muteRole : Role = await DiscordUtils.getRoleByName(msg.guild, "Muted");
 
         //Check if the user is even muted
         if (!targetMember || (!targetMember.roles.array().find(role => role.id == muteRole.id) && userRecord.mutedUntil == -1)) {

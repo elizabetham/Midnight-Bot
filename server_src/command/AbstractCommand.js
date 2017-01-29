@@ -5,10 +5,11 @@ import Logging from '../utils/Logging';
 import Lang from './Lang';
 import _ from 'lodash';
 import Tools from './CommandTools'
+import DiscordUtils from '../utils/DiscordUtils';
 
 //Types
 import {Message, Role, GuildMember} from 'discord.js';
-import Permission from './Permission';
+import Permission from '../utils/Permission';
 
 export default class AbstractCommand {
 
@@ -52,7 +53,7 @@ export default class AbstractCommand {
             }
 
             //Check if the user has Permission
-            let hasPermission = this.tools.hasPermission(message.member, minRole);
+            let hasPermission = DiscordUtils.hasPermission(message.member, minRole);
 
             //If the user does not have permission
             if (!hasPermission) {

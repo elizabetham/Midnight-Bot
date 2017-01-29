@@ -1,7 +1,7 @@
 // @flow
 
 import AbstractCommand from '../../AbstractCommand';
-import {PERMISSION_PRESETS} from '../../Permission';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import _ from 'lodash';
@@ -26,10 +26,10 @@ class PlayCommand extends AbstractCommand {
 
         const query = args.join(" ");
         try {
-            const playData = await MusicManager.play(query, user.id);
+            const playData = await MusicManager.play(query, user);
             reply("Added **" + playData.queueItem.videoInfo.title + "** to the queue. Position in queue: **" + playData.queuePosition + "** - estimated time until play: " + playData.eta);
         } catch (e) {
-            switch (e) {
+            switch (e.e) {
                 case "QUEUE_FULL":
                     this.tools.volatileReply(reply, "The queue is full, please wait to add more music!", 5000, msg);
                     break;
@@ -44,6 +44,16 @@ class PlayCommand extends AbstractCommand {
                     break;
                 case "SEARCH_RESOLVE_ERROR":
                     this.tools.volatileReply(reply, "An error has occurred while resolving your search. Please notify a staff member!", 5000, msg);
+                    break;
+                case "MAX_ALLOWED_QUEUES":
+                    this.tools.volatileReply(reply, "You have reached your maximum of **" + e.allowed + "** queued song" + (e.allowed > 1
+                        ? "s"
+                        : "") + "! Please wait for " + (e.allowed > 1
+                        ? "some of them"
+                        : "it") + " to play before queuing more.", 5000, msg);
+                    break;
+                case "USER_QUEUE_COOLDOWN":
+                    this.tools.volatileReply(reply, "Please wait! You can queue again in `" + e.timeRemaining + "`.", 5000, msg);
                     break;
                 default:
                     console.log(e);

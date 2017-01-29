@@ -1,13 +1,14 @@
 // @flow
 
 import AbstractCommand from '../../AbstractCommand';
-import {PERMISSION_PRESETS} from '../../Permission';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import Infraction from '../../../datatypes/Infraction';
 import Logging from '../../../utils/Logging';
 import moment from 'moment';
 import _ from 'lodash';
+import DiscordUtils from '../../../utils/DiscordUtils';
 
 class BanCommand extends AbstractCommand {
 
@@ -38,7 +39,7 @@ class BanCommand extends AbstractCommand {
             ? GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
         //If we found a reference, make sure we're not banning superiors
-        if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
+        if (targetMember && !DiscordUtils.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
             this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked equally or higher than you.", 5000, msg);
             return;
         }

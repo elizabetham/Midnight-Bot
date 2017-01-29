@@ -41,7 +41,7 @@ class MusicQueue {
     async push(query : string, requestedBy : string) : Object {
         //Quit if queue is already full
         if(this.queue.length >= this.maxQueueSize) {
-            throw "QUEUE_FULL";
+            throw {e: "QUEUE_FULL"};
         }
 
         //First assume it's a URL
@@ -59,7 +59,7 @@ class MusicQueue {
 
                 //Check if we found results
                 if (searchRes[0].length == 0) {
-                    throw "NO_RESULTS_FOUND";
+                    throw {e: "NO_RESULTS_FOUND"};
                 }
 
                 //Obtain the video info of the found result
@@ -67,20 +67,20 @@ class MusicQueue {
                     videoInfo = await yt.getInfo(searchRes[0][0].link);
                 } catch (e) {
                     console.log("ATTEMPTED RESOLVE", searchRes[0][0].link, e);
-                    throw "SEARCH_RESOLVE_ERROR";
+                    throw {e: "SEARCH_RESOLVE_ERROR"};
                 }
             } catch (e) {
                 //We cannot find results. Quit here.
-                if (e == "SEARCH_RESOLVE_ERROR") {
+                if (e.e == "SEARCH_RESOLVE_ERROR") {
                     throw e;
                 }
                 console.log(e);
-                throw "SEARCH_ERROR";
+                throw {e: "SEARCH_ERROR"};
             }
         }
 
         if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
-            throw "DUPLICATE_ENTRY";
+            throw {e: "DUPLICATE_ENTRY"};
         }
 
         //Push new video onto queue

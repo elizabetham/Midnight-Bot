@@ -16,6 +16,9 @@ import DiscordUtils from '../utils/DiscordUtils';
 import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
 import {yt} from './MusicTools';
+import {PERMISSION_PRESETS} from '../utils/Permission';
+import {Redis} from '../utils/DBManager';
+import moment from 'moment';
 
 class MusicManager {
 
@@ -103,7 +106,42 @@ class MusicManager {
 
     play : Function;
 
-    async play(query : string, requestedBy : string) {
+    async play(query : string, member : GuildMember) {
+        //Check if user is allowed another queue
+        const currentlyQueued = this.queue.getArray().filter(i => i.requestedBy == member.id).length;
+        const allowedQueues = ([
+            [
+                PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
+            ],
+            [PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3]
+        ].find(lvl => DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [null, 1])[1];
+        if (currentlyQueued >= allowedQueues) {
+            throw {e: "MAX_ALLOWED_QUEUES", allowed: allowedQueues};
+        }
+
+        //Check if user is on cooldown
+        const requiredCooldown = ([
+            [
+                PERMISSION_PRESETS.CONVICTS.MODERATOR, 0
+            ],
+            [
+                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
+            ]
+        ].find(lvl => DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
+            null, 15 * 60
+        ])[1];
+
+        let redisKey = member.id + ":MusicQueueCooldown";
+        let res = await Redis.existsAsync(redisKey);
+        if (res) {
+            Redis.get(redisKey);
+            let data = await Redis.getAsync(redisKey);
+            throw {
+                e: "USER_QUEUE_COOLDOWN",
+                timeRemaining: this.secondsToTimestamp(data - moment().unix())
+            };
+        }
+
         //Calculate seconds remaining before playing
         let eta = this.queue.getArray().reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
             ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
@@ -112,11 +150,20 @@ class MusicManager {
             : 0);
 
         //Return info
-        return {
-            queueItem: await this.queue.push(query, requestedBy),
+        let response = {
+            queueItem: await this.queue.push(query, member.id),
             queuePosition: this.queue.size(),
             eta: this.secondsToTimestamp(eta)
         };
+
+        //Update Redis cooldowns
+        if (requiredCooldown > 0) {
+            Redis.set(redisKey, (moment().unix() + requiredCooldown));
+            Redis.expire(redisKey, requiredCooldown);
+        }
+
+        //Return info
+        return response;
     }
 
     secondsToTimestamp : Function;
