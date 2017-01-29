@@ -24,6 +24,12 @@ class UpvoteCommand extends AbstractCommand {
             this.tools.volatileReply(reply, "upvoted!", 1000, msg);
         } catch (e) {
             switch (e) {
+                case "ALREADY_VOTED":
+                    this.tools.volatileReply(reply, "You have already voted for this track!", 2000, msg);
+                    break;
+                case "NOT_LISTENING":
+                    this.tools.volatileReply(reply, "You're not allowed to vote if you're not a listener.", 2000, msg);
+                    break;
                 default:
                     console.log("UNKNOWN UPVOTE RESPONSE", e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);

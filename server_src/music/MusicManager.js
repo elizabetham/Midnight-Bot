@@ -22,6 +22,7 @@ import moment from 'moment';
 
 class MusicManager {
 
+    //Fields
     queue : MusicQueue;
     idlePlaylist : Array < QueueItem >;
     activeStream :
@@ -36,11 +37,14 @@ class MusicManager {
         ? Message;
     controlChannel :
         ? TextChannel;
+    votes : Map < string,
+    boolean >; //<UID,VoteType : boolean>
 
     constructor(voiceChannel : string, controlChannel :
         ? string) {
         //Initialize defaults
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
+        this.votes = new Map();
 
         //Bind methods
         this.skip = this.skip.bind(this);
@@ -50,6 +54,7 @@ class MusicManager {
         this.upvote = this.upvote.bind(this);
         this.downvote = this.downvote.bind(this);
         this.vote = this.vote.bind(this);
+        this.purgeVotes = this.purgeVotes.bind(this);
 
         (async() => {
             //Connect to voice channels when discord is ready
@@ -92,17 +97,46 @@ class MusicManager {
     }
 
     upvote : Function;
-    upvote(user : GuildMember) {
-        this.vote(user, true);
+    async upvote(user : GuildMember) {
+        await this.vote(user, true);
     }
 
     downvote : Function;
-    downvote(user : GuildMember) {
-        this.vote(user, false);
+    async downvote(user : GuildMember) {
+        await this.vote(user, false);
     }
 
     vote : Function;
-    vote(user : GuildMember, type : boolean) {}
+    async vote(user : GuildMember, type : boolean) {
+        //Prevent double voting
+        if (this.votes.has(user.id)) {
+            throw {e: "ALREADY_VOTED"};
+        }
+
+        //Only allow listeners to vote
+        if (!this.activeVoiceChannel || user.voiceChannelID != this.activeVoiceChannel.id) {
+            throw {e: "NOT_LISTENING"};
+        }
+
+        //Apply vote
+        this.votes.set(user.id, type);
+
+        //Purge votes from users who left
+        await this.purgeVotes();
+    }
+
+    purgeVotes : Function;
+
+    async purgeVotes() {
+        await Promise.all(Array.from(this.votes.keys()).map(async(key) => {
+            if (this.activeVoiceChannel) {
+                let member = await this.activeVoiceChannel.guild.fetchMember(key);
+                if (this.activeVoiceChannel && (!member || member.voiceChannelID != this.activeVoiceChannel.id)) {
+                    this.votes.delete(key);
+                }
+            }
+        }));
+    }
 
     play : Function;
 
@@ -226,8 +260,10 @@ class MusicManager {
                     this.nowPlayingMessage = await this.nowPlayingMessage.edit(newMessage);
                 }
             }
-
         }
+
+        //Reset votes
+        this.votes.clear();
 
         return true;
     }
