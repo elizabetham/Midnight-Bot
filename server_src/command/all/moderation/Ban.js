@@ -1,23 +1,25 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../Permission';
 import {Message, GuildMember} from 'discord.js';
-import Lang from '../Lang';
-import Infraction from '../../datatypes/Infraction';
-import Logging from '../../utils/Logging';
+import Lang from '../../Lang';
+import Infraction from '../../../datatypes/Infraction';
+import Logging from '../../../utils/Logging';
 import moment from 'moment';
 import _ from 'lodash';
 
-class UnbanCommand extends AbstractCommand {
+class BanCommand extends AbstractCommand {
 
     constructor() {
-        super("unban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("ban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
+
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
+
         //Verify argument length
         if (args.length < 1) {
-            this.tools.volatileReply(reply, "The correct usage for the unban command is `unban <user> [reason]`", 5000, msg);
+            this.tools.volatileReply(reply, "The correct usage for the ban command is `ban <user> [reason]`", 5000, msg);
             return;
         }
 
@@ -31,20 +33,13 @@ class UnbanCommand extends AbstractCommand {
             return;
         }
 
-        //Retrieve bans from guild
-        const bans = await msg.guild.fetchBans();
+        //Fetch the guild member for the user to be banned
+        const targetMember :
+            ? GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
-        //If ban fetch fails, let the user know and stop
-        if (!bans) {
-            this.tools.volatileReply(reply, "Failed to fetch bans. Please try again.", 5000, msg);
-        }
-
-        //Make sure user is banned
-        const isBanned = bans.has(uid);
-
-        //If user is not banned, cannot unban, let user know and stop
-        if (!isBanned) {
-            this.tools.volatileReply(reply, "User is not banned, cannot perform unban.", 5000, msg);
+        //If we found a reference, make sure we're not banning superiors
+        if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
+            this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to ban users ranked equally or higher than you.", 5000, msg);
             return;
         }
 
@@ -63,18 +58,17 @@ class UnbanCommand extends AbstractCommand {
 
         //Save an infraction and log it
         await Logging.infractionLog(await new Infraction(uid, moment().unix(), {
-            type: 'UNBAN',
+            type: 'BAN',
             increasedNotoriety: false
         }, null, {
             executor: user.id,
             reason
         }).save());
 
-        //Perform unban
-        await msg.guild.unban(uid);
-
+        //Execute the ban
+        msg.guild.ban(uid, 7);
     };
 
 }
 
-export default new UnbanCommand();
+export default new BanCommand();

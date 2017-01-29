@@ -177,16 +177,15 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!playing</h3>
+                    <h3 style={style.commandHeader}>!game</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Set Midnight's 'playing' status.</h5>
+                        &nbsp;- Set Midnight's 'game' status.</h5>
                     <h5>Usage:
-                        <code>!playing [status]</code>
+                        <code>!game [status]</code>
                     </h5>
                     <p>Minimum role required:&nbsp;<code>Master Moderator</code>
                     </p>
-                    <p>In case of no status being provided, the playing status shall be cleared</p>
-                    {/* Cannot be disabled in the actual sense of the word, just nulled*/}
+                    <p>In case of no status being provided, the game status shall be cleared</p>
                 </Row>
                 <Row>
                     <hr/>

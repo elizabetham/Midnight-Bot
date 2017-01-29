@@ -1,17 +1,17 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../Permission';
 import {Message, GuildMember, Role} from 'discord.js';
-import Lang from '../Lang';
-import Infraction from '../../datatypes/Infraction';
-import Logging from '../../utils/Logging';
+import Lang from '../../Lang';
+import Infraction from '../../../datatypes/Infraction';
+import Logging from '../../../utils/Logging';
 import moment from 'moment';
 import _ from 'lodash';
-import DiscordUtils from '../../utils/DiscordUtils';
-import UserUtils from '../../utils/UserUtils';
-import {UserRecord} from '../../utils/DBManager';
-import Config from '../../../config';
+import DiscordUtils from '../../../utils/DiscordUtils';
+import UserUtils from '../../../utils/UserUtils';
+import {UserRecord} from '../../../utils/DBManager';
+import Config from '../../../../config';
 
 class UnmuteCommand extends AbstractCommand {
 

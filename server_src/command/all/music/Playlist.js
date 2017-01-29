@@ -1,18 +1,18 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../Permission';
 import {Message, GuildMember} from 'discord.js';
-import Lang from '../Lang';
+import Lang from '../../Lang';
 import _ from 'lodash';
-import {UserRecord} from '../../utils/DBManager';
-import UserUtils from '../../utils/UserUtils';
-import MusicManager from '../../utils/MusicManager';
+import {UserRecord} from '../../../utils/DBManager';
+import UserUtils from '../../../utils/UserUtils';
+import MusicManager from '../../../music/MusicManager';
 
 class PlaylistCommand extends AbstractCommand {
 
     constructor() {
-        super("playlist", [PERMISSION_PRESETS.CONVICTS.PLATINUM_PEEPS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("playlist", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

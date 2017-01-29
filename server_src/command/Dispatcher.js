@@ -4,26 +4,35 @@ from 'discord.js';
 
 import AbstractCommand from './AbstractCommand';
 
-import RestartCommand from './all/Restart';
-import BanCommand from './all/Ban';
-import MuteCommand from './all/Mute';
-import UnmuteCommand from './all/Unmute';
-import PlayingCommand from './all/Playing';
-import UnbanCommand from './all/Unban'
-import PlayCommand from './all/Play';
-import SkipCommand from './all/Skip';
-import PlaylistCommand from './all/Playlist';
+//Admin
+import GameCommand from './all/admin/Game';
+import RestartCommand from './all/admin/Restart';
+
+//Moderation
+import BanCommand from './all/moderation/Ban';
+import MuteCommand from './all/moderation/Mute';
+import UnmuteCommand from './all/moderation/Unmute';
+import UnbanCommand from './all/moderation/Unban';
+
+//Music
+import PlayCommand from './all/music/Play';
+import SkipCommand from './all/music/Skip';
+import PlaylistCommand from './all/music/Playlist';
+import UpvoteCommand from './all/music/Upvote';
+import DownvoteCommand from './all/music/Downvote';
 
 const commands = [
     RestartCommand,
     BanCommand,
     MuteCommand,
     UnmuteCommand,
-    PlayingCommand,
+    GameCommand,
     UnbanCommand,
     PlayCommand,
     SkipCommand,
-    PlaylistCommand
+    PlaylistCommand,
+    DownvoteCommand,
+    UpvoteCommand
 ];
 
 export const processMessage = (message : Message) : boolean => {

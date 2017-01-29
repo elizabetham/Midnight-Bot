@@ -51,7 +51,7 @@
     "redis": "^2.6.3",
     "request": "^2.76.0",
     "roboto-npm-webfont": "0.0.2",
-    "superagent": "^3.3.2",
+    "superagent": "^3.4.1",
     "url-loader": "^0.5.7",
     "youtube-search": "^1.0.8",
     "ytdl-core": "^0.7.23"

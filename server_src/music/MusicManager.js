@@ -1,124 +1,21 @@
 // @flow
 
 import Config from '../../config';
-import ytdl from 'ytdl-core';
-import ytsearch from 'youtube-search';
-import promisify from 'promisify-any';
-import type {StreamDispatcher, VoiceConnection, VoiceChannel, Message, TextChannel}
+import type {
+    StreamDispatcher,
+    VoiceConnection,
+    VoiceChannel,
+    Message,
+    TextChannel,
+    User,
+    GuildMember
+}
 from 'discord.js';
 import _ from 'lodash';
-import DiscordUtils from './DiscordUtils';
-
-//Make promise compatible yt tools
-const yt = {
-    getInfo: promisify(ytdl.getInfo, 1),
-    search: promisify(ytsearch, 2),
-    stream: ytdl.downloadFromInfo
-};
-
-class QueueItem {
-
-    requestedBy : string;
-    videoInfo : Object;
-
-    constructor(requestedBy : string, videoInfo : Object) {
-        if (!videoInfo)
-            throw "FALSY videoInfo PARAMETER";
-        this.requestedBy = requestedBy;
-        this.videoInfo = videoInfo;
-    }
-
-}
-
-class MusicQueue {
-
-    queue : Array < QueueItem >;
-    maxQueueSize : number;
-    manager : MusicManager;
-
-    constructor(maxQueueSize : number, manager : MusicManager) {
-        this.queue = [];
-        this.maxQueueSize = maxQueueSize;
-        this.size = this.size.bind(this);
-        this.pop = this.pop.bind(this);
-        this.push = this.push.bind(this);
-        this.getArray = this.getArray.bind(this);
-    }
-
-    getArray : Function;
-
-    getArray() : Array < QueueItem > {
-        return this.queue;
-    }
-
-    size : Function;
-
-    size() {
-        return this.queue.length;
-    }
-
-    pop : Function;
-
-    pop() {
-        return this.queue.shift();
-    }
-
-    push : Function;
-
-    async push(query : string, requestedBy : string) : Object {
-        //Quit if queue is already full
-        if(this.queue.length >= this.maxQueueSize) {
-            throw "QUEUE_FULL";
-        }
-
-        //First assume it's a URL
-        let videoInfo;
-        try {
-            videoInfo = await yt.getInfo(query);
-        } catch (e) {
-            //Not a URL, let's do a search.
-            try {
-                const searchRes = await yt.search(query, {
-                    maxResults: 1,
-                    key: Config.YOUTUBE_API_KEY,
-                    type: 'video'
-                });
-
-                //Check if we found results
-                if (searchRes[0].length == 0) {
-                    throw "NO_RESULTS_FOUND";
-                }
-
-                //Obtain the video info of the found result
-                try {
-                    videoInfo = await yt.getInfo(searchRes[0][0].link);
-                } catch (e) {
-                    console.log("ATTEMPTED RESOLVE", searchRes[0][0].link, e);
-                    throw "SEARCH_RESOLVE_ERROR";
-                }
-            } catch (e) {
-                //We cannot find results. Quit here.
-                if (e == "SEARCH_RESOLVE_ERROR") {
-                    throw e;
-                }
-                console.log(e);
-                throw "SEARCH_ERROR";
-            }
-        }
-
-        if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
-            throw "DUPLICATE_ENTRY";
-        }
-
-        //Push new video onto queue
-        const newItem = new QueueItem(requestedBy, videoInfo);
-        this.queue.push(newItem);
-
-        //Return the found video
-        return newItem;
-    }
-
-}
+import DiscordUtils from '../utils/DiscordUtils';
+import QueueItem from './QueueItem';
+import MusicQueue from './MusicQueue';
+import {yt} from './MusicTools';
 
 class MusicManager {
 
@@ -140,13 +37,16 @@ class MusicManager {
     constructor(voiceChannel : string, controlChannel :
         ? string) {
         //Initialize defaults
-        this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 10, this);
+        this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
 
         //Bind methods
         this.skip = this.skip.bind(this);
         this.play = this.play.bind(this);
         this.getStatus = this.getStatus.bind(this);
         this.handleStreamEnd = this.handleStreamEnd.bind(this);
+        this.upvote = this.upvote.bind(this);
+        this.downvote = this.downvote.bind(this);
+        this.vote = this.vote.bind(this);
 
         (async() => {
             //Connect to voice channels when discord is ready
@@ -187,6 +87,19 @@ class MusicManager {
             });
         })();
     }
+
+    upvote : Function;
+    upvote(user : GuildMember) {
+        this.vote(user, true);
+    }
+
+    downvote : Function;
+    downvote(user : GuildMember) {
+        this.vote(user, false);
+    }
+
+    vote : Function;
+    vote(user : GuildMember, type : boolean) {}
 
     play : Function;
 

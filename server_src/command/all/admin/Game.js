@@ -1,16 +1,16 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../Permission';
 import {Message, GuildMember} from 'discord.js';
-import Lang from '../Lang';
+import Lang from '../../Lang';
 import _ from 'lodash';
-import DiscordUtils from '../../utils/DiscordUtils';
+import DiscordUtils from '../../../utils/DiscordUtils';
 
-class PlayingCommand extends AbstractCommand {
+class GameCommand extends AbstractCommand {
 
     constructor() {
-        super("playing", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("game", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -23,4 +23,4 @@ class PlayingCommand extends AbstractCommand {
 
 }
 
-export default new PlayingCommand();
+export default new GameCommand();

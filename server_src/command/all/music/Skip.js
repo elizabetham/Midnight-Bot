@@ -1,11 +1,11 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../Permission';
 import {Message, GuildMember} from 'discord.js';
-import Lang from '../Lang';
+import Lang from '../../Lang';
 import _ from 'lodash';
-import MusicManager from '../../utils/MusicManager';
+import MusicManager from '../../../music/MusicManager';
 
 class SkipCommand extends AbstractCommand {
 
