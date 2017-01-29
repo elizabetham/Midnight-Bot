@@ -3,6 +3,7 @@
 import QueueItem from './QueueItem';
 import {yt} from './MusicTools';
 import Config from '../../config';
+import {Redis} from '../utils/DBManager';
 
 class MusicQueue {
 
@@ -53,7 +54,9 @@ class MusicQueue {
             try {
                 const searchRes = await yt.search(query, {
                     maxResults: 1,
-                    key: Config.YOUTUBE_API_KEY,
+                    key: Config.YOUTUBE_API_KEY
+                        ? Config.YOUTUBE_API_KEY
+                        : "",
                     type: 'video'
                 });
 
@@ -79,8 +82,16 @@ class MusicQueue {
             }
         }
 
+        //Check if already on queue
         if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
             throw {e: "DUPLICATE_ENTRY"};
+        }
+
+        //Check if blacklisted
+        let blacklistKey = videoInfo.video_id + ":MusicTmpBlacklist";
+        let res = await Redis.existsAsync(blacklistKey);
+        if (res) {
+            throw {e: "BLACKLISTED_TEMPORARILY"};
         }
 
         //Push new video onto queue

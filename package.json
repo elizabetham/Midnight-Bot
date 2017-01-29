@@ -37,6 +37,7 @@
     "node-opus": "^0.2.4",
     "node-schedule": "^1.2.0",
     "normalize.css": "^5.0.0",
+    "ordinal-number-suffix": "^0.1.1",
     "pastebin-js": "^0.4.0",
     "promisify-any": "^2.0.1",
     "randomstring": "^1.1.5",

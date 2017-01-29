@@ -55,6 +55,9 @@ class PlayCommand extends AbstractCommand {
                 case "USER_QUEUE_COOLDOWN":
                     this.tools.volatileReply(reply, "Please wait! You can queue again in `" + e.timeRemaining + "`.", 5000, msg);
                     break;
+                case "BLACKLISTED_TEMPORARILY":
+                    this.tools.volatileReply(reply, "This song is temporarily blacklisted. It cannot be played at this moment.", 5000, msg);
+                    break;
                 default:
                     console.log(e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);

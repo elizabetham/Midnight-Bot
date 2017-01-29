@@ -47,6 +47,10 @@ export const UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
     username_lower: {
         type: String,
         required: true
+    },
+    djAwardPoints: {
+        type: Number,
+        required: false
     }
 }));
 
