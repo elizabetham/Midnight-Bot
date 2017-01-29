@@ -64,6 +64,7 @@ class MusicManager {
         this.setShamePoints = this.setShamePoints.bind(this);
         this.getShamePoints = this.getShamePoints.bind(this);
         this.incrShamePoints = this.incrShamePoints.bind(this);
+        this.updateNowPlaying = this.updateNowPlaying.bind(this);
 
         (async() => {
             //Connect to voice channels when discord is ready
@@ -158,11 +159,29 @@ class MusicManager {
             throw {e: "NOT_LISTENING"};
         }
 
+        //Dont vote when there's nothing playing
+        if (!this.activeItem) {
+            throw {e: "NO_ACTIVE_SONG"};
+        }
+
+        //Don't vote if the current item comes from the default playlist
+        if (!this.activeItem.requestedBy) {
+            throw {e: "MIDNIGHT_DJ"};
+        }
+
+        //Prevent voting for self
+        if (this.activeItem.requestedBy == user.id) {
+            throw {e: "SELF_VOTE"};
+        }
+
         //Apply vote
         this.votes.set(user.id, type);
 
         //Process vote effects
         await this.processVoteEffects("VOTE");
+
+        //Redraw vote data
+        await this.updateNowPlaying();
     }
 
     processVoteEffects : Function;
@@ -179,12 +198,6 @@ class MusicManager {
         }));
 
         const votes = Array.from(this.votes.values()).length;
-
-        //No vote effects below a threshold of 5
-        if (votes < 5) {
-            return;
-        }
-
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
         const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
 
@@ -229,18 +242,20 @@ class MusicManager {
         }
 
         //Song end
-        if (event == "SONG_END" && this.activeItem) {
-            let msg = "<@" + this.activeItem.requestedBy + ">" + ", Your track ended with **" + upvotes + "**:thumbsup:/**" + downvotes + "**:thumbsdown:.";
+        if (event == "SONG_END" && this.activeItem && this.activeItem.requestedBy) {
+            let requestedBy = this.activeItem.requestedBy;
+            let msg = "<@" + requestedBy + ">" + ", Your track ended with **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:.";
             if (upvotes / votes >= 0.75 && upvotes >= 5) {
 
                 //Save award point
-                const record = UserUtils.assertUserRecord(this.activeItem.requestedBy);
+                const record = UserUtils.assertUserRecord(requestedBy);
                 record.djAwardPoints = record.djAwardPoints
                     ? record.djAwardPoints + 1
                     : 1;
                 await record.save();
 
                 //Obtain placement
+                //TODO: REPLACE WITH MORE EFFICIENT SOLUTION
                 let found = false;
                 let placement = UserRecord.find({
                     djAwardsPoints: {
@@ -256,11 +271,12 @@ class MusicManager {
                 //Add to message
                 msg += " You have been given an award point! You now have **" + record.djAwardsPoints + "** points, putting you in the **" + ordinal(placement) + "** position on the leaderboards!";
             }
-            if (this.controlChannel) {
-                this.controlChannel.sendMessage(msg);
-            }
+            setTimeout(async() => {
+                if (this.controlChannel) {
+                    (await this.controlChannel.sendMessage(msg)).delete(10 * 1000);
+                }
+            }, 1000);
         }
-
     }
 
     play : Function;
@@ -273,7 +289,9 @@ class MusicManager {
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
             ],
             [PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3]
-        ].find(lvl => DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [null, 1])[1];
+        ].find(lvl => {
+            return lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true);
+        }) || [null, 1])[1];
         if (currentlyQueued >= allowedQueues) {
             throw {e: "MAX_ALLOWED_QUEUES", allowed: allowedQueues};
         }
@@ -286,7 +304,7 @@ class MusicManager {
             [
                 PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
             ]
-        ].find(lvl => DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
+        ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
             null, 15 * 60
         ])[1];
 
@@ -363,11 +381,17 @@ class MusicManager {
         //If there's nothing to play, just don't play anything.
         if (!nextItem) {
             DiscordUtils.setPlaying(await DiscordUtils.getPlaying());
+            if (this.nowPlayingMessage) {
+                this.nowPlayingMessage.delete();
+            }
             return false;
         }
 
         //Register current item
         this.activeItem = nextItem;
+
+        //Reset votes
+        this.votes.clear();
 
         //Play the next item on stream
         if (this.activeConnection != null) {
@@ -380,23 +404,34 @@ class MusicManager {
                 : "Unknown Number");
 
             //Update now-playing message
-            if (this.controlChannel && this.activeItem) {
-                const newMessage = "Now playing in **" + this.controlChannel.name + "**: **" + this.activeItem.videoInfo.title + "**";
-                if (!this.nowPlayingMessage || this.nowPlayingMessage.id != this.controlChannel.lastMessageID) {
-                    this.nowPlayingMessage = await this.controlChannel.send(newMessage);
-                } else {
-                    this.nowPlayingMessage = await this.nowPlayingMessage.edit(newMessage);
-                }
-            }
+            await this.updateNowPlaying();
         }
-
-        //Reset votes
-        this.votes.clear();
 
         //Reset flow variables
         this.skipped = false;
 
         return true;
+    }
+
+    updateNowPlaying : Function;
+
+    async updateNowPlaying() {
+        if (this.controlChannel && this.activeItem) {
+            let controlChannel = this.controlChannel;
+            let activeItem = this.activeItem;
+            let newMessage = "Now playing in **" + this.controlChannel.name + "**: **" + activeItem.videoInfo.title + "**";
+            if (activeItem.requestedBy) {
+                newMessage += " added by **" + (await UserUtils.assertUserRecord(activeItem.requestedBy)).username + "**"
+                const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
+                const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
+                newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:. - To vote, use **!upvote** or **!downvote**!";
+            }
+            if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {
+                this.nowPlayingMessage = await controlChannel.send(newMessage);
+            } else {
+                this.nowPlayingMessage = await this.nowPlayingMessage.edit(newMessage);
+            }
+        }
     }
 
     handleStreamEnd : Function;

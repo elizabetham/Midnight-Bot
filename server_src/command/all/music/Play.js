@@ -24,10 +24,12 @@ class PlayCommand extends AbstractCommand {
             return;
         }
 
+        msg.delete();
+
         const query = args.join(" ");
         try {
             const playData = await MusicManager.play(query, user);
-            reply("Added **" + playData.queueItem.videoInfo.title + "** to the queue. Position in queue: **" + playData.queuePosition + "** - estimated time until play: " + playData.eta);
+            reply("Added **" + playData.queueItem.videoInfo.title + "** to the queue. Position in queue: **" + playData.queuePosition + "** - estimated time until play: `" + playData.eta + "`");
         } catch (e) {
             switch (e.e) {
                 case "QUEUE_FULL":
@@ -59,7 +61,7 @@ class PlayCommand extends AbstractCommand {
                     this.tools.volatileReply(reply, "This song is temporarily blacklisted. It cannot be played at this moment.", 5000, msg);
                     break;
                 default:
-                    console.log(e);
+                    console.log("UNEXPECTED !PLAY RESPONSE", e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);
                     break;
             }

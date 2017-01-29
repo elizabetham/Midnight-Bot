@@ -74,7 +74,7 @@ class MusicQueue {
                 }
             } catch (e) {
                 //We cannot find results. Quit here.
-                if (e.e == "SEARCH_RESOLVE_ERROR") {
+                if (e.e == "SEARCH_RESOLVE_ERROR" || e.e == "NO_RESULTS_FOUND") {
                     throw e;
                 }
                 console.log(e);

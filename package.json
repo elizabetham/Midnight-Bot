@@ -10,7 +10,7 @@
     "build": "webpack --config webpack.prod.config.js",
     "start": "npm run build && cd dist && node Midnight.js",
     "debug": "npm-run-all --parallel debug:*",
-    "debug:server": "webpack --config webpack.server.config.js && cd dist && nodemon Midnight.js",
+    "debug:server": "webpack --config webpack.server.config.js -d && cd dist && node Midnight.js",
     "debug:client": "webpack-dev-server --hot --inline -d --config webpack.client.config.js --port 8081"
   },
   "author": "BeMacized",
@@ -82,6 +82,7 @@
     "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.0",
     "react-hot-loader": "^1.3.1",
+    "source-map-support": "^0.4.11",
     "style-loader": "^0.13.1",
     "supertest": "^2.0.1",
     "timeout-as-promise": "^1.0.0",

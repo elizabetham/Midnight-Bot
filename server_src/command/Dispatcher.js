@@ -7,6 +7,7 @@ import AbstractCommand from './AbstractCommand';
 //Admin
 import GameCommand from './all/admin/Game';
 import RestartCommand from './all/admin/Restart';
+import Dbtools from './all/admin/Dbtools';
 
 //Moderation
 import BanCommand from './all/moderation/Ban';
@@ -32,7 +33,8 @@ const commands = [
     SkipCommand,
     PlaylistCommand,
     DownvoteCommand,
-    UpvoteCommand
+    UpvoteCommand,
+    Dbtools
 ];
 
 export const processMessage = (message : Message) : boolean => {

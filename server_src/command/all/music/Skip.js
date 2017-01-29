@@ -19,6 +19,8 @@ class SkipCommand extends AbstractCommand {
             return;
         }
 
+        await msg.delete();
+
         const skipped : boolean = await MusicManager.skip();
         this.tools.volatileReply(reply, skipped
             ? _.sample(Lang.AFFIRMATIVE) + " Skipping..."

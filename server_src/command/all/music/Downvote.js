@@ -19,16 +19,27 @@ class DownvoteCommand extends AbstractCommand {
             return;
         }
 
+        await msg.delete();
+
         try {
             await MusicManager.downvote(user);
-            this.tools.volatileReply(reply, "downvoted!", 1000, msg);
+            this.tools.volatileReply(reply, "downvoted!", 1000);
         } catch (e) {
-            switch (e) {
+            switch (e.e) {
                 case "ALREADY_VOTED":
                     this.tools.volatileReply(reply, "You have already voted for this track!", 2000, msg);
                     break;
                 case "NOT_LISTENING":
                     this.tools.volatileReply(reply, "You're not allowed to vote if you're not a listener.", 2000, msg);
+                    break;
+                case "MIDNIGHT_DJ":
+                    this.tools.volatileReply(reply, "This is not a user requested song. You can't vote on songs from the default playlist!", 5000, msg);
+                    break;
+                case "NO_ACTIVE_SONG":
+                    this.tools.volatileReply(reply, "There is no song currently playing to vote for.", 5000, msg);
+                    break;
+                case "SELF_VOTE":
+                    this.tools.volatileReply(reply, "You cannot vote for yourself m8", 5000, msg);
                     break;
                 default:
                     console.log("UNKNOWN DOWNVOTE RESPONSE", e);

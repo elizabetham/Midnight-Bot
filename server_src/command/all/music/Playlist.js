@@ -25,7 +25,9 @@ class PlaylistCommand extends AbstractCommand {
             const status = MusicManager.getStatus();
 
             let response = (status.currentItem)
-                ? "\nCurrent Song: **" + status.currentItem.videoInfo.title + "** added by **" + (status.currentItem.requestedBy
+                ? (status.queue
+                    ? "\n"
+                    : "") + "Current Song: **" + status.currentItem.videoInfo.title + "** added by **" + (status.currentItem.requestedBy
                     ? (await UserUtils.assertUserRecord(status.currentItem.requestedBy)).username
                     : "Midnight") + "** `[" + MusicManager.secondsToTimestamp(status.currentProgress) + "/" + MusicManager.secondsToTimestamp(Number(status.currentItem.videoInfo.length_seconds)) + "]`"
                 : "No song is currently playing.";

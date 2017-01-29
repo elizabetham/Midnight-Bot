@@ -57,7 +57,7 @@ class DiscordUtils {
     };
 
     getRoleById(id : string) {
-        return this.client.guilds.array().map(guild => guild.roles.find(role => role.id == id)).find(r => r);
+        return this.client.guilds.array().map(guild => guild.roles.array().find(role => role.id == id)).find(c => c);
     }
 
     async start() {
