@@ -4,6 +4,8 @@ import QueueItem from './QueueItem';
 import {yt} from './MusicTools';
 import Config from '../../config';
 import {Redis, BlacklistedVideo} from '../utils/DBManager';
+import OffensiveBehaviourFilter from '../chatfilters/all/OffensiveBehaviourFilter';
+import RacismFilter from '../chatfilters/all/RacismFilter';
 
 class MusicQueue {
 
@@ -99,12 +101,36 @@ class MusicQueue {
             throw {e: "BLACKLISTED_PERMANENTLY"};
         }
 
+        //Check title filters
+        if (!this.checkTitle(videoInfo.title)) {
+            throw {e: "FILTERED_TITLE"};
+        }
+
+        //Check song length
+        if (videoInfo.length_seconds > 60 * 10) {
+            throw {e: "CONTENT_TOO_LONG"};
+        }
+
         //Push new video onto queue
         const newItem = new QueueItem(requestedBy, videoInfo);
         this.queue.push(newItem);
 
         //Return the found video
         return newItem;
+    }
+
+    checkTitle : Function;
+
+    checkTitle(title : string) {
+        //Check with racism & offensive behaviour chat filters
+        if (OffensiveBehaviourFilter.check({content: title}))
+            return false;
+        if (RacismFilter.check({content: title}))
+            return false;
+
+        //Custom rules
+        let rules = [];
+        return rules.filter(rule => title.match(rule)).length == 0;
     }
 
 }

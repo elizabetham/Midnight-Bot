@@ -63,6 +63,12 @@ class PlayCommand extends AbstractCommand {
                 case "BLACKLISTED_PERMANENTLY":
                     this.tools.volatileReply(reply, "This song is permanently blacklisted. It cannot be played.", 5000, msg);
                     break;
+                case "FILTERED_TITLE":
+                    this.tools.volatileReply(reply, "This song's title contains something that has been blacklisted. It cannot be played.", 5000, msg);
+                    break;
+                case "CONTENT_TOO_LONG":
+                    this.tools.volatileReply(reply, "This song exceeds our 10 minute limit. It cannot be played.", 5000, msg);
+                    break;
                 default:
                     console.log("UNEXPECTED !PLAY RESPONSE", e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);
