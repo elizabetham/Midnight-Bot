@@ -85,7 +85,13 @@ class DiscordUtils {
 
     hasPermission(user : GuildMember, minRole : Role, inclusive : boolean = true) {
         const userpos = _.max(user.roles.array().map(r => r.position));
-        return user.roles.array().find(role => role.name.toUpperCase() == "BOTDEV" || (inclusive && userpos >= minRole.position || userpos > minRole.position));
+        if (user.roles.array().find(role => role.name.toUpperCase() == "BOTDEV"))
+            return true;
+        if (minRole) {
+            return (inclusive && userpos >= minRole.position || userpos > minRole.position);
+        } else {
+            return false;
+        }
     }
 }
 

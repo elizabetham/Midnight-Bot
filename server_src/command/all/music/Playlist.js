@@ -8,6 +8,7 @@ import _ from 'lodash';
 import {UserRecord} from '../../../utils/DBManager';
 import UserUtils from '../../../utils/UserUtils';
 import MusicManager from '../../../music/MusicManager';
+import DiscordUtils from '../../../utils/DiscordUtils';
 
 class PlaylistCommand extends AbstractCommand {
 
@@ -18,6 +19,16 @@ class PlaylistCommand extends AbstractCommand {
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
         if (!MusicManager) {
             this.tools.volatileReply(reply, "My music module is currently not enabled!", 5000, msg);
+            return;
+        }
+
+        if (args.length > 0 && args[0] == 'purge') {
+            if (!DiscordUtils.hasPermission(user, PERMISSION_PRESETS.CONVICTS.MODERATOR.getRole()) && !DiscordUtils.hasPermission(user, PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN.getRole())) {
+                this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION), 5000, msg);
+                return;
+            }
+            MusicManager.queue.queue.splice(0, MusicManager.queue.queue.length);
+            this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Queue purged.", 5000, msg);
             return;
         }
 
