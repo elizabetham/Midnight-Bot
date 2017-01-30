@@ -11,7 +11,7 @@ import {yt} from '../../../music/MusicTools';
 class BlacklistCommand extends AbstractCommand {
 
     constructor() {
-        super("blacklist", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("blacklist", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

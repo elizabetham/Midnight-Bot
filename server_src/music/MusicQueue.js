@@ -18,13 +18,6 @@ class MusicQueue {
         this.size = this.size.bind(this);
         this.pop = this.pop.bind(this);
         this.push = this.push.bind(this);
-        this.getArray = this.getArray.bind(this);
-    }
-
-    getArray : Function;
-
-    getArray() : Array < QueueItem > {
-        return this.queue;
     }
 
     size : Function;

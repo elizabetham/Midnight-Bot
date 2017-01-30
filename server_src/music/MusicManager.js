@@ -296,18 +296,18 @@ class MusicManager {
 
     async play(query : string, member : GuildMember) {
         //Check if user is allowed another queue
-        const currentlyQueued = this.queue.getArray().filter(i => i.requestedBy == member.id).length;
+        const currentlyQueued = this.queue.queue.filter(i => i.requestedBy == member.id).length;
         const allowedQueues = ([
             [
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN, 5
+                PERMISSION_PRESETS.BOTDEV.MODERATOR, 5
             ],
             [
                 PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3
             ],
-            [PERMISSION_PRESETS.BOTDEV.MUTED, 3]
+            [PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 3]
         ].find(lvl => {
             return lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true);
         }) || [null, 1])[1];
@@ -321,13 +321,13 @@ class MusicManager {
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN, 0
+                PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
                 PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.MUTED, 8 * 60
+                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 8 * 60
             ]
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
             null, 15 * 60
@@ -345,7 +345,7 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.getArray().reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
+        let eta = this.queue.queue.reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
             ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
@@ -481,7 +481,7 @@ class MusicManager {
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000),
             currentItem: this.activeItem,
-            queue: this.queue.getArray()
+            queue: this.queue.queue
         };
     }
 

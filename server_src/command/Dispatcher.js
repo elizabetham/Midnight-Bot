@@ -22,6 +22,7 @@ import PlaylistCommand from './all/music/Playlist';
 import UpvoteCommand from './all/music/Upvote';
 import DownvoteCommand from './all/music/Downvote';
 import BlacklistCommand from './all/music/Blacklist';
+import DequeueCommand from './all/music/Dequeue';
 
 const commands = [
     RestartCommand,
@@ -36,7 +37,8 @@ const commands = [
     DownvoteCommand,
     UpvoteCommand,
     BlacklistCommand,
-    Dbtools
+    Dbtools,
+    DequeueCommand
 ];
 
 export const processMessage = (message : Message) : boolean => {

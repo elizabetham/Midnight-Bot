@@ -12,6 +12,9 @@ import DiscordUtils from '../../../utils/DiscordUtils';
 
 class PlaylistCommand extends AbstractCommand {
 
+    playlistMessage :
+        ? Message;
+
     constructor() {
         super("playlist", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
     }
@@ -22,8 +25,11 @@ class PlaylistCommand extends AbstractCommand {
             return;
         }
 
+        await msg.delete();
+
+        //Moderator sub-command for purging the entire queue
         if (args.length > 0 && args[0] == 'purge') {
-            if (!DiscordUtils.hasPermission(user, PERMISSION_PRESETS.CONVICTS.MODERATOR.getRole()) && !DiscordUtils.hasPermission(user, PERMISSION_PRESETS.BOTDEV.DISCORD_ADMIN.getRole())) {
+            if (!DiscordUtils.hasPermission(user, PERMISSION_PRESETS.CONVICTS.MODERATOR.getRole()) && !DiscordUtils.hasPermission(user, PERMISSION_PRESETS.BOTDEV.MODERATOR.getRole())) {
                 this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION), 5000, msg);
                 return;
             }
@@ -33,8 +39,10 @@ class PlaylistCommand extends AbstractCommand {
         }
 
         try {
+            //Obtain current status
             const status = MusicManager.getStatus();
 
+            //Construct new response
             let response = (status.currentItem)
                 ? (status.queue
                     ? "\n"
@@ -50,7 +58,13 @@ class PlaylistCommand extends AbstractCommand {
                     : "Midnight") + "**\n"))).forEach(line => response += line);
             }
 
-            reply(response);
+            //Delete old playlist message
+            if (this.playlistMessage) {
+                this.playlistMessage.delete();
+            }
+
+            //Send new playlist message
+            this.playlistMessage = await msg.channel.sendMessage(response);
         } catch (e) {
             console.log(e);
         }
