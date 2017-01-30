@@ -449,16 +449,37 @@ class MusicManager {
         if (this.controlChannel && this.activeItem) {
             let controlChannel = this.controlChannel;
             let activeItem = this.activeItem;
-            let newMessage = "Now playing in **" + this.controlChannel.name + "**: **" + activeItem.videoInfo.title + "**";
+
+            //Construct message
+            let newMessage = "";
+
+            //Playlist
+            if (this.queue.queue.length > 0) {
+                newMessage += "`Now` **" + activeItem.videoInfo.title + "** added by **" + (activeItem.requestedBy
+                    ? (await UserUtils.assertUserRecord(activeItem.requestedBy)).username
+                    : "Midnight") + "**\n";
+                (await Promise.all(this.queue.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
+                    ? (await UserUtils.assertUserRecord(item.requestedBy)).username
+                    : "Midnight") + "**\n"))).forEach(line => newMessage += line);
+            }
+
+            //Voting info
             if (activeItem.requestedBy) {
-                newMessage += " added by **" + (await UserUtils.assertUserRecord(activeItem.requestedBy)).username + "**"
                 const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
                 const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
                 newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:. - To vote, use **!upvote** or **!downvote**!";
             }
+
+            //If the now playing message doesn't exist or is not the last message anymore, create a new one
             if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {
+                if (this.nowPlayingMessage) {
+                    //Delete the message if it existed
+                    this.nowPlayingMessage.delete();
+                }
+                //Send new message
                 this.nowPlayingMessage = await controlChannel.send(newMessage);
             } else {
+                //Edit existing message if it's still last.
                 this.nowPlayingMessage = await this.nowPlayingMessage.edit(newMessage);
             }
         }

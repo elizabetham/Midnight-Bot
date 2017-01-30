@@ -21,11 +21,14 @@ export default class AbstractCommand {
 
     tools : typeof Tools;
 
-    constructor(command : string, minRoles : Array < Permission >) {
+    aliases : Array < string >;
+
+    constructor(command : string, minRoles : Array < Permission >, aliases : Array < string > = []) {
         this.command = command;
         this.minRoles = minRoles;
         this.call = this.call.bind(this);
         this.tools = Tools;
+        this.aliases = aliases;
     }
 
     call(message : Message, args : Array < string >) {

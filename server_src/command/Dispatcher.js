@@ -16,9 +16,8 @@ import UnmuteCommand from './all/moderation/Unmute';
 import UnbanCommand from './all/moderation/Unban';
 
 //Music
-import PlayCommand from './all/music/Play';
+import QueueCommand from './all/music/Queue';
 import SkipCommand from './all/music/Skip';
-import PlaylistCommand from './all/music/Playlist';
 import UpvoteCommand from './all/music/Upvote';
 import DownvoteCommand from './all/music/Downvote';
 import BlacklistCommand from './all/music/Blacklist';
@@ -31,9 +30,8 @@ const commands = [
     UnmuteCommand,
     GameCommand,
     UnbanCommand,
-    PlayCommand,
+    QueueCommand,
     SkipCommand,
-    PlaylistCommand,
     DownvoteCommand,
     UpvoteCommand,
     BlacklistCommand,
@@ -54,7 +52,7 @@ export const processMessage = (message : Message) : boolean => {
 
     //Attempt finding a relevant command class
     const cmdObj :
-        ? AbstractCommand = commands.find(c => c.command.toLowerCase() == cmd.toLowerCase());
+        ? AbstractCommand = commands.find(c => c.command.toLowerCase() == cmd.toLowerCase() || c.aliases.indexOf(cmd.toLowerCase()) > -1);
 
     //If none found, stop here
     if (!cmdObj)

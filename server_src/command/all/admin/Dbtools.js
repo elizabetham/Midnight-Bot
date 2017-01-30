@@ -10,7 +10,9 @@ import {Redis} from '../../../utils/DBManager';
 class DbtoolsCommand extends AbstractCommand {
 
     constructor() {
-        super("dbtools", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("dbtools", [
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE
+        ], ["db"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -18,6 +20,7 @@ class DbtoolsCommand extends AbstractCommand {
             switch (args[0]) {
                 case "redis":
                     switch (args[1]) {
+                        case "clean":
                         case "flush":
                         case "flushall":
                             this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Fully flushing Redis DB...", 5000, msg);

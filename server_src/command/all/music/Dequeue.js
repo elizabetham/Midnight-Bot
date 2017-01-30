@@ -30,6 +30,12 @@ class DequeueCommand extends AbstractCommand {
                 return;
             }
 
+            if (args[0].toLowerCase() == "all") {
+                MusicManager.queue.queue.splice(0, MusicManager.queue.queue.length);
+                this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Queue purged.", 5000, msg);
+                return;
+            }
+
             //Check if number
             if (isNaN(args[0])) {
                 this.tools.volatileReply(reply, "`" + args[0] + "` is not a valid queue index. Please use a valid number.", 5000, msg);

@@ -7,10 +7,12 @@ import Lang from '../../Lang';
 import _ from 'lodash';
 import MusicManager from '../../../music/MusicManager';
 
-class PlayCommand extends AbstractCommand {
+class QueueCommand extends AbstractCommand {
 
     constructor() {
-        super("play", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("queue", [
+            PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
+        ], ["play"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -79,4 +81,4 @@ class PlayCommand extends AbstractCommand {
 
 }
 
-export default new PlayCommand();
+export default new QueueCommand();
