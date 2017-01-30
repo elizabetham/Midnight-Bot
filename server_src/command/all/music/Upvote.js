@@ -10,7 +10,9 @@ import MusicManager from '../../../music/MusicManager';
 class UpvoteCommand extends AbstractCommand {
 
     constructor() {
-        super("upvote", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("upvote", [
+            PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
+        ], "", "Upvote the currently playing track", ["up"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

@@ -11,8 +11,8 @@ class DbtoolsCommand extends AbstractCommand {
 
     constructor() {
         super("dbtools", [
-            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE
-        ], ["db"]);
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "", "Database related administration tools", ["db"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

@@ -10,7 +10,9 @@ import DiscordUtils from '../../../utils/DiscordUtils';
 class GameCommand extends AbstractCommand {
 
     constructor() {
-        super("game", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("game", [
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "[status]", "Set Midnight's game status");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

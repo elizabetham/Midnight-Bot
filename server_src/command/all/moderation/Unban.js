@@ -12,12 +12,14 @@ import _ from 'lodash';
 class UnbanCommand extends AbstractCommand {
 
     constructor() {
-        super("unban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("unban", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user> [[for]reason]", "Unban a banned guild member");
     }
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
         //Verify argument length
         if (args.length < 1) {
-            this.tools.volatileReply(reply, "The correct usage for the unban command is `unban <user> [reason]`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 

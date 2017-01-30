@@ -23,20 +23,24 @@ import DownvoteCommand from './all/music/Downvote';
 import BlacklistCommand from './all/music/Blacklist';
 import DequeueCommand from './all/music/Dequeue';
 
+//Misc
+import HelpCommand from './all/misc/Help';
+
 const commands = [
-    RestartCommand,
-    BanCommand,
-    MuteCommand,
-    UnmuteCommand,
-    GameCommand,
-    UnbanCommand,
+    HelpCommand,
     QueueCommand,
-    SkipCommand,
+    DequeueCommand,
     DownvoteCommand,
     UpvoteCommand,
     BlacklistCommand,
-    Dbtools,
-    DequeueCommand
+    SkipCommand,
+    BanCommand,
+    UnbanCommand,
+    MuteCommand,
+    UnmuteCommand,
+    RestartCommand,
+    GameCommand,
+    Dbtools
 ];
 
 export const processMessage = (message : Message) : boolean => {
@@ -65,6 +69,9 @@ export const processMessage = (message : Message) : boolean => {
     return true;
 };
 
+export {commands};
+
 export default {
-    processMessage
+    processMessage,
+    commands
 };

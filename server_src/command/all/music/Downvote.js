@@ -10,7 +10,9 @@ import MusicManager from '../../../music/MusicManager';
 class DownvoteCommand extends AbstractCommand {
 
     constructor() {
-        super("downvote", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("downvote", [
+            PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
+        ], "", "Downvote the currently playing track", ["down"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -52,3 +54,4 @@ class DownvoteCommand extends AbstractCommand {
 }
 
 export default new DownvoteCommand();
+new DownvoteCommand();

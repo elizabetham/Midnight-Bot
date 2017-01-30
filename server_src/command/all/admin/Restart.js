@@ -9,7 +9,9 @@ import _ from 'lodash';
 class RestartCommand extends AbstractCommand {
 
     constructor() {
-        super("restart", [PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("restart", [
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "", "Make Midnight restart herself.");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

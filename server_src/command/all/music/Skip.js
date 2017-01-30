@@ -10,7 +10,9 @@ import MusicManager from '../../../music/MusicManager';
 class SkipCommand extends AbstractCommand {
 
     constructor() {
-        super("skip", [PERMISSION_PRESETS.CONVICTS.PLATINUM_PEEPS, PERMISSION_PRESETS.BOTDEV.MODERATOR]);
+        super("skip", [
+            PERMISSION_PRESETS.CONVICTS.PLATINUM_PEEPS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "", "Skip the currently playing track");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

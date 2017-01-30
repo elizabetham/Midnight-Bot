@@ -11,7 +11,9 @@ import DiscordUtils from '../../../utils/DiscordUtils';
 class DequeueCommand extends AbstractCommand {
 
     constructor() {
-        super("dequeue", [PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("dequeue", [
+            PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
+        ], "[#|all]", "Remove a specific- or your last queued track from the queue.", ["unqueue"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {

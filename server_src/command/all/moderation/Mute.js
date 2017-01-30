@@ -14,14 +14,16 @@ import UserUtils from '../../../utils/UserUtils';
 class MuteCommand extends AbstractCommand {
 
     constructor() {
-        super("mute", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("mute", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user> <duration|forever> [[for]reason]", "Mute a guild member for a specific period of time");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 2) {
-            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 
@@ -47,7 +49,7 @@ class MuteCommand extends AbstractCommand {
 
         //Obtain duration:
         if (args[1].toLowerCase() != 'forever' && args.length < 3) {
-            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 

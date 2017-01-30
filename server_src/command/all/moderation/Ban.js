@@ -13,14 +13,16 @@ import DiscordUtils from '../../../utils/DiscordUtils';
 class BanCommand extends AbstractCommand {
 
     constructor() {
-        super("ban", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("ban", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user> [[for]reason]", "Ban a guild member permanently");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 1) {
-            this.tools.volatileReply(reply, "The correct usage for the ban command is `ban <user> [reason]`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 

@@ -11,7 +11,9 @@ import {yt} from '../../../music/MusicTools';
 class BlacklistCommand extends AbstractCommand {
 
     constructor() {
-        super("blacklist", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR]);
+        super("blacklist", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<add/remove> <youtubeURL>", "Add or remove a track from the permanent blacklist");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -21,7 +23,7 @@ class BlacklistCommand extends AbstractCommand {
         }
 
         if (args.length < 2) {
-            this.tools.volatileReply(reply, "Correct command usage: blacklist <add/remove> <youtubeURL>", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 
@@ -42,7 +44,7 @@ class BlacklistCommand extends AbstractCommand {
                     await MusicManager.unblacklistVideo(info.video_id);
                     break;
                 default:
-                    this.tools.volatileReply(reply, "Correct command usage: blacklist <add/remove> <youtubeURL>", 5000, msg);
+                    this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
                     return;
             }
             this.tools.volatileReply(reply, "Successfully blacklisted **'" + info.title + "'**.", 5000, msg);

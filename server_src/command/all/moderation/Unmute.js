@@ -16,14 +16,16 @@ import Config from '../../../../config';
 class UnmuteCommand extends AbstractCommand {
 
     constructor() {
-        super("unmute", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("unmute", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user>", "Unmute a muted guild member");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 1) {
-            this.tools.volatileReply(reply, "The correct usage for the unmute command is `unmute <user>`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 

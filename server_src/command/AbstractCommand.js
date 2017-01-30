@@ -14,21 +14,24 @@ import Permission from '../utils/Permission';
 export default class AbstractCommand {
 
     command : string
-
     minRoles : Array < Permission >;
-
     call : (message : Message) => void;
-
     tools : typeof Tools;
-
     aliases : Array < string >;
+    description : string;
+    usage : string;
+    getUsage : () => string;
 
-    constructor(command : string, minRoles : Array < Permission >, aliases : Array < string > = []) {
+    constructor(command : string, minRoles : Array < Permission >, usage : string, description : string, aliases : Array < string > = []) {
         this.command = command;
         this.minRoles = minRoles;
-        this.call = this.call.bind(this);
         this.tools = Tools;
         this.aliases = aliases;
+        this.usage = usage;
+        this.description = description;
+
+        this.call = this.call.bind(this);
+        this.getUsage = this.getUsage.bind(this);
     }
 
     call(message : Message, args : Array < string >) {
@@ -71,6 +74,12 @@ export default class AbstractCommand {
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) : Promise < void > {
         //Override me
+    }
+
+    getUsage(showCorrect : boolean = true) : string {
+        return(showCorrect
+            ? "Correct usage: "
+            : "") + "!" + this.command + " " + this.usage;
     }
 
 }

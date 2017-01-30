@@ -12,7 +12,7 @@ class QueueCommand extends AbstractCommand {
     constructor() {
         super("queue", [
             PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
-        ], ["play"]);
+        ], "<youtubeURL|searchQuery>", "Add a track to the queue", ["play"]);
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
