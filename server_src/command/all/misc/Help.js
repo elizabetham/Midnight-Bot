@@ -39,9 +39,13 @@ class HelpCommand extends AbstractCommand {
                 if (!minRole || DiscordUtils.hasPermission(user, minRole, true)) {
                     help += "**!" + cmdObj.command + "**: _" + cmdObj.description + "_\n";
                     help += "Usage: `" + cmdObj.getUsage(false) + "`\n";
-                    help += minRole && minRole.getRole().name != "@everyone"
-                        ? "Minimum Role: **" + minRole.getRole().name + "**\n\n"
-                        : "\n";
+                    if (cmdObj.aliases.length > 0) {
+                        help += "Alias(es): _" + cmdObj.aliases.map(a => "!" + a).join(", ") + "_\n";
+                    }
+                    if (minRole && minRole.getRole().name != "@everyone") {
+                        help += "Minimum Role: **" + minRole.getRole().name + "**\n";
+                    }
+                    help += "\n";
                 }
             });
 
@@ -67,9 +71,12 @@ class HelpCommand extends AbstractCommand {
             let minRole = cmdObj.minRoles.find(role => role.guildId == msg.guild.id);
             help += "**Command:** !" + cmdObj.command + ": _" + cmdObj.description + "_\n";
             help += "Usage: `" + cmdObj.getUsage(false) + "`\n";
-            help += minRole && minRole.getRole().name != "@everyone"
-                ? "Minimum Role: **" + minRole.getRole().name + "**\n"
-                : "";
+            if (cmdObj.aliases.length > 0) {
+                help += "Alias(es): _" + cmdObj.aliases.map(a => "!" + a).join(", ") + "_\n";
+            }
+            if (minRole && minRole.getRole().name != "@everyone") {
+                help += "Minimum Role: **" + minRole.getRole().name + "**\n";
+            }
 
         }
 
