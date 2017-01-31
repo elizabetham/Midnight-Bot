@@ -45,6 +45,7 @@
  - A MongoDB instance `>=3.20`;
  - A Redis instance
  - A Discord Bot token
+ - An installation of FFMPEG, added to $PATH
  - An API key for the Youtube Data API (Optional)
  - A Pastebin API key for error reporting (Optional)
 
