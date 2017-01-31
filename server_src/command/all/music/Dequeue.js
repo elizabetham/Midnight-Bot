@@ -7,6 +7,7 @@ import Lang from '../../Lang';
 import _ from 'lodash';
 import MusicManager from '../../../music/MusicManager';
 import DiscordUtils from '../../../utils/DiscordUtils';
+import Config from '../../../../config';
 
 class DequeueCommand extends AbstractCommand {
 
@@ -19,6 +20,11 @@ class DequeueCommand extends AbstractCommand {
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
         if (!MusicManager) {
             this.tools.volatileReply(reply, "My music module is currently not enabled!", 5000, msg);
+            return;
+        }
+
+        if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
+            msg.delete();
             return;
         }
 

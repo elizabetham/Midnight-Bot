@@ -6,6 +6,7 @@ import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import _ from 'lodash';
 import MusicManager from '../../../music/MusicManager';
+import Config from '../../../../config';
 
 class DownvoteCommand extends AbstractCommand {
 
@@ -22,6 +23,10 @@ class DownvoteCommand extends AbstractCommand {
         }
 
         await msg.delete();
+
+        if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
+            return;
+        }
 
         try {
             await MusicManager.downvote(user);

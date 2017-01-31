@@ -6,6 +6,7 @@ import {Message, GuildMember} from 'discord.js';
 import Lang from '../../Lang';
 import _ from 'lodash';
 import MusicManager from '../../../music/MusicManager';
+import Config from '../../../../config';
 
 class QueueCommand extends AbstractCommand {
 
@@ -27,6 +28,9 @@ class QueueCommand extends AbstractCommand {
         }
 
         msg.delete();
+        if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
+            return;
+        }
 
         const query = args.join(" ");
         try {
