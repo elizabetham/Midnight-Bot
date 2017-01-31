@@ -194,14 +194,14 @@ class MusicManager {
 
     async processVoteEffects(event : string) {
         //First purge all the votes from users who left
-        // await Promise.all(Array.from(this.votes.keys()).map(async(key) => {
-        //     if (this.activeVoiceChannel) {
-        //         let member = await this.activeVoiceChannel.guild.fetchMember(key);
-        //         if (this.activeVoiceChannel && (!member || member.voiceChannelID != this.activeVoiceChannel.id)) {
-        //             this.votes.delete(key);
-        //         }
-        //     }
-        // }));
+        await Promise.all(Array.from(this.votes.keys()).map(async(key) => {
+            if (this.activeVoiceChannel) {
+                let member = await this.activeVoiceChannel.guild.fetchMember(key);
+                if (this.activeVoiceChannel && (!member || member.voiceChannelID != this.activeVoiceChannel.id)) {
+                    this.votes.delete(key);
+                }
+            }
+        }));
 
         const votes = Array.from(this.votes.values()).length;
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
