@@ -1,27 +1,29 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember} from 'discord.js';
-import Lang from '../Lang';
-import Infraction from '../../datatypes/Infraction';
-import Logging from '../../utils/Logging';
+import Lang from '../../Lang';
+import Infraction from '../../../datatypes/Infraction';
+import Logging from '../../../utils/Logging';
 import moment from 'moment';
 import _ from 'lodash';
-import DiscordUtils from '../../utils/DiscordUtils';
-import UserUtils from '../../utils/UserUtils';
+import DiscordUtils from '../../../utils/DiscordUtils';
+import UserUtils from '../../../utils/UserUtils';
 
 class MuteCommand extends AbstractCommand {
 
     constructor() {
-        super("mute", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("mute", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user> <duration|forever> [[for]reason]", "Mute a guild member for a specific period of time");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 2) {
-            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000,msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 
@@ -31,7 +33,7 @@ class MuteCommand extends AbstractCommand {
 
         //If the UID is invalid, let the user know and stop here
         if (!uid) {
-            this.tools.volatileReply(reply, "The given user is not a valid target. Please use a mention or UID format.", 5000,msg);
+            this.tools.volatileReply(reply, "The given user is not a valid target. Please use a mention or UID format.", 5000, msg);
             return;
         }
 
@@ -40,14 +42,14 @@ class MuteCommand extends AbstractCommand {
             ? GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
         //If we found a reference, make sure we're not muting superiors
-        if (targetMember && !this.tools.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
-            this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to mute users ranked equally or higher than you.", 5000,msg);
+        if (targetMember && !DiscordUtils.hasPermission(user, _.maxBy(targetMember.roles.array(), r => r.position), false)) {
+            this.tools.volatileReply(reply, _.sample(Lang.NO_PERMISSION) + " It's not possible to mute users ranked equally or higher than you.", 5000, msg);
             return;
         }
 
         //Obtain duration:
         if (args[1].toLowerCase() != 'forever' && args.length < 3) {
-            this.tools.volatileReply(reply, "The correct usage for the mute command is `mute <user> <duration|forever> [reason]`", 5000,msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 
@@ -72,7 +74,7 @@ class MuteCommand extends AbstractCommand {
             : _.capitalize(reasonArr.join(" "));
 
         //Confirm action
-        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000,msg);
+        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000, msg);
 
         //Save an infraction and log it
         await Logging.infractionLog(await new Infraction(uid, moment().unix(), {
@@ -89,7 +91,7 @@ class MuteCommand extends AbstractCommand {
 
         //Apply the mute
         if (targetMember) {
-            targetMember.addRole(await DiscordUtils.getRole(msg.guild, "Muted"));
+            targetMember.addRole(await DiscordUtils.getRoleByName(msg.guild, "Muted"));
         }
 
         //Save it to the user record

@@ -22,11 +22,17 @@ module.exports = {
         path: path.join(__dirname, 'dist'),
         filename: 'Midnight.js'
     },
-    plugins: [new webpack.DefinePlugin({
+    plugins: [
+        new webpack.BannerPlugin('require("source-map-support").install();', {
+            raw: true,
+            entryOnly: false
+        }),
+        new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify("development")
             }
-        })],
+        })
+    ],
     target: 'node',
     node: {
         __dirname: false,

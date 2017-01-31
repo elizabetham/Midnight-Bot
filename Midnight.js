@@ -21,4 +21,4 @@ expressApp.listen(Config.HTTP_PORT, () => {
 });
 
 //Start music Module
-import './server_src/utils/MusicManager';
+import MusicManager from './server_src/music/MusicManager';

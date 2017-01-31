@@ -40,7 +40,7 @@ const unmuteApplicableUsers = () => {
                 let member = guild[1].members.get(doc.userid);
                 if (!member)
                     continue;
-                let role = await DiscordUtils.getRole(guild[1], "Muted");
+                let role = await DiscordUtils.getRoleByName(guild[1], "Muted");
                 member.removeRole(role);
                 const record = await new Infraction(member.user.id, moment().unix(), {
                     type: 'MUTE_LIFT',

@@ -28,10 +28,9 @@ class FloodSpamFilter extends AbstractFilter {
             Redis.set(key, 0);
             Redis.expire(key, SECONDS);
         }
-        //Increment message count
-        Redis.incr(key);
-        res = await Redis.getAsync(key);
-        return res > MESSAGES;
+
+        //Increment message count & return result
+        return (await Redis.incrAsync(key)) > MESSAGES;
     }
 
     async action(message : Message) : Promise < void > {

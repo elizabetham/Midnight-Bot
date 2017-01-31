@@ -2,7 +2,7 @@
 
 //Dependencies
 import express from 'express';
-import {InfractionRecord} from '../../utils/DBManager';
+import {InfractionRecord, UserRecord} from '../../utils/DBManager';
 import moment from 'moment';
 import _ from 'lodash';
 import {middleware as cache} from 'apicache';
@@ -15,6 +15,19 @@ from 'express';
 const router = express.Router();
 
 //Endpoints
+router.get('/djleaderboard', async function(req : $Request, res : $Response) {
+    try {
+        res.status(200).json((await UserRecord.find({
+            djAwardPoints: {
+                $gt: 0
+            }
+        }).sort({djAwardPoints: -1}).limit(50).lean()));
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({"error:": "Internal server error"});
+    }
+});
+
 router.get('/infractionstats', cache('1 hour'), async function(req : $Request, res : $Response) {
 
     let getTimeData = async(buckets : number, interval : number) => {
