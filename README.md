@@ -40,10 +40,11 @@
 
 ### Requirements
 
- - Node `>=6.0.0` required
+ - Node `>=6.0.0`
  - An installation of NPM
  - A MongoDB instance `>=3.20`;
  - A Redis instance
+ - A Discord Bot token
  - An API key for the Youtube Data API (Optional)
  - A Pastebin API key for error reporting (Optional)
 
