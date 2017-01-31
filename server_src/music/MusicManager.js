@@ -291,7 +291,10 @@ class MusicManager {
                 msg += " You have been given an award point! You now have **" + record.djAwardPoints + "** points, putting you in the **" + ordinal(placement) + "** position on the leaderboard!";
             }
             if (this.controlChannel) {
-                this.controlChannel.sendMessage(msg);
+                let message = await this.controlChannel.sendMessage(msg);
+                if (votes < 5) {
+                    message.delete(10000);
+                }
             }
         }
     }

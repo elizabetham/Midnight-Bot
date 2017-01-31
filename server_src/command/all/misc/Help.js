@@ -15,7 +15,7 @@ class HelpCommand extends AbstractCommand {
 
     constructor() {
         super("help", [
-            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE
+            PERMISSION_PRESETS.CONVICTS.EVERYONE, PERMISSION_PRESETS.BOTDEV.EVERYONE
         ], "[command]", "List Midnight's help");
     }
 
