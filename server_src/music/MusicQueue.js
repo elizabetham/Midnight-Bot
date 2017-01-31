@@ -46,34 +46,38 @@ class MusicQueue {
             videoInfo = await yt.getInfo(query);
         } catch (e) {
             //Not a URL, let's do a search.
-            try {
-                const searchRes = await yt.search(query, {
-                    maxResults: 1,
-                    key: Config.YOUTUBE_API_KEY
-                        ? Config.YOUTUBE_API_KEY
-                        : "",
-                    type: 'video'
-                });
-
-                //Check if we found results
-                if (searchRes[0].length == 0) {
-                    throw {e: "NO_RESULTS_FOUND"};
-                }
-
-                //Obtain the video info of the found result
+            if (Config.YOUTUBE_API_KEY) {
                 try {
-                    videoInfo = await yt.getInfo(searchRes[0][0].link);
+                    const searchRes = await yt.search(query, {
+                        maxResults: 1,
+                        key: Config.YOUTUBE_API_KEY
+                            ? Config.YOUTUBE_API_KEY
+                            : "",
+                        type: 'video'
+                    });
+
+                    //Check if we found results
+                    if (searchRes[0].length == 0) {
+                        throw {e: "NO_RESULTS_FOUND"};
+                    }
+
+                    //Obtain the video info of the found result
+                    try {
+                        videoInfo = await yt.getInfo(searchRes[0][0].link);
+                    } catch (e) {
+                        console.log("ATTEMPTED RESOLVE", searchRes[0][0].link, e);
+                        throw {e: "SEARCH_RESOLVE_ERROR"};
+                    }
                 } catch (e) {
-                    console.log("ATTEMPTED RESOLVE", searchRes[0][0].link, e);
-                    throw {e: "SEARCH_RESOLVE_ERROR"};
+                    //We cannot find results. Quit here.
+                    if (e.e == "SEARCH_RESOLVE_ERROR" || e.e == "NO_RESULTS_FOUND") {
+                        throw e;
+                    }
+                    console.log(e);
+                    throw {e: "SEARCH_ERROR"};
                 }
-            } catch (e) {
-                //We cannot find results. Quit here.
-                if (e.e == "SEARCH_RESOLVE_ERROR" || e.e == "NO_RESULTS_FOUND") {
-                    throw e;
-                }
-                console.log(e);
-                throw {e: "SEARCH_ERROR"};
+            } else {
+                throw {e: "SEARCH_DISABLED"};
             }
         }
 

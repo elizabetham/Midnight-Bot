@@ -71,6 +71,9 @@ class QueueCommand extends AbstractCommand {
                 case "CONTENT_TOO_LONG":
                     this.tools.volatileReply(reply, "This song exceeds our 10 minute limit. It cannot be played.", 5000, msg);
                     break;
+                case "SEARCH_DISABLED":
+                    this.tools.volatileReply(reply, "Please enter a youtube URL. Search is currently not enabled by the guild administrators.", 5000, msg);
+                    break;
                 default:
                     console.log("UNEXPECTED !PLAY RESPONSE", e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);
