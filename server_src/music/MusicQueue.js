@@ -81,9 +81,9 @@ class MusicQueue {
             }
         }
 
-        //Check if already on queue
-        if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
-            throw {e: "DUPLICATE_ENTRY"};
+        //Check if blacklisted permanently
+        if (await BlacklistedVideo.findOne({ytid: videoInfo.video_id})) {
+            throw {e: "BLACKLISTED_PERMANENTLY"};
         }
 
         //Check if blacklisted temporarily
@@ -91,11 +91,6 @@ class MusicQueue {
         let res = await Redis.existsAsync(blacklistKey);
         if (res) {
             throw {e: "BLACKLISTED_TEMPORARILY"};
-        }
-
-        //Check if blacklisted permanently
-        if (await BlacklistedVideo.findOne({ytid: videoInfo.video_id})) {
-            throw {e: "BLACKLISTED_PERMANENTLY"};
         }
 
         //Check title filters
@@ -106,6 +101,11 @@ class MusicQueue {
         //Check song length
         if (videoInfo.length_seconds > 60 * 10) {
             throw {e: "CONTENT_TOO_LONG"};
+        }
+
+        //Check if already on queue
+        if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
+            throw {e: "DUPLICATE_ENTRY"};
         }
 
         //Push new video onto queue

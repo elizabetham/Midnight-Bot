@@ -50,7 +50,7 @@
     "superagent": "^3.4.1",
     "url-loader": "^0.5.7",
     "youtube-search": "^1.0.8",
-    "ytdl-core": "^0.7.23"
+    "ytdl-core": "github:fent/node-ytdl-core#pull/105/head"
   },
   "devDependencies": {
     "babel-core": "^6.21.0",

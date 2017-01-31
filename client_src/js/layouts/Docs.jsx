@@ -238,9 +238,9 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!dbtools (!db)</h3>
+                    <h3 style={style.commandHeader}>!debug (!dbg)</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Database related administration tools.</h5>
+                        &nbsp;- Debugging tools for administrators.</h5>
                     <p>Minimum role required:&nbsp;<code>Master Moderator</code>
                     </p>
                 </Row>

@@ -7,7 +7,7 @@ import AbstractCommand from './AbstractCommand';
 //Admin
 import GameCommand from './all/admin/Game';
 import RestartCommand from './all/admin/Restart';
-import Dbtools from './all/admin/Dbtools';
+import Debug from './all/admin/Debug';
 
 //Moderation
 import BanCommand from './all/moderation/Ban';
@@ -40,7 +40,7 @@ const commands = [
     UnmuteCommand,
     RestartCommand,
     GameCommand,
-    Dbtools
+    Debug
 ];
 
 export const processMessage = (message : Message) : boolean => {
@@ -68,12 +68,6 @@ export const processMessage = (message : Message) : boolean => {
     //Stop chat filter processing
     return true;
 };
-
-commands.forEach(cmd => {
-    console.log("<Row>\n" +
-        "    <hr/>\n" +
-        "    <h3 style={style.commandHeader}>!" + cmd.command + "</h3>\n" + "    <h5 style={style.commandHeader}>\n" + "        &nbsp;- " + cmd.description + "</h5>\n" + "    <h5>Usage:" + "        <code>" + cmd.getUsage(false) + "</code>\n" + "    </h5>\n" + "    <p>Minimum role required:&nbsp;<code>ROLE HERE</code>\n" + "    </p>\n" + "</Row>\n");
-});
 
 export {commands};
 

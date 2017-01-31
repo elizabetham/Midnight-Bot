@@ -6,7 +6,7 @@ class QueueItem {
     videoInfo : Object;
 
     constructor(requestedBy : string, videoInfo : Object) {
-        if (!videoInfo)
+        if (!videoInfo) 
             throw "FALSY videoInfo PARAMETER";
         this.requestedBy = requestedBy;
         this.videoInfo = videoInfo;

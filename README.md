@@ -36,7 +36,7 @@
 |!**unmute**|*!unmute \<user\>*|Unmute a muted guild member|
 |!**restart**|*!restart*|Make Midnight restart herself.|
 |!**game**|*!game [status]*|Set Midnight's game status|
-|!**dbtools**|*!dbtools*|Database related administration tools|db
+|!**debug**|*!debug*|Database related administration tools|dbg
 
 ### Requirements
 

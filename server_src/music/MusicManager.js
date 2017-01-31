@@ -47,6 +47,7 @@ class MusicManager {
 
     constructor(voiceChannel : string, controlChannel :
         ? string) {
+
         //Initialize defaults
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
         this.votes = new Map();
@@ -70,12 +71,9 @@ class MusicManager {
         this.checkPermBlacklist = this.checkPermBlacklist.bind(this);
 
         (async() => {
+
             //Connect to voice channels when discord is ready
             DiscordUtils.client.on('ready', async() => {
-                //Load idle playlist
-                this.idlePlaylist = await Promise.all((Config.MUSIC_IDLE_PLAYLIST || []).map(async(url) => {
-                    return new QueueItem("", await yt.getInfo(url));
-                }));
 
                 //Reference control channel
                 this.controlChannel = (controlChannel)
@@ -93,6 +91,16 @@ class MusicManager {
                 this.activeConnection = (this.activeVoiceChannel)
                     ? await this.activeVoiceChannel.join()
                     : null;
+
+                //Load idle playlist
+                this.idlePlaylist = await Promise.all((Config.MUSIC_IDLE_PLAYLIST || []).map(async(url) => {
+                    try {
+                        return new QueueItem("", await yt.getInfo(url));
+                    } catch (e) {
+                        console.log("ATTEMPTED RESOLVE", url, e);
+                        return null;
+                    }
+                }));
 
                 //Start music
                 this.skip();
@@ -186,28 +194,28 @@ class MusicManager {
 
     async processVoteEffects(event : string) {
         //First purge all the votes from users who left
-        await Promise.all(Array.from(this.votes.keys()).map(async(key) => {
-            if (this.activeVoiceChannel) {
-                let member = await this.activeVoiceChannel.guild.fetchMember(key);
-                if (this.activeVoiceChannel && (!member || member.voiceChannelID != this.activeVoiceChannel.id)) {
-                    this.votes.delete(key);
-                }
-            }
-        }));
+        // await Promise.all(Array.from(this.votes.keys()).map(async(key) => {
+        //     if (this.activeVoiceChannel) {
+        //         let member = await this.activeVoiceChannel.guild.fetchMember(key);
+        //         if (this.activeVoiceChannel && (!member || member.voiceChannelID != this.activeVoiceChannel.id)) {
+        //             this.votes.delete(key);
+        //         }
+        //     }
+        // }));
 
         const votes = Array.from(this.votes.values()).length;
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
         const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
 
         //25% negativity threshold;
-        if (downvotes / votes >= 0.25 && downvotes >= 5 && !this.skipped && event != "SONG_END") {
+        if (downvotes / votes >= 0.50 && votes >= 5 && !this.skipped && event != "SONG_END") {
             //Block flow for effect
             this.skipped = true;
 
             //Increase shame points for current DJ. Block access for 24hr if they've gained too many.
             let djBlocked = false;
             let shamePoints = this.activeItem
-                ? this.incrShamePoints(this.activeItem.requestedBy)
+                ? await this.incrShamePoints(this.activeItem.requestedBy)
                 : 0;
             if (this.activeItem && shamePoints >= 3) {
                 let key = this.activeItem.requestedBy + ":MusicQueueCooldown";
@@ -258,10 +266,9 @@ class MusicManager {
         if (event == "SONG_END" && this.activeItem && this.activeItem.requestedBy) {
             let requestedBy = this.activeItem.requestedBy;
             let msg = "<@" + requestedBy + ">" + ", Your track ended with **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:.";
-            if (upvotes / votes >= 0.75 && upvotes >= 5) {
-
+            if (upvotes / votes >= 0.75 && votes >= 5) {
                 //Save award point
-                const record = UserUtils.assertUserRecord(requestedBy);
+                let record = await UserUtils.assertUserRecord(requestedBy);
                 record.djAwardPoints = record.djAwardPoints
                     ? record.djAwardPoints + 1
                     : 1;
@@ -270,31 +277,40 @@ class MusicManager {
                 //Obtain placement
                 //TODO: REPLACE WITH MORE EFFICIENT SOLUTION
                 let found = false;
-                let placement = UserRecord.find({
-                    djAwardsPoints: {
+                let placement = (await UserRecord.find({
+                    djAwardPoints: {
                         $gt: 0
                     }
-                }).sort({djAwardsPoints: 1, username: 1}).lean().filter((r, index) => {
+                }).sort({djAwardPoints: 1, username: 1}).lean()).filter((r, index) => {
                     if (r.userid == record.userid) {
                         found = true;
                     }
                     return found;
-                }).length();
-
+                }).length;
                 //Add to message
-                msg += " You have been given an award point! You now have **" + record.djAwardsPoints + "** points, putting you in the **" + ordinal(placement) + "** position on the leaderboards!";
+                msg += " You have been given an award point! You now have **" + record.djAwardPoints + "** points, putting you in the **" + ordinal(placement) + "** position on the leaderboard!";
             }
-            setTimeout(async() => {
-                if (this.controlChannel) {
-                    (await this.controlChannel.sendMessage(msg)).delete(10 * 1000);
-                }
-            }, 1000);
+            if (this.controlChannel) {
+                this.controlChannel.sendMessage(msg);
+            }
         }
     }
 
     play : Function;
 
     async play(query : string, member : GuildMember) {
+
+        let redisKey = member.id + ":MusicQueueCooldown";
+        let res = await Redis.existsAsync(redisKey);
+        if (res) {
+            Redis.get(redisKey);
+            let data = await Redis.getAsync(redisKey);
+            throw {
+                e: "USER_QUEUE_COOLDOWN",
+                timeRemaining: this.secondsToTimestamp(data - moment().unix())
+            };
+        }
+
         //Check if user is allowed another queue
         const currentlyQueued = this.queue.queue.filter(i => i.requestedBy == member.id).length;
         const allowedQueues = ([
@@ -315,7 +331,21 @@ class MusicManager {
             throw {e: "MAX_ALLOWED_QUEUES", allowed: allowedQueues};
         }
 
-        //Check if user is on cooldown
+        //Calculate seconds remaining before playing
+        let eta = this.queue.queue.reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
+            ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
+                ? this.activeStream.totalStreamTime
+                : 0) / 1000)
+            : 0);
+
+        //Construct return info
+        let response = {
+            queueItem: await this.queue.push(query, member.id),
+            queuePosition: this.queue.size(),
+            eta: this.secondsToTimestamp(eta)
+        };
+
+        //Check if user should receive
         const requiredCooldown = ([
             [
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 0
@@ -332,31 +362,6 @@ class MusicManager {
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
             null, 15 * 60
         ])[1];
-
-        let redisKey = member.id + ":MusicQueueCooldown";
-        let res = await Redis.existsAsync(redisKey);
-        if (res) {
-            Redis.get(redisKey);
-            let data = await Redis.getAsync(redisKey);
-            throw {
-                e: "USER_QUEUE_COOLDOWN",
-                timeRemaining: this.secondsToTimestamp(data - moment().unix())
-            };
-        }
-
-        //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
-            ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
-                ? this.activeStream.totalStreamTime
-                : 0) / 1000)
-            : 0);
-
-        //Return info
-        let response = {
-            queueItem: await this.queue.push(query, member.id),
-            queuePosition: this.queue.size(),
-            eta: this.secondsToTimestamp(eta)
-        };
 
         //Update Redis cooldowns
         if (requiredCooldown > 0) {
@@ -451,13 +456,12 @@ class MusicManager {
             let activeItem = this.activeItem;
 
             //Construct message
-            let newMessage = "";
+            let newMessage = "`Now` **" + activeItem.videoInfo.title + "** added by **" + (activeItem.requestedBy
+                ? (await UserUtils.assertUserRecord(activeItem.requestedBy)).username
+                : "Midnight") + "**\n";;
 
             //Playlist
             if (this.queue.queue.length > 0) {
-                newMessage += "`Now` **" + activeItem.videoInfo.title + "** added by **" + (activeItem.requestedBy
-                    ? (await UserUtils.assertUserRecord(activeItem.requestedBy)).username
-                    : "Midnight") + "**\n";
                 (await Promise.all(this.queue.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
                     ? (await UserUtils.assertUserRecord(item.requestedBy)).username
                     : "Midnight") + "**\n"))).forEach(line => newMessage += line);
