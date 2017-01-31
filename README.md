@@ -126,31 +126,33 @@ export default config;
 
 ### Running Midnight
 
-Step 1-6 are a one-time only setup.
+**Initial setup:**
 
-1. Set up your MongoDB and Redis instances
-2. Clone the Midnight repository
+- Set up your MongoDB and Redis instances
+- Clone the Midnight repository
 ```
 $ git clone https://github.com/BeMacized/Midnight-Bot.git midnight && cd midnight
 ```
-3. Fetch required dependencies
+- Fetch required dependencies
 ```
 $ npm run init
 ```
-4. Write your config file and place it in the project directory alongside Midnight.js
-5. Run tests to make sure your configuration is correct:
+- Write your config file and place it in the project directory alongside Midnight.js
+- Run tests to make sure your configuration is correct:
 ```
 $ npm run test
 ```
-6. Build Midnight:
+- Build Midnight:
 ```
 $ npm run build
 ```
-7. Run Midnight:
+
+**Start Midnight**
+
+Execute:
 ```
 $ cd dist && node Midnight.js
 ```
-
 Please note that in order for the `!restart` command to start the bot back up, it is required to use an external runner like [PM2](https://github.com/Unitech/pm2). In case you use PM2, replace `node Midnight.js` with `pm2 start Midnight.js`.
 
 
