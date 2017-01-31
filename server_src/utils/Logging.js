@@ -10,7 +10,9 @@ import Config from '../../config';
 import moment from 'moment';
 
 //Dependencies
-const pastebin = new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY);
+const pastebin = (Config.PASTEBIN_DEV_KEY)
+    ? new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY)
+    : null;
 
 export const bot = (msg : string) => {
     DiscordUtils.client.guilds.array().forEach(async(guild) => {
@@ -81,16 +83,18 @@ export const error = async(identifier : string, err : any) => {
     errorTimeData[identifier] = moment().unix();
 
     //Create pastebin & post in client log channel
-    try {
-        let data = await pastebin.createPaste({
-            text: JSON.stringify(err, null, 2),
-            privacy: 1,
-            title: "[Midnight] Error (ID: " + identifier + ")"
-        });
-        bot(format("ERROR", "[" + identifier + "]: <http://pastebin.com/" + data + ">"));
-    } catch (err) {
-        console.error(err);
-        bot(format("ERROR", "[" + identifier + "]: Could not upload to pastebin."));
+    if (pastebin) {
+        try {
+            let data = await pastebin.createPaste({
+                text: JSON.stringify(err, null, 2),
+                privacy: 1,
+                title: "[Midnight] Error (ID: " + identifier + ")"
+            });
+            bot(format("ERROR", "[" + identifier + "]: <http://pastebin.com/" + data + ">"));
+        } catch (err) {
+            console.error(err);
+            bot(format("ERROR", "[" + identifier + "]: Could not upload to pastebin."));
+        }
     }
 };
 

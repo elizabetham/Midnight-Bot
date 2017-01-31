@@ -1,10 +1,11 @@
 // @flow
 
 import Config from '../../config';
-import type {Guild, VoiceChannel, TextChannel}
+import type {Guild, VoiceChannel, TextChannel, GuildMember, Role}
 from 'discord.js';
 import {Client} from 'discord.js';
 import {Redis} from './DBManager';
+import _ from 'lodash';
 
 class DiscordUtils {
 
@@ -17,6 +18,10 @@ class DiscordUtils {
         : boolean) => Promise < void >;
     getVoiceChannel : (id : string) => VoiceChannel;
     getTextChannel : (id : string) => TextChannel;
+    hasPermission : (user : GuildMember, minRole : Role, inclusive
+        ?
+        : boolean) => boolean;
+    getRoleById : (id : string) => Role;
 
     //Constructor
     constructor() {
@@ -27,6 +32,7 @@ class DiscordUtils {
         this.setPlaying = this.setPlaying.bind(this);
         this.getVoiceChannel = this.getVoiceChannel.bind(this);
         this.getTextChannel = this.getTextChannel.bind(this);
+        this.getRoleById = this.getRoleById.bind(this);
     }
 
     //Functions
@@ -44,11 +50,15 @@ class DiscordUtils {
         return this.client.guilds.array().map(guild => guild.channels.find(channel => channel.type == 'voice' && id == channel.id)).find(c => c);
     };
 
-    getRole(guild : Guild, rolename : string) {
+    getRoleByName(guild : Guild, rolename : string) {
         return new Promise(resolve => {
             resolve(guild.roles.array().find(r => r.name == rolename));
         });
     };
+
+    getRoleById(id : string) {
+        return this.client.guilds.array().map(guild => guild.roles.array().find(role => role.id == id)).find(c => c);
+    }
 
     async start() {
         return await this.client.login(Config.botToken);
@@ -71,6 +81,17 @@ class DiscordUtils {
             Redis.set("bot:game", game);
         }
         this.client.user.setGame(game);
+    }
+
+    hasPermission(user : GuildMember, minRole : Role, inclusive : boolean = true) {
+        const userpos = _.max(user.roles.array().map(r => r.position));
+        if (user.roles.array().find(role => role.name.toUpperCase() == "BOTDEV"))
+            return true;
+        if (minRole) {
+            return (inclusive && userpos >= minRole.position || userpos > minRole.position);
+        } else {
+            return false;
+        }
     }
 }
 

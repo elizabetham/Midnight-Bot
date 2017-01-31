@@ -1,29 +1,31 @@
 // @flow
 
-import AbstractCommand from '../AbstractCommand';
-import {PERMISSION_PRESETS} from '../Permission';
+import AbstractCommand from '../../AbstractCommand';
+import {PERMISSION_PRESETS} from '../../../utils/Permission';
 import {Message, GuildMember, Role} from 'discord.js';
-import Lang from '../Lang';
-import Infraction from '../../datatypes/Infraction';
-import Logging from '../../utils/Logging';
+import Lang from '../../Lang';
+import Infraction from '../../../datatypes/Infraction';
+import Logging from '../../../utils/Logging';
 import moment from 'moment';
 import _ from 'lodash';
-import DiscordUtils from '../../utils/DiscordUtils';
-import UserUtils from '../../utils/UserUtils';
-import {UserRecord} from '../../utils/DBManager';
-import Config from '../../../config';
+import DiscordUtils from '../../../utils/DiscordUtils';
+import UserUtils from '../../../utils/UserUtils';
+import {UserRecord} from '../../../utils/DBManager';
+import Config from '../../../../config';
 
 class UnmuteCommand extends AbstractCommand {
 
     constructor() {
-        super("unmute", [PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.EVERYONE]);
+        super("unmute", [
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+        ], "<user> [[for]reason]", "Unmute a muted guild member");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
 
         //Verify argument length
         if (args.length < 1) {
-            this.tools.volatileReply(reply, "The correct usage for the unmute command is `unmute <user>`", 5000, msg);
+            this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
             return;
         }
 
@@ -44,13 +46,23 @@ class UnmuteCommand extends AbstractCommand {
         const targetMember : GuildMember = msg.guild.members.array().find(user => user.id == uid);
 
         //Fetch mute role
-        const muteRole : Role = await DiscordUtils.getRole(msg.guild, "Muted");
+        const muteRole : Role = await DiscordUtils.getRoleByName(msg.guild, "Muted");
 
         //Check if the user is even muted
         if (!targetMember || (!targetMember.roles.array().find(role => role.id == muteRole.id) && userRecord.mutedUntil == -1)) {
             this.tools.volatileReply(reply, "This user is not muted!", 5000, msg);
             return;
         }
+
+        //Obtain a reason if it exists
+        let reasonArr = args.length == 1
+            ? []
+            : args.slice(1, args.length);
+        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i))
+            reasonArr.shift();
+        const reason = reasonArr.length == 0
+            ? null
+            : _.capitalize(reasonArr.join(" "));
 
         //Confirm action
         this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000, msg);
@@ -59,7 +71,10 @@ class UnmuteCommand extends AbstractCommand {
         const record = await new Infraction(uid, moment().unix(), {
             type: 'MUTE_LIFT',
             increasedNotoriety: false
-        }, null, {executor: user.id}).save();
+        }, null, {
+            executor: user.id,
+            reason
+        }).save();
 
         //Make modlog
         let permalink = Config.baseURL + "/#/infractions/" + record.userid + "/" + record._id;

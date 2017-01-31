@@ -5,26 +5,33 @@ import Logging from '../utils/Logging';
 import Lang from './Lang';
 import _ from 'lodash';
 import Tools from './CommandTools'
+import DiscordUtils from '../utils/DiscordUtils';
 
 //Types
 import {Message, Role, GuildMember} from 'discord.js';
-import Permission from './Permission';
+import Permission from '../utils/Permission';
 
 export default class AbstractCommand {
 
     command : string
-
     minRoles : Array < Permission >;
-
     call : (message : Message) => void;
-
     tools : typeof Tools;
+    aliases : Array < string >;
+    description : string;
+    usage : string;
+    getUsage : () => string;
 
-    constructor(command : string, minRoles : Array < Permission >) {
+    constructor(command : string, minRoles : Array < Permission >, usage : string, description : string, aliases : Array < string > = []) {
         this.command = command;
         this.minRoles = minRoles;
-        this.call = this.call.bind(this);
         this.tools = Tools;
+        this.aliases = aliases;
+        this.usage = usage;
+        this.description = description;
+
+        this.call = this.call.bind(this);
+        this.getUsage = this.getUsage.bind(this);
     }
 
     call(message : Message, args : Array < string >) {
@@ -52,7 +59,7 @@ export default class AbstractCommand {
             }
 
             //Check if the user has Permission
-            let hasPermission = this.tools.hasPermission(message.member, minRole);
+            let hasPermission = DiscordUtils.hasPermission(message.member, minRole);
 
             //If the user does not have permission
             if (!hasPermission) {
@@ -67,6 +74,12 @@ export default class AbstractCommand {
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) : Promise < void > {
         //Override me
+    }
+
+    getUsage(showCorrect : boolean = true) : string {
+        return(showCorrect
+            ? "Correct usage: "
+            : "") + "!" + this.command + " " + this.usage;
     }
 
 }

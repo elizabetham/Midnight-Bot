@@ -4,31 +4,48 @@ from 'discord.js';
 
 import AbstractCommand from './AbstractCommand';
 
-import RestartCommand from './all/Restart';
-import BanCommand from './all/Ban';
-import MuteCommand from './all/Mute';
-import UnmuteCommand from './all/Unmute';
-import PlayingCommand from './all/Playing';
-import UnbanCommand from './all/Unban'
-import PlayCommand from './all/Play';
-import SkipCommand from './all/Skip';
-import PlaylistCommand from './all/Playlist';
+//Admin
+import GameCommand from './all/admin/Game';
+import RestartCommand from './all/admin/Restart';
+import Debug from './all/admin/Debug';
+
+//Moderation
+import BanCommand from './all/moderation/Ban';
+import MuteCommand from './all/moderation/Mute';
+import UnmuteCommand from './all/moderation/Unmute';
+import UnbanCommand from './all/moderation/Unban';
+
+//Music
+import QueueCommand from './all/music/Queue';
+import SkipCommand from './all/music/Skip';
+import UpvoteCommand from './all/music/Upvote';
+import DownvoteCommand from './all/music/Downvote';
+import BlacklistCommand from './all/music/Blacklist';
+import DequeueCommand from './all/music/Dequeue';
+
+//Misc
+import HelpCommand from './all/misc/Help';
 
 const commands = [
-    RestartCommand,
+    HelpCommand,
+    QueueCommand,
+    DequeueCommand,
+    DownvoteCommand,
+    UpvoteCommand,
+    BlacklistCommand,
+    SkipCommand,
     BanCommand,
+    UnbanCommand,
     MuteCommand,
     UnmuteCommand,
-    PlayingCommand,
-    UnbanCommand,
-    PlayCommand,
-    SkipCommand,
-    PlaylistCommand
+    RestartCommand,
+    GameCommand,
+    Debug
 ];
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
-    const args = message.content.replace(new RegExp("(^<@[0-9]*> )|(^\!)", "gi"), "").split(/\s+/gi);
+    const args = message.content.replace(new RegExp("(^<@[0-9]*> )|(^\!)|(^\/)", "gi"), "").split(/\s+/gi);
 
     //If no command was supplied quit here
     if (args.length == 0)
@@ -39,7 +56,7 @@ export const processMessage = (message : Message) : boolean => {
 
     //Attempt finding a relevant command class
     const cmdObj :
-        ? AbstractCommand = commands.find(c => c.command.toLowerCase() == cmd.toLowerCase());
+        ? AbstractCommand = commands.find(c => c.command.toLowerCase() == cmd.toLowerCase() || c.aliases.indexOf(cmd.toLowerCase()) > -1);
 
     //If none found, stop here
     if (!cmdObj)
@@ -52,6 +69,9 @@ export const processMessage = (message : Message) : boolean => {
     return true;
 };
 
+export {commands};
+
 export default {
-    processMessage
+    processMessage,
+    commands
 };
