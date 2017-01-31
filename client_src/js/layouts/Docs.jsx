@@ -41,7 +41,7 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <h3>Command usage</h3>
-                    <p>You can prefix a command to Midnight either with &nbsp;<code>!</code>, or a Discord mention &nbsp;<code>@Midnight</code>.
+                    <p>You can prefix a command to Midnight either with &nbsp;<code>!</code>, &nbsp;<code>/</code>, or a Discord mention &nbsp;<code>@Midnight</code>.
                         <br/>
                         Parameters surrounded with &nbsp;<code>&lt;&nbsp;&gt;</code>&nbsp; are mandatory. Those surrounded with &nbsp;<code>[ ]</code>&nbsp; are optional. Do not type these braces into your actual commands.
                     </p>

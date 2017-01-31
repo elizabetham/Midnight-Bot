@@ -45,7 +45,7 @@ const commands = [
 
 export const processMessage = (message : Message) : boolean => {
     //Strip off mention & obtain split data
-    const args = message.content.replace(new RegExp("(^<@[0-9]*> )|(^\!)", "gi"), "").split(/\s+/gi);
+    const args = message.content.replace(new RegExp("(^<@[0-9]*> )|(^\!)|(^\/)", "gi"), "").split(/\s+/gi);
 
     //If no command was supplied quit here
     if (args.length == 0)

@@ -53,7 +53,7 @@ DiscordUtils.client.on('message', (message : Message) => {
     if (!message.guild)
         return;
 
-    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi")) || message.content.substring(0, 1) == "!") {
+    if (message.content.match(new RegExp("^<@" + DiscordUtils.client.user.id + ">", "gi")) || message.content.substring(0, 1) == "!" || message.content.substring(0, 1) == "/") {
         if (CommandDispatcher.processMessage(message))
             return;
         }
