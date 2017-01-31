@@ -77,25 +77,43 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
+                    <h3 style={style.commandHeader}>!help</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- List Midnight's help.</h5>
+                    <h5>Usage:
+                        <code>!help [command]</code>
+                    </h5>
+                </Row>
+                <Row>
+                    <hr/>
                     <h3>Music</h3>
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!play</h3>
+                    <h3 style={style.commandHeader}>!queue (!play)</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Queue a song for the music voice chat.</h5>
+                        &nbsp;- Queue a track for the music voice chat.</h5>
                     <h5>Usage:
                         <code>!play &lt;youtubeURL/searchQuery&gt;</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
-                    </p>
                     <p>You can either supply a valid URL to a youtube video, or you can just type in a search query and Midnight will pick the best result.</p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!dequeue (!unqueue)
+                    </h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Remove a specific- or your last queued track from the queue.</h5>
+                    <h5>Usage:
+                        <code>!dequeue [#|all]</code>
+                    </h5>
+                    <p>Dequeueing a specific entry or all entries is reserved for moderators.</p>
                 </Row>
                 <Row>
                     <hr/>
                     <h3 style={style.commandHeader}>!skip</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Skip the currently playing song</h5>
+                        &nbsp;- Skip the currently playing track</h5>
                     <h5>Usage:
                         <code>!skip</code>
                     </h5>
@@ -104,13 +122,33 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
-                    <h3 style={style.commandHeader}>!playlist</h3>
+                    <h3 style={style.commandHeader}>!upvote (!up)</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Show the currently queued songs</h5>
+                        &nbsp;- Upvote the currently playing track.</h5>
                     <h5>Usage:
-                        <code>!playlist</code>
+                        <code>!upvote</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
+                    <p>You are required to be a listener in order to vote. If you leave after voting before the song completes, your vote is invalidated.</p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!downvote (!down)</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Downvote the currently playing track.</h5>
+                    <h5>Usage:
+                        <code>!downvote</code>
+                    </h5>
+                    <p>You are required to be a listener in order to vote. If you leave after voting before the song completes, your vote is invalidated.</p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!blacklist</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Add or remove a track from the permanent blacklist</h5>
+                    <h5>Usage:
+                        <code>!blacklist &lt;add/remove&gt; &lt;youtubeURL&gt;</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code>
                     </p>
                 </Row>
                 <Row>
@@ -121,7 +159,7 @@ class DocsLayout extends Component {
                     <hr/>
                     <h3 style={style.commandHeader}>!mute</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually mute a user.</h5>
+                        &nbsp;- Mute a guild member for a specific period of time.</h5>
                     <h5>Usage:
                         <code>!mute &lt;user&gt; &lt;duration&gt; [[for]reason]</code>
                     </h5>
@@ -142,9 +180,9 @@ class DocsLayout extends Component {
                     <hr/>
                     <h3 style={style.commandHeader}>!unmute</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually lift a mute.</h5>
+                        &nbsp;- Unmute a muted guild member.</h5>
                     <h5>Usage:
-                        <code>!unmute &lt;user&gt;</code>
+                        <code>!unmute &lt;user&gt; [[for]reason]</code>
                     </h5>
                     <p>Minimum role required:&nbsp;<code>Moderator</code>
                     </p>
@@ -153,7 +191,7 @@ class DocsLayout extends Component {
                     <hr/>
                     <h3 style={style.commandHeader}>!ban</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually ban a user permanently.</h5>
+                        &nbsp;- Ban a guild member permanently.</h5>
                     <h5>Usage:
                         <code>!ban &lt;user&gt; [[for]reason]</code>
                     </h5>
@@ -164,7 +202,7 @@ class DocsLayout extends Component {
                     <hr/>
                     <h3 style={style.commandHeader}>!unban</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Manually unban a user.</h5>
+                        &nbsp;- Unban a banned guild member.</h5>
                     <h5>Usage:
                         <code>!unban &lt;user&gt; [[for]reason]</code>
                     </h5>
@@ -198,7 +236,14 @@ class DocsLayout extends Component {
                     <p>Minimum role required:&nbsp;<code>Master Moderator</code>
                     </p>
                 </Row>
-
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!dbtools (!db)</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Database related administration tools.</h5>
+                    <p>Minimum role required:&nbsp;<code>Master Moderator</code>
+                    </p>
+                </Row>
             </div>
         );
     }

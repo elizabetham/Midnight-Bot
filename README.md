@@ -28,12 +28,12 @@
 |!**dequeue**|*!dequeue [#\|all]*|Remove a specific- or your last queued track from the queue.|unqueue
 |!**downvote**|*!downvote*|Downvote the currently playing track|down
 |!**upvote**|*!upvote*|Upvote the currently playing track|up
-|!**blacklist**|*!blacklist \<add/remove> \<youtubeURL>*|Add or remove a track from the permanent blacklist|
+|!**blacklist**|*!blacklist \<add/remove\> \<youtubeURL\>*|Add or remove a track from the permanent blacklist|
 |!**skip**|*!skip*|Skip the currently playing track|
-|!**ban**|*!ban <user> [[for]reason]*|Ban a guild member permanently|
-|!**unban**|*!unban <user> [[for]reason]*|Unban a banned guild member|
-|!**mute**|*!mute <user> <duration\|forever> [[for]reason]*|Mute a guild member for a specific period of time|
-|!**unmute**|*!unmute <user>*|Unmute a muted guild member|
+|!**ban**|*!ban \<user\> [[for]reason]*|Ban a guild member permanently|
+|!**unban**|*!unban \<user\> [[for]reason]*|Unban a banned guild member|
+|!**mute**|*!mute \<user\> \<duration\|forever\> [[for]reason]*|Mute a guild member for a specific period of time|
+|!**unmute**|*!unmute \<user\>*|Unmute a muted guild member|
 |!**restart**|*!restart*|Make Midnight restart herself.|
 |!**game**|*!game [status]*|Set Midnight's game status|
 |!**dbtools**|*!dbtools*|Database related administration tools|db

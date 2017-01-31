@@ -69,6 +69,12 @@ export const processMessage = (message : Message) : boolean => {
     return true;
 };
 
+commands.forEach(cmd => {
+    console.log("<Row>\n" +
+        "    <hr/>\n" +
+        "    <h3 style={style.commandHeader}>!" + cmd.command + "</h3>\n" + "    <h5 style={style.commandHeader}>\n" + "        &nbsp;- " + cmd.description + "</h5>\n" + "    <h5>Usage:" + "        <code>" + cmd.getUsage(false) + "</code>\n" + "    </h5>\n" + "    <p>Minimum role required:&nbsp;<code>ROLE HERE</code>\n" + "    </p>\n" + "</Row>\n");
+});
+
 export {commands};
 
 export default {

@@ -18,7 +18,7 @@ class UnmuteCommand extends AbstractCommand {
     constructor() {
         super("unmute", [
             PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
-        ], "<user>", "Unmute a muted guild member");
+        ], "<user> [[for]reason]", "Unmute a muted guild member");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
@@ -54,6 +54,16 @@ class UnmuteCommand extends AbstractCommand {
             return;
         }
 
+        //Obtain a reason if it exists
+        let reasonArr = args.length == 1
+            ? []
+            : args.slice(1, args.length);
+        if (reasonArr.length > 0 && reasonArr[0].match(/^for$/i))
+            reasonArr.shift();
+        const reason = reasonArr.length == 0
+            ? null
+            : _.capitalize(reasonArr.join(" "));
+
         //Confirm action
         this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE), 5000, msg);
 
@@ -61,7 +71,10 @@ class UnmuteCommand extends AbstractCommand {
         const record = await new Infraction(uid, moment().unix(), {
             type: 'MUTE_LIFT',
             increasedNotoriety: false
-        }, null, {executor: user.id}).save();
+        }, null, {
+            executor: user.id,
+            reason
+        }).save();
 
         //Make modlog
         let permalink = Config.baseURL + "/#/infractions/" + record.userid + "/" + record._id;
