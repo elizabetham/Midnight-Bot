@@ -58,68 +58,68 @@ class DebugCommand extends AbstractCommand {
                     await MusicManager.updateNowPlaying();
                     this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Setting votes to " + upvotes + ":thumbsup: " + downvotes + ":thumbsdown:.", 5000, msg);
                     break;
-                case "shell":
-                    //Delete request message
-                    msg.delete();
-
-                    //Clean output
-                    const clean = (text : any) => {
-                        return (typeof text !== "string")
-                            ? text
-                            : text.replace("``", `\`${String.fromCharCode(8203)}\``);
-                    };
-
-                    //Obtain command
-                    const cmd = args.slice(1, args.length).join(" ");
-
-                    //Construct & send progress message
-                    let rep = ["`RUNNING`", "```xl", clean(cmd), "```"];
-                    const repmsg = await msg.channel.sendMessage(rep);
-
-                    //Execute command
-                    let stdOut = await new Promise((resolve, reject) => {
-                        exec(cmd, {}, (err, stdout, stderr) => {
-                            if (err)
-                                return reject({stdout, stderr});
-                            resolve(stdout);
-                        });
-                    }).catch(data => {
-                        //Construct error data
-                        data.stderr = data.stderr
-                            ? [
-                                "`STDERR`",
-                                "```sh",
-                                clean(data.stderr.substring(0, 800)) || " ",
-                                "```"
-                            ]
-                            : [];
-                        data.stdout = data.stdout
-                            ? [
-                                "`STDOUT`",
-                                "```sh",
-                                clean(data.stdout.substring(0, data.stderr
-                                    ? data.stderr.length
-                                    : 2046 - 40)) || " ",
-                                "```"
-                            ]
-                            : [];
-
-                        //Show error data
-                        let message = data.stdout.concat(data.stderr).join("\n").substring(0, 2000);
-                        repmsg.edit(message);
-                        //Delete the message after 15 seconds
-                        repmsg.delete(15000);
-                    });
-                    //Show output
-                    await repmsg.edit([
-                        "`OUTPUT`",
-                        "```sh",
-                        clean(stdOut.substring(0, 1750)),
-                        "```"
-                    ].join("\n"));
-                    //Delete the message after 15 seconds
-                    repmsg.delete(15000);
-                    break;
+                    // case "shell":
+                    //     //Delete request message
+                    //     msg.delete();
+                    //
+                    //     //Clean output
+                    //     const clean = (text : any) => {
+                    //         return (typeof text !== "string")
+                    //             ? text
+                    //             : text.replace("``", `\`${String.fromCharCode(8203)}\``);
+                    //     };
+                    //
+                    //     //Obtain command
+                    //     const cmd = args.slice(1, args.length).join(" ");
+                    //
+                    //     //Construct & send progress message
+                    //     let rep = ["`RUNNING`", "```xl", clean(cmd), "```"];
+                    //     const repmsg = await msg.channel.sendMessage(rep);
+                    //
+                    //     //Execute command
+                    //     let stdOut = await new Promise((resolve, reject) => {
+                    //         exec(cmd, {}, (err, stdout, stderr) => {
+                    //             if (err)
+                    //                 return reject({stdout, stderr});
+                    //             resolve(stdout);
+                    //         });
+                    //     }).catch(data => {
+                    //         //Construct error data
+                    //         data.stderr = data.stderr
+                    //             ? [
+                    //                 "`STDERR`",
+                    //                 "```sh",
+                    //                 clean(data.stderr.substring(0, 800)) || " ",
+                    //                 "```"
+                    //             ]
+                    //             : [];
+                    //         data.stdout = data.stdout
+                    //             ? [
+                    //                 "`STDOUT`",
+                    //                 "```sh",
+                    //                 clean(data.stdout.substring(0, data.stderr
+                    //                     ? data.stderr.length
+                    //                     : 2046 - 40)) || " ",
+                    //                 "```"
+                    //             ]
+                    //             : [];
+                    //
+                    //         //Show error data
+                    //         let message = data.stdout.concat(data.stderr).join("\n").substring(0, 2000);
+                    //         repmsg.edit(message);
+                    //         //Delete the message after 15 seconds
+                    //         repmsg.delete(15000);
+                    //     });
+                    //     //Show output
+                    //     await repmsg.edit([
+                    //         "`OUTPUT`",
+                    //         "```sh",
+                    //         clean(stdOut.substring(0, 1750)),
+                    //         "```"
+                    //     ].join("\n"));
+                    //     //Delete the message after 15 seconds
+                    //     repmsg.delete(15000);
+                    //     break;
                 default:
                     throw "";
             }
