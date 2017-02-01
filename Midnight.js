@@ -22,3 +22,8 @@ expressApp.listen(Config.HTTP_PORT, () => {
 
 //Start music Module
 import MusicManager from './server_src/music/MusicManager';
+
+//Report unhandled promise rejections
+process.on("unhandledRejection", function(err) {
+    console.log("UNHANDLED REJECTION:", err);
+});
