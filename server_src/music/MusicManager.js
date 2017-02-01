@@ -211,7 +211,7 @@ class MusicManager {
             : 0;
 
         //Negativity threshold;
-        if (downvotes / listeners >= 0.50 && votes >= 5 && !this.skipped && event != "SONG_END") {
+        if (downvotes / listeners >= 0.40 && votes >= 5 && !this.skipped && event != "SONG_END") {
             //Block flow for effect
             this.skipped = true;
 
