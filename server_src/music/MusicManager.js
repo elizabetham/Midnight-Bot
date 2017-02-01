@@ -21,6 +21,7 @@ import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
 import moment from 'moment';
 import UserUtils from '../utils/UserUtils';
 import ordinal from 'ordinal-number-suffix';
+import Logging from '../utils/Logging';
 
 class MusicManager {
 
@@ -211,7 +212,7 @@ class MusicManager {
             : 0;
 
         //Negativity threshold;
-        if (downvotes / listeners >= 0.50 && votes >= 5 && !this.skipped && event != "SONG_END") {
+        if (downvotes / listeners >= 0.40 && votes >= 5 && !this.skipped && event != "SONG_END") {
             //Block flow for effect
             this.skipped = true;
 
@@ -435,17 +436,27 @@ class MusicManager {
         this.votes.clear();
 
         //Play the next item on stream
-        if (this.activeConnection != null) {
-            this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
-            this.activeStream.on('end', (reason : string) => {
-                this.handleStreamEnd(reason);
-            });
-            DiscordUtils.setPlaying(this.activeItem
-                ? this.activeItem.videoInfo.title
-                : "Unknown Number");
+        try {
+            if (this.activeConnection != null) {
+                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
+                this.activeStream.on('end', (reason : string) => {
+                    this.handleStreamEnd(reason);
+                });
+                DiscordUtils.setPlaying(this.activeItem
+                    ? this.activeItem.videoInfo.title
+                    : "Unknown Number");
 
-            //Update now-playing message
-            await this.updateNowPlaying();
+                //Update now-playing message
+                await this.updateNowPlaying();
+            }
+        } catch (e) {
+            Logging.error("YT_STREAM_ERROR", {
+                e: e,
+                item: nextItem
+            });
+            if (this.controlChannel) {
+                (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
+            }
         }
 
         //Reset flow variables
