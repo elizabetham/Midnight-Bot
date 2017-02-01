@@ -37,7 +37,7 @@ export default class AbstractCommand {
     call(message : Message, args : Array < string >) {
         //Find minimum permission for this guild
         const minPerm :
-            ? Permission = this.minRoles.find(role => role.guildId == message.member.guild.id);
+            ? Permission = this.minRoles.find(role => role.guildId == message.guild.id);
 
         //If there's none, let the user know.
         if (!minPerm) {
@@ -69,7 +69,16 @@ export default class AbstractCommand {
         }
 
         //User has permission, let's execute it.
-        this.exec(args, message.reply.bind(message), message.member, message);
+        try {
+            this.exec(args, message.reply.bind(message), message.member, message);
+        } catch (e) {
+            Logging.error("CMD_EXEC_ERROR", {
+                e: e,
+                command: this.command,
+                args
+            });
+            this.tools.volatileReply(message.reply.bind(message), "An error occurred I tried to execute your command. Please notify a staff member.", 5000, message);
+        }
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) : Promise < void > {

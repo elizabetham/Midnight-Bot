@@ -2,6 +2,9 @@
 import type {Message}
 from 'discord.js';
 
+import CommandTools from './CommandTools';
+import Logging from '../utils/Logging';
+
 import AbstractCommand from './AbstractCommand';
 
 //Admin
@@ -63,7 +66,16 @@ export const processMessage = (message : Message) : boolean => {
         return false;
 
     //Call the found command
-    cmdObj.call(message, args);
+    try {
+        cmdObj.call(message, args);
+    } catch (e) {
+        Logging.error("CMD_CALL_ERROR", {
+            e: e,
+            command: cmd,
+            args
+        });
+        CommandTools.volatileReply(message.reply.bind(message), "An error occurred when I tried to execute your command. Please notify a staff member.", 5000, message);
+    }
 
     //Stop chat filter processing
     return true;
