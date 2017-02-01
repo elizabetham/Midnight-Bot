@@ -121,7 +121,7 @@ class InfractionComponent extends Component {
         let manualData = infraction.manual
             ? (
                 <span>
-                    {infraction.manual !== undefined && <ListItem primaryText={infraction.manual.executor.username} secondaryText="Issued by"/>}
+                    {infraction.manual !== undefined && <ListItem primaryText={infraction.manual.executor.username} secondaryText="Responsible moderator"/>}
                     {infraction.manual !== undefined && infraction.manual.reason !== undefined && <ListItem primaryText={infraction.manual.reason} secondaryText="Reason"/>}
 
                 </span>
