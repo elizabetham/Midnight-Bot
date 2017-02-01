@@ -73,7 +73,7 @@ class MusicQueue {
                     if (e.e == "SEARCH_RESOLVE_ERROR" || e.e == "NO_RESULTS_FOUND") {
                         throw e;
                     }
-                    console.log(e);
+                    console.log("SEARCH_ERROR", e);
                     throw {e: "SEARCH_ERROR"};
                 }
             } else {

@@ -361,13 +361,13 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 8 * 60
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 5 * 60
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 8 * 60
+                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 5 * 60
             ]
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
-            null, 15 * 60
+            null, 10 * 60
         ])[1];
 
         //Update Redis cooldowns
