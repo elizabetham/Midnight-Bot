@@ -206,9 +206,12 @@ class MusicManager {
         const votes = Array.from(this.votes.values()).length;
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
         const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
+        const listeners = this.activeVoiceChannel
+            ? this.activeVoiceChannel.members.array().length - 1
+            : 0;
 
-        //25% negativity threshold;
-        if (downvotes / votes >= 0.50 && votes >= 5 && !this.skipped && event != "SONG_END") {
+        //Negativity threshold;
+        if (downvotes / listeners >= 0.50 && votes >= 5 && !this.skipped && event != "SONG_END") {
             //Block flow for effect
             this.skipped = true;
 
@@ -324,7 +327,7 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 5
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 3
             ],
             [PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 3]
         ].find(lvl => {
@@ -357,7 +360,7 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 8 * 60
             ],
             [
                 PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 8 * 60
