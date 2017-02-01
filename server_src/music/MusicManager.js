@@ -327,7 +327,7 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 5
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 3
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 3
             ],
             [PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 3]
         ].find(lvl => {
@@ -360,7 +360,7 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.SILVER_SOULS, 8 * 60
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 8 * 60
             ],
             [
                 PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 8 * 60
