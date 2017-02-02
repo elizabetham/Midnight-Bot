@@ -96,14 +96,14 @@ class DocsLayout extends Component {
                     <h5>Usage:
                         <code>!play &lt;youtubeURL/searchQuery&gt;</code>
                     </h5>
-                    <p>You can either supply a valid URL to a youtube video, or you can just type in a search query and Midnight will pick the best result.</p>
+                    <p>You can either supply a valid URL to a YouTube video, or you can just type in a search query and Midnight will pick the top result.</p>
                 </Row>
                 <Row>
                     <hr/>
                     <h3 style={style.commandHeader}>!dequeue (!unqueue)
                     </h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Remove a specific- or your last queued track from the queue.</h5>
+                        &nbsp;- Remove a specific track or your last queued one from the queue.</h5>
                     <h5>Usage:
                         <code>!dequeue [#|all]</code>
                     </h5>
@@ -117,7 +117,7 @@ class DocsLayout extends Component {
                     <h5>Usage:
                         <code>!skip</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Platinum Peep</code>
+                    <p>Minimum role required:&nbsp;<code>Platinum Peeps</code>
                     </p>
                 </Row>
                 <Row>
@@ -144,7 +144,7 @@ class DocsLayout extends Component {
                     <hr/>
                     <h3 style={style.commandHeader}>!blacklist</h3>
                     <h5 style={style.commandHeader}>
-                        &nbsp;- Add or remove a track from the permanent blacklist</h5>
+                        &nbsp;- Add a track to or remove one from the permanent blacklist</h5>
                     <h5>Usage:
                         <code>!blacklist &lt;add/remove&gt; &lt;youtubeURL&gt;</code>
                     </h5>

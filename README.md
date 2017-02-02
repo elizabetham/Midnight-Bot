@@ -1,6 +1,6 @@
 # Midnight
 
-*Midnight is a custom written [Discord](https://discordapp.com/) Bot for [MuselK](https://www.youtube.com/user/MrMuselk)'s Discord Guild "The Convicts", currently maintained by [@BeMacized](http://github.com/BeMacized)*
+*Midnight is a custom written [Discord](https://discordapp.com/) Bot for [Muselk](https://www.youtube.com/user/MrMuselk)'s Discord Guild "The Convicts", currently maintained by [@BeMacized](http://github.com/BeMacized)*
 
 
 ### Main functionality
@@ -40,18 +40,18 @@
 
 ### Requirements
 
- - Node `>=6.0.0`
- - An installation of NPM
+ - Node `>=6.0.0` and NPM
  - A MongoDB instance `>=3.20`;
  - A Redis instance
  - A Discord Bot token
+ - A role in your Discord server named `Muted`
  - An installation of FFMPEG, added to $PATH
  - An API key for the Youtube Data API (Optional)
  - A Pastebin API key for error reporting (Optional)
 
 ### Configuration
 
-**NOTE:** The method Midnight's configured is scheduled for change at a later moment. The current solution isn't very pretty.
+**NOTE:** The method Midnight is configured with currently is scheduled for change at a later time. The current solution isn't very pretty.
 
 Before building the application, a file named `config.js` should be placed in the root directory of the project, alongside `Midnight.js`. It is important to mixin `/shared_src/publicConfig`.
 
@@ -73,11 +73,12 @@ config.database = "mongodb://user:password@host:port/db";
 //MUSIC SETTINGS
 
 //Your youtube api key to enable search for jukebox (Optional)
-config.YOUTUBE_API_KEY = 'YOUR_GOOGLE_API_LEY';
+config.YOUTUBE_API_KEY = 'YOUR_GOOGLE_API_KEY';
 //The voice channel to play music in  (Optional)
 config.MUSIC_VOICE_CHANNEL = "VOICE_CHANNEL_ID";
 //The voice channel users can control the music functionality in (Optional)
 config.MUSIC_CONTROL_CHANNEL = "CONTROL_CHANNEL_ID";
+//Automatic playlist to use when the queue is empty
 config.MUSIC_IDLE_PLAYLIST = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"];
 
 //EXPRESS SETTINGS
@@ -149,6 +150,8 @@ $ npm run test
 $ npm run build
 ```
 
+- Create a role in your Discord server with the name `Muted` and setup its permissions to disallow chatting as preferred.
+
 **Start Midnight**
 
 Execute:
@@ -160,7 +163,7 @@ Please note that in order for the `!restart` command to start the bot back up, i
 
 ### Contributing
 1. [Check for open issues](https://github.com/BeMacized/Midnight-Bot/issues) at the project issue page or open a new issue to start a discussion about a feature or bug.
-2. Fork the [Midnight repository](https://github.com/BeMacized/Midnight-Bott) on GitHub to start making changes.
+2. Fork the [Midnight repository](https://github.com/BeMacized/Midnight-Bot) on GitHub to start making changes.
 3. Add a test case to show that the bug is fixed or the feature is implemented correctly. Bug me until I can merge your pull request.
 
 ### Contact

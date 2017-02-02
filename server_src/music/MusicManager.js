@@ -488,7 +488,7 @@ class MusicManager {
             if (activeItem.requestedBy) {
                 const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
                 const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-                newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:. - To vote, use **!upvote** or **!downvote**!";
+                newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
             }
 
             //If the now playing message doesn't exist or is not the last message anymore, create a new one
