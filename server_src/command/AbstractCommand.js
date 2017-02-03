@@ -59,7 +59,7 @@ export default class AbstractCommand {
             }
 
             //Check if the user has Permission
-            let hasPermission = DiscordUtils.hasPermission(message.member, minRole);
+            let hasPermission = message.member && DiscordUtils.hasPermission(message.member, minRole);
 
             //If the user does not have permission
             if (!hasPermission) {
