@@ -104,7 +104,7 @@ class MusicManager {
                 }));
 
                 //Start music
-                this.skip();
+                this.skip("KICKSTART");
 
                 //Reconnect when connection lost
                 if (this.activeConnection) {
@@ -263,7 +263,8 @@ class MusicManager {
             }
 
             //Skip the current song
-            this.skip();
+            await this.skip("VOTESKIP");
+            this.skipped = false;
         }
 
         //Song end
@@ -338,8 +339,6 @@ class MusicManager {
             throw {e: "MAX_ALLOWED_QUEUES", allowed: allowedQueues};
         }
 
-        console.log("INFO", this.queue.queue[0]);
-
         //Calculate seconds remaining before playing
         let eta = this.queue.queue.reduce((tot, val) => tot + timestampToSeconds(val.videoInfo.duration), 0) + ((this.activeItem)
             ? timestampToSeconds(this.activeItem.videoInfo.duration) - Math.floor((this.activeStream
@@ -380,7 +379,7 @@ class MusicManager {
 
         //Start playing if there's nothing else active
         if (!this.activeItem) {
-            this.skip();
+            this.skip("AUTOSTART");
         }
 
         //Return info
@@ -389,7 +388,20 @@ class MusicManager {
 
     skip : Function;
 
-    async skip() {
+    async skip(origin : string) {
+
+        //Flood protection
+        if (origin != "CMD") {
+            let count = await Redis.incrAsync("MUSIC_SKIP_FLOOD");
+            await Redis.expireAsync("MUSIC_SKIP_FLOOD", 2);
+            if (count >= 5) {
+                Logging.error("SKIP_LOOP");
+                if (this.controlChannel) {
+                    this.controlChannel.sendMessage("An internal error occurred, please contact a staff member!");
+                }
+            }
+        }
+
         //End currently active stream if it exists
         if (this.activeStream) {
             this.activeStream.end('skipMusic');
@@ -423,7 +435,7 @@ class MusicManager {
         //Play the next item on stream
         try {
             if (this.activeConnection != null) {
-                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
+                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo.webpage_url, ['-x', '--audio-format', 'mp3']));
                 this.activeStream.on('end', (reason : string) => {
                     this.handleStreamEnd(reason);
                 });
@@ -442,10 +454,8 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
             }
+            this.skip("STREAM_ERROR_SKIP");
         }
-
-        //Reset flow variables
-        this.skipped = false;
 
         return true;
     }
@@ -496,7 +506,7 @@ class MusicManager {
     handleStreamEnd(reason : string) {
         //Only automatically skip if caused by a graceful stream end
         if (reason != 'skipMusic') {
-            this.skip();
+            this.skip("SONG_END");
         }
     }
 
