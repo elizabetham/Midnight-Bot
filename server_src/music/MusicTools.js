@@ -5,9 +5,13 @@ import ytsearch from 'youtube-search';
 import promisify from 'promisify-any';
 
 export const yt = {
-    getInfo: promisify(ytdl.getInfo, 1),
+    getInfo: (url : string) => {
+        return promisify(ytdl.getInfo, 1)(url, ['-4']);
+    },
     search: promisify(ytsearch, 2),
-    stream: ytdl
+    stream: (url : string, options : Array < any >) => {
+        return ytdl(url, options.concat(['-4']));
+    }
 };
 
 export const secondsToTimestamp = (value : number) : string => {
