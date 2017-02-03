@@ -15,7 +15,7 @@ import _ from 'lodash';
 import DiscordUtils from '../utils/DiscordUtils';
 import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
-import {yt} from './MusicTools';
+import {yt, secondsToTimestamp, timestampToSeconds} from './MusicTools';
 import {PERMISSION_PRESETS} from '../utils/Permission';
 import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
 import moment from 'moment';
@@ -314,7 +314,7 @@ class MusicManager {
             let data = await Redis.getAsync(redisKey);
             throw {
                 e: "USER_QUEUE_COOLDOWN",
-                timeRemaining: this.secondsToTimestamp(data - moment().unix())
+                timeRemaining: secondsToTimestamp(data - moment().unix())
             };
         }
 
@@ -338,9 +338,11 @@ class MusicManager {
             throw {e: "MAX_ALLOWED_QUEUES", allowed: allowedQueues};
         }
 
+        console.log("INFO", this.queue.queue[0]);
+
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
-            ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
+        let eta = this.queue.queue.reduce((tot, val) => tot + timestampToSeconds(val.videoInfo.duration), 0) + ((this.activeItem)
+            ? timestampToSeconds(this.activeItem.videoInfo.duration) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
             : 0);
@@ -349,7 +351,7 @@ class MusicManager {
         let response = {
             queueItem: await this.queue.push(query, member.id),
             queuePosition: this.queue.size(),
-            eta: this.secondsToTimestamp(eta)
+            eta: secondsToTimestamp(eta)
         };
 
         //Check if user should receive
@@ -361,13 +363,13 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 5 * 60
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 2 * 60
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 5 * 60
+                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 2 * 60
             ]
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
-            null, 10 * 60
+            null, 5 * 60
         ])[1];
 
         //Update Redis cooldowns
@@ -383,23 +385,6 @@ class MusicManager {
 
         //Return info
         return response;
-    }
-
-    secondsToTimestamp : Function;
-
-    secondsToTimestamp(value : number) : string {
-        let hours = Math.floor(value / 3600);
-        let minutes = Math.floor((value - hours * 3600) / 60);
-        let seconds = (value - hours * 3600 - minutes * 60);
-        return (hours > 0
-            ? (hours < 10
-                ? "0"
-                : "") + hours + ":"
-            : "") + (minutes < 10
-            ? "0"
-            : "") + minutes + ":" + (seconds < 10
-            ? "0"
-            : "") + seconds;
     }
 
     skip : Function;
