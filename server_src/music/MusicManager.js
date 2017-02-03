@@ -15,7 +15,7 @@ import _ from 'lodash';
 import DiscordUtils from '../utils/DiscordUtils';
 import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
-import {yt, secondsToTimestamp, timestampToSeconds} from './MusicTools';
+import {yt, secondsToTimestamp} from './MusicTools';
 import {PERMISSION_PRESETS} from '../utils/Permission';
 import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
 import moment from 'moment';
@@ -75,7 +75,7 @@ class MusicManager {
         (async() => {
 
             //Connect to voice channels when discord is ready
-            DiscordUtils.client.on('ready', async() => {
+            DiscordUtils.client.once('ready', async() => {
 
                 //Reference control channel
                 this.controlChannel = (controlChannel)
@@ -354,8 +354,8 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + timestampToSeconds(val.videoInfo.duration), 0) + ((this.activeItem)
-            ? timestampToSeconds(this.activeItem.videoInfo.duration) - Math.floor((this.activeStream
+        let eta = this.queue.queue.reduce((tot, val) => tot + val.videoInfo.length_seconds, 0) + ((this.activeItem)
+            ? this.activeItem.videoInfo.length_seconds - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
             : 0);
@@ -435,8 +435,8 @@ class MusicManager {
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
             ? this.idlePlaylist
-            : this.idlePlaylist.filter(item => item.videoInfo.id != (this.activeItem
-                ? this.activeItem.videoInfo.id
+            : this.idlePlaylist.filter(item => item.videoInfo.video_id != (this.activeItem
+                ? this.activeItem.videoInfo.video_id
                 : "")));
 
         //If there's nothing to play, just don't play anything.
@@ -457,7 +457,7 @@ class MusicManager {
         //Play the next item on stream
         try {
             if (this.activeConnection != null) {
-                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo.webpage_url, ['-x', '--audio-format', 'mp3']));
+                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
                 this.activeStream.on('end', (reason : string) => {
                     this.handleStreamEnd(reason);
                 });

@@ -1,17 +1,13 @@
 // @flow
 
-import ytdl from 'youtube-dl';
+import ytdl from 'ytdl-core';
 import ytsearch from 'youtube-search';
 import promisify from 'promisify-any';
 
 export const yt = {
-    getInfo: (url : string) => {
-        return promisify(ytdl.getInfo, 1)(url, ['-4'], {maxBuffer: 1000 *1024});
-    },
+    getInfo: promisify(ytdl.getInfo, 1),
     search: promisify(ytsearch, 2),
-    stream: (url : string, options : Array < any >) => {
-        return ytdl(url, options.concat(['-4']));
-    }
+    stream: ytdl.downloadFromInfo
 };
 
 export const secondsToTimestamp = (value : number) : string => {
@@ -29,18 +25,18 @@ export const secondsToTimestamp = (value : number) : string => {
         : "") + seconds;
 }
 
-export const timestampToSeconds = (value : string) : number => {
-    let strarr = value.split(':').reverse();
-    let sec = 0;
-    let units = [
-        1, 60, 3600, 3600 * 24
-    ];
-    strarr.forEach((val, index) => {
-        try {
-            sec += units[index] * parseInt(val);
-        } catch (e) {
-            console.log(e);
-        }
-    });
-    return sec;
-}
+// export const timestampToSeconds = (value : string) : number => {
+//     let strarr = value.split(':').reverse();
+//     let sec = 0;
+//     let units = [
+//         1, 60, 3600, 3600 * 24
+//     ];
+//     strarr.forEach((val, index) => {
+//         try {
+//             sec += units[index] * parseInt(val);
+//         } catch (e) {
+//             console.log(e);
+//         }
+//     });
+//     return sec;
+// }
