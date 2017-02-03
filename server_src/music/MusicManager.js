@@ -70,6 +70,7 @@ class MusicManager {
         this.unblacklistVideo = this.unblacklistVideo.bind(this);
         this.blacklistVideo = this.blacklistVideo.bind(this);
         this.checkPermBlacklist = this.checkPermBlacklist.bind(this);
+        this.addToIdlePlaylist = this.addToIdlePlaylist.bind(this);
 
         (async() => {
 
@@ -94,17 +95,30 @@ class MusicManager {
                     : null;
 
                 //Load idle playlist
-                this.idlePlaylist = await Promise.all((Config.MUSIC_IDLE_PLAYLIST || []).map(async(url) => {
-                    try {
-                        return new QueueItem("", await yt.getInfo(url));
-                    } catch (e) {
-                        console.log("ATTEMPTED RESOLVE", url, e);
-                        return null;
-                    }
-                }));
-
-                //Start music
-                this.skip("KICKSTART");
+                this.idlePlaylist = [];
+                if (Config.MUSIC_IDLE_PLAYLIST) {
+                    let urls = _.shuffle(Config.MUSIC_IDLE_PLAYLIST.slice(0));
+                    (function load(i, start) {
+                        setTimeout((async function() {
+                            if (i > 0) {
+                                try {
+                                    this.addToIdlePlaylist(new QueueItem("", await yt.getInfo(urls[i])));
+                                    if (start) {
+                                        await this.skip("KICKSTART");
+                                    }
+                                } catch (e) {
+                                    console.log("ATTEMPTED RESOLVE", urls[i], e);
+                                }
+                                if (--i)
+                                    load.bind(this)(i, false);
+                                }
+                            }).bind(this), start
+                            ? 0
+                            : 2000);
+                    }).bind(this)(urls.length - 1, true);
+                } else {
+                    this.skip("KICKSTART");
+                }
 
                 //Reconnect when connection lost
                 if (this.activeConnection) {
@@ -386,6 +400,13 @@ class MusicManager {
         return response;
     }
 
+    addToIdlePlaylist : Function;
+
+    addToIdlePlaylist(queueItem : QueueItem) {
+        this.idlePlaylist.push(queueItem);
+        console.log("Loaded default playlist item:", queueItem.videoInfo.title);
+    }
+
     skip : Function;
 
     async skip(origin : string) {
@@ -399,6 +420,7 @@ class MusicManager {
                 if (this.controlChannel) {
                     this.controlChannel.sendMessage("An internal error occurred, please contact a staff member!");
                 }
+                return false;
             }
         }
 
@@ -413,8 +435,8 @@ class MusicManager {
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
             ? this.idlePlaylist
-            : this.idlePlaylist.filter(item => item.videoInfo.video_id != (this.activeItem
-                ? this.activeItem.videoInfo.video_id
+            : this.idlePlaylist.filter(item => item.videoInfo.id != (this.activeItem
+                ? this.activeItem.videoInfo.id
                 : "")));
 
         //If there's nothing to play, just don't play anything.
