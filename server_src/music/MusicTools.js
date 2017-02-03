@@ -6,7 +6,7 @@ import promisify from 'promisify-any';
 
 export const yt = {
     getInfo: (url : string) => {
-        return promisify(ytdl.getInfo, 1)(url, ['-4']);
+        return promisify(ytdl.getInfo, 1)(url, ['-4'], {maxBuffer: 1000 *1024});
     },
     search: promisify(ytsearch, 2),
     stream: (url : string, options : Array < any >) => {
