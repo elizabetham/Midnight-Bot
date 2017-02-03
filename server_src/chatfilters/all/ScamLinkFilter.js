@@ -24,7 +24,7 @@ class ScamLinkFilter extends AbstractLinkFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Posting scam links is prohibited.\nIf you did this unknowingly, your login details to whatever site (Steam etc. ) may be compromised. Change them immediately!");
         let infraction = new Infraction(message.author.id, moment().unix(), {
             type: 'WARN',

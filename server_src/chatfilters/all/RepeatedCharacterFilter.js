@@ -19,7 +19,7 @@ class RepeatedCharacterFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
         let infraction = new Infraction(message.author.id, moment().unix(), {
             type: 'WARN',

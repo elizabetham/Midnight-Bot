@@ -15,13 +15,11 @@ class DiscordInviteFilter extends AbstractLinkFilter {
     }
 
     domains() : Array < string > {
-        return [
-            "discord.gg"
-        ];
+        return ["discord.gg"];
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: It is not allowed to advertise other Discord servers in our guild.");
 
         //Punish

@@ -22,7 +22,7 @@ class OffensiveBehaviour extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Offensive behavior towards other members is not permitted here.");
 
         //Punish

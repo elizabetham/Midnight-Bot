@@ -22,7 +22,7 @@ class DownvoteCommand extends AbstractCommand {
             return;
         }
 
-        await msg.delete();
+        await msg.delete().catch(e => {});
 
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
             return;

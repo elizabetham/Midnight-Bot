@@ -22,10 +22,11 @@ class SkipCommand extends AbstractCommand {
             return;
         }
 
-        await msg.delete();
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
             return;
         }
+
+        await msg.delete().catch(e => {});
 
         const skipped : boolean = await MusicManager.skip();
         this.tools.volatileReply(reply, skipped

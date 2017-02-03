@@ -19,7 +19,7 @@ class BulkMentionFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Mass mentioning people is not permitted.");
         try {
             let infractionAction = await UserUtils.increaseNotoriety(message.author.id);

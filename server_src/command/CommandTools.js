@@ -43,9 +43,9 @@ export default {
     volatileReply : async(reply : (message : string) => Message, message : string, delay : number, originalMsg :? Message) => {
         const msg = await reply(message);
         setTimeout(() => {
-            msg.delete();
+            msg.delete().catch(e => {});
             if (originalMsg)
-                originalMsg.delete();
+                originalMsg.delete().catch(e => {});
             }
         , delay);
     }

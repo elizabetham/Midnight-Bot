@@ -20,7 +20,7 @@ class HelpCommand extends AbstractCommand {
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
-        msg.delete();
+        msg.delete().catch(e => {});
 
         let help = "";
 

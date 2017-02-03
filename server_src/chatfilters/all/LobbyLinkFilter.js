@@ -29,7 +29,7 @@ class LobbyLinkFilter extends AbstractLinkFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Posting links in the lobby channels is prohibited.");
         let infraction = new Infraction(message.author.id, moment().unix(), {
             type: 'WARN',

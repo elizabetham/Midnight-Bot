@@ -22,10 +22,11 @@ class UpvoteCommand extends AbstractCommand {
             return;
         }
 
-        await msg.delete();
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
             return;
         }
+
+        await msg.delete().catch(e => {});
 
         try {
             await MusicManager.upvote(user);
