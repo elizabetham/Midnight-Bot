@@ -297,7 +297,7 @@ class MusicManager {
             if (this.controlChannel) {
                 let message = await this.controlChannel.sendMessage(msg);
                 if (votes < 5) {
-                    message.delete(10000);
+                    message.delete(10000).catch(e => {});
                 }
             }
         }
@@ -424,7 +424,7 @@ class MusicManager {
         if (!nextItem) {
             DiscordUtils.setPlaying(await DiscordUtils.getPlaying());
             if (this.nowPlayingMessage) {
-                this.nowPlayingMessage.delete();
+                this.nowPlayingMessage.delete().catch(e => {});
             }
             return false;
         }
@@ -495,7 +495,7 @@ class MusicManager {
             if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {
                 if (this.nowPlayingMessage) {
                     //Delete the message if it existed
-                    this.nowPlayingMessage.delete();
+                    this.nowPlayingMessage.delete().catch(e => {});
                 }
                 //Send new message
                 this.nowPlayingMessage = await controlChannel.send(newMessage);

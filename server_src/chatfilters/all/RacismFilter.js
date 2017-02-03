@@ -24,7 +24,7 @@ class RacismFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: The use of racist or discriminative terms is not permitted here.");
 
         //Punish

@@ -27,7 +27,7 @@ class QueueCommand extends AbstractCommand {
             return;
         }
 
-        msg.delete();
+        msg.delete().catch(e => {});
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
             return;
         }

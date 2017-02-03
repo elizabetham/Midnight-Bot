@@ -60,7 +60,7 @@ class DebugCommand extends AbstractCommand {
                     break;
                     // case "shell":
                     //     //Delete request message
-                    //     msg.delete();
+                    //     msg.delete().catch(e =>{});
                     //
                     //     //Clean output
                     //     const clean = (text : any) => {
@@ -124,7 +124,7 @@ class DebugCommand extends AbstractCommand {
                     throw "";
             }
         } catch (e) {
-            msg.delete();
+            msg.delete().catch(e => {});
         }
     };
 

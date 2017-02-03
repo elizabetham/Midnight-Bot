@@ -35,7 +35,7 @@ class MentionFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: It is not permitted to mention members of the Grandmaster Gang directly."); //Grammar fix, not from but of
 
         //Punish

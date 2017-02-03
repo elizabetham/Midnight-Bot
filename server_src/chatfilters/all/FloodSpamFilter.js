@@ -40,7 +40,7 @@ class FloodSpamFilter extends AbstractFilter {
         let key = message.author.id + ":floodcount";
         const msgCount = await Redis.getAsync(key);
         let res = await message.channel.fetchMessages({limit: 40});
-        res.array().filter(msg => msg.author.id == message.author.id).sort((a, b) => b - a).slice(0, msgCount).forEach(msg => msg.delete());
+        res.array().filter(msg => msg.author.id == message.author.id).sort((a, b) => b - a).slice(0, msgCount).forEach(msg => msg.delete().catch(e => {}));
 
         Redis.del(key);
 

@@ -19,7 +19,7 @@ class BazzaFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete();
+        message.delete().catch(e =>{});
         message.author.sendMessage("Your message was removed: Posting messages with spam-like content is not permitted.");
 
         //Punish

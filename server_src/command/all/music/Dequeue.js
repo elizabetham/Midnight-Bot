@@ -24,7 +24,7 @@ class DequeueCommand extends AbstractCommand {
         }
 
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
-            msg.delete();
+            msg.delete().catch(e => {});
             return;
         }
 
