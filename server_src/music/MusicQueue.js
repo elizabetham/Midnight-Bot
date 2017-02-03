@@ -104,7 +104,7 @@ class MusicQueue {
         }
 
         //Check if already on queue
-        if (this.queue.filter(item => item.videoInfo.id == videoInfo.id).length > 0) {
+        if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
             throw {e: "DUPLICATE_ENTRY"};
         }
 
