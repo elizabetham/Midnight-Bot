@@ -59,6 +59,9 @@ export default class AbstractCommand {
             }
 
             //Check if the user has Permission
+            if (message.member == null) {
+                Logging.error("DJS_GITHUB_ISSUE", message);
+            }
             let hasPermission = message.member && DiscordUtils.hasPermission(message.member, minRole);
 
             //If the user does not have permission
