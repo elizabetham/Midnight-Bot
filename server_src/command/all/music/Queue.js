@@ -27,8 +27,8 @@ class QueueCommand extends AbstractCommand {
             return;
         }
 
-        msg.delete().catch(e => {});
         if (msg.channel.id != Config.MUSIC_CONTROL_CHANNEL) {
+            msg.delete().catch(e => {});
             return;
         }
 
@@ -84,6 +84,7 @@ class QueueCommand extends AbstractCommand {
                     break;
             }
         }
+        msg.delete().catch(e => {});
     };
 
 }

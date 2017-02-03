@@ -1,7 +1,7 @@
 //@flow
 
 import QueueItem from './QueueItem';
-import {yt} from './MusicTools';
+import {yt, timestampToSeconds} from './MusicTools';
 import Config from '../../config';
 import {Redis, BlacklistedVideo} from '../utils/DBManager';
 import OffensiveBehaviourFilter from '../chatfilters/all/OffensiveBehaviourFilter';
@@ -82,12 +82,12 @@ class MusicQueue {
         }
 
         //Check if blacklisted permanently
-        if (await BlacklistedVideo.findOne({ytid: videoInfo.video_id})) {
+        if (await BlacklistedVideo.findOne({ytid: videoInfo.id})) {
             throw {e: "BLACKLISTED_PERMANENTLY"};
         }
 
         //Check if blacklisted temporarily
-        let blacklistKey = videoInfo.video_id + ":MusicTmpBlacklist";
+        let blacklistKey = videoInfo.id + ":MusicTmpBlacklist";
         let res = await Redis.existsAsync(blacklistKey);
         if (res) {
             throw {e: "BLACKLISTED_TEMPORARILY"};
@@ -99,12 +99,12 @@ class MusicQueue {
         }
 
         //Check song length
-        if (videoInfo.length_seconds > 60 * 10) {
+        if (timestampToSeconds(videoInfo.duration) > 60 * 10) {
             throw {e: "CONTENT_TOO_LONG"};
         }
 
         //Check if already on queue
-        if (this.queue.filter(item => item.videoInfo.video_id == videoInfo.video_id).length > 0) {
+        if (this.queue.filter(item => item.videoInfo.id == videoInfo.id).length > 0) {
             throw {e: "DUPLICATE_ENTRY"};
         }
 

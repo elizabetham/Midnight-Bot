@@ -15,7 +15,7 @@ import _ from 'lodash';
 import DiscordUtils from '../utils/DiscordUtils';
 import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
-import {yt} from './MusicTools';
+import {yt, secondsToTimestamp, timestampToSeconds} from './MusicTools';
 import {PERMISSION_PRESETS} from '../utils/Permission';
 import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
 import moment from 'moment';
@@ -104,7 +104,7 @@ class MusicManager {
                 }));
 
                 //Start music
-                this.skip();
+                this.skip("KICKSTART");
 
                 //Reconnect when connection lost
                 if (this.activeConnection) {
@@ -263,7 +263,8 @@ class MusicManager {
             }
 
             //Skip the current song
-            this.skip();
+            await this.skip("VOTESKIP");
+            this.skipped = false;
         }
 
         //Song end
@@ -314,7 +315,7 @@ class MusicManager {
             let data = await Redis.getAsync(redisKey);
             throw {
                 e: "USER_QUEUE_COOLDOWN",
-                timeRemaining: this.secondsToTimestamp(data - moment().unix())
+                timeRemaining: secondsToTimestamp(data - moment().unix())
             };
         }
 
@@ -339,8 +340,8 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + Number(val.videoInfo.length_seconds), 0) + ((this.activeItem)
-            ? Number(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
+        let eta = this.queue.queue.reduce((tot, val) => tot + timestampToSeconds(val.videoInfo.duration), 0) + ((this.activeItem)
+            ? timestampToSeconds(this.activeItem.videoInfo.duration) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
             : 0);
@@ -349,7 +350,7 @@ class MusicManager {
         let response = {
             queueItem: await this.queue.push(query, member.id),
             queuePosition: this.queue.size(),
-            eta: this.secondsToTimestamp(eta)
+            eta: secondsToTimestamp(eta)
         };
 
         //Check if user should receive
@@ -361,13 +362,13 @@ class MusicManager {
                 PERMISSION_PRESETS.BOTDEV.MODERATOR, 0
             ],
             [
-                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 5 * 60
+                PERMISSION_PRESETS.CONVICTS.TWITCH_SUBSCRIBER, 2 * 60
             ],
             [
-                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 5 * 60
+                PERMISSION_PRESETS.BOTDEV.SILVER_SOULS, 2 * 60
             ]
         ].find(lvl => lvl[0].getRole() && DiscordUtils.hasPermission(member, lvl[0].getRole(), true)) || [
-            null, 10 * 60
+            null, 5 * 60
         ])[1];
 
         //Update Redis cooldowns
@@ -378,33 +379,29 @@ class MusicManager {
 
         //Start playing if there's nothing else active
         if (!this.activeItem) {
-            this.skip();
+            this.skip("AUTOSTART");
         }
 
         //Return info
         return response;
     }
 
-    secondsToTimestamp : Function;
-
-    secondsToTimestamp(value : number) : string {
-        let hours = Math.floor(value / 3600);
-        let minutes = Math.floor((value - hours * 3600) / 60);
-        let seconds = (value - hours * 3600 - minutes * 60);
-        return (hours > 0
-            ? (hours < 10
-                ? "0"
-                : "") + hours + ":"
-            : "") + (minutes < 10
-            ? "0"
-            : "") + minutes + ":" + (seconds < 10
-            ? "0"
-            : "") + seconds;
-    }
-
     skip : Function;
 
-    async skip() {
+    async skip(origin : string) {
+
+        //Flood protection
+        if (origin != "CMD") {
+            let count = await Redis.incrAsync("MUSIC_SKIP_FLOOD");
+            await Redis.expireAsync("MUSIC_SKIP_FLOOD", 2);
+            if (count >= 5) {
+                Logging.error("SKIP_LOOP");
+                if (this.controlChannel) {
+                    this.controlChannel.sendMessage("An internal error occurred, please contact a staff member!");
+                }
+            }
+        }
+
         //End currently active stream if it exists
         if (this.activeStream) {
             this.activeStream.end('skipMusic');
@@ -438,7 +435,7 @@ class MusicManager {
         //Play the next item on stream
         try {
             if (this.activeConnection != null) {
-                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
+                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo.webpage_url, ['-x', '--audio-format', 'mp3']));
                 this.activeStream.on('end', (reason : string) => {
                     this.handleStreamEnd(reason);
                 });
@@ -457,10 +454,8 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
             }
+            this.skip("STREAM_ERROR_SKIP");
         }
-
-        //Reset flow variables
-        this.skipped = false;
 
         return true;
     }
@@ -511,7 +506,7 @@ class MusicManager {
     handleStreamEnd(reason : string) {
         //Only automatically skip if caused by a graceful stream end
         if (reason != 'skipMusic') {
-            this.skip();
+            this.skip("SONG_END");
         }
     }
 
