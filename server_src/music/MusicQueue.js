@@ -1,7 +1,7 @@
 //@flow
 
 import QueueItem from './QueueItem';
-import {yt, timestampToSeconds} from './MusicTools';
+import {yt} from './MusicTools';
 import Config from '../../config';
 import {Redis, BlacklistedVideo} from '../utils/DBManager';
 import OffensiveBehaviourFilter from '../chatfilters/all/OffensiveBehaviourFilter';
@@ -99,7 +99,7 @@ class MusicQueue {
         }
 
         //Check song length
-        if (timestampToSeconds(videoInfo.duration) > 60 * 10) {
+        if (videoInfo.length_seconds > 60 * 10) {
             throw {e: "CONTENT_TOO_LONG"};
         }
 

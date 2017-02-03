@@ -38,10 +38,10 @@ class BlacklistCommand extends AbstractCommand {
         try {
             switch (args[0]) {
                 case "add":
-                    await MusicManager.blacklistVideo(info.id, user.id);
+                    await MusicManager.blacklistVideo(info.video_id, user.id);
                     break;
                 case "remove":
-                    await MusicManager.unblacklistVideo(info.id);
+                    await MusicManager.unblacklistVideo(info.video_id);
                     break;
                 default:
                     this.tools.volatileReply(reply, this.getUsage(), 5000, msg);
