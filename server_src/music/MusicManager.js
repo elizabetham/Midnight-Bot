@@ -354,8 +354,8 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + val.videoInfo.length_seconds, 0) + ((this.activeItem)
-            ? this.activeItem.videoInfo.length_seconds - Math.floor((this.activeStream
+        let eta = this.queue.queue.reduce((tot, val) => tot + parseInt(val.videoInfo.length_seconds), 0) + ((this.activeItem)
+            ? parseInt(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
             : 0);
