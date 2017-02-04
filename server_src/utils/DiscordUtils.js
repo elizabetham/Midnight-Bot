@@ -25,7 +25,7 @@ class DiscordUtils {
 
     //Constructor
     constructor() {
-        this.client = new Client({fetchAllMembers: true});
+        this.client = new Client();
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
         this.getPlaying = this.getPlaying.bind(this);
