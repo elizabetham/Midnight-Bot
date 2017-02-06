@@ -448,16 +448,50 @@ class MusicManager {
             return false;
         }
 
+        //Skip failed downloads
+        if (nextItem.status == "FAILED") {
+            if (this.controlChannel) {
+                (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
+            }
+            this.skip("PREVIOUS_TRACK_FAILED");
+            return;
+        }
+
         //Register current item
         this.activeItem = nextItem;
 
         //Reset votes
         this.votes.clear();
 
+        //Download
+        let musicFile;
+        try {
+            musicFile = await Promise.race([
+                nextItem.download(),
+                new Promise((resolve, reject) => {
+                    setTimeout(() => resolve("TIMEOUT"), 10000)
+                })
+            ]);
+            if (musicFile == "TIMEOUT") {
+                if (this.controlChannel) {
+                    (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it took too long to download.")).delete(5000);
+                }
+                this.skip("PREVIOUS_TRACK_FAILED");
+                return;
+            }
+        } catch (e) {
+            console.log(e);
+            if (this.controlChannel) {
+                (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
+            }
+            this.skip("PREVIOUS_TRACK_FAILED");
+            return;
+        }
+
         //Play the next item on stream
         try {
             if (this.activeConnection != null) {
-                this.activeStream = this.activeConnection.playStream(yt.stream(nextItem.videoInfo, {filter: 'audioonly'}));
+                this.activeStream = this.activeConnection.playFile(musicFile);
                 this.activeStream.on('end', (reason : string) => {
                     this.handleStreamEnd(reason);
                 });
