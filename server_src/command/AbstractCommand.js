@@ -58,9 +58,11 @@ export default class AbstractCommand {
                 return;
             }
 
-            //Check if the user has Permission
+            //Check if the user has permission
             if (message.member == null) {
-                Logging.error("DJS_GITHUB_ISSUE", message);
+                //As Discord does not provide member data for offline users, catch that, notify user and abort
+                this.tools.volatileReply(message.reply.bind(message), "You cannot use the bot while your Discord status is set to `Invisible`. Please change your status to an online mode and try again.", 5000, message);
+                return;
             }
             let hasPermission = message.member && DiscordUtils.hasPermission(message.member, minRole);
 
