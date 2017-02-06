@@ -3,11 +3,25 @@
 import ytdl from 'ytdl-core';
 import ytsearch from 'youtube-search';
 import promisify from 'promisify-any';
+import fs from 'fs';
 
 export const yt = {
     getInfo: promisify(ytdl.getInfo, 1),
     search: promisify(ytsearch, 2),
-    stream: ytdl.downloadFromInfo
+    stream: ytdl.downloadFromInfo,
+    download: (ytinfo : Object, file : string): Promise <> => {
+        return new Promise((resolve, reject) => {
+            try {
+                let stream = ytdl.downloadFromInfo(ytinfo, {filter: 'audioonly'});
+                stream.on('error', (err) => reject(err));
+                stream.on('finish', () => resolve());
+                stream.pipe(fs.createWriteStream(file));
+            } catch (err) {
+                reject(err);
+            }
+        });
+
+    }
 };
 
 export const secondsToTimestamp = (value : number) : string => {
