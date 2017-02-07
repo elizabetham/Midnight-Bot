@@ -9,12 +9,12 @@ import Infraction from '../datatypes/Infraction';
 
 //Schedule the job
 schedule.scheduleJob('*/10 * * * * *', () => {
-    decreaseNotorietyLevel();
-    unmuteApplicableUsers();
+    //decreaseNotorietyLevel();
+    //unmuteApplicableUsers();
 });
 //Schedule cleanup
 schedule.scheduleJob('*/1 * * *', () => {
-    cleanupInfractions();
+    //cleanupInfractions();
 });
 
 const unmuteApplicableUsers = () => {

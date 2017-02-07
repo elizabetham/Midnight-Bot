@@ -18,8 +18,15 @@ class QueueItem {
 
     download : Function;
     async download() {
-        let file = "musicCache/" + this.videoInfo.video_id + ".mp3";
+        let cacheDir = "musicCache";
+        let file = cacheDir + "/" + this.videoInfo.video_id + ".mp3";
 
+        //Create cache directory if it does not yet exist
+        if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir);
+        }
+
+        //Check if the download already exists.
         if (fs.existsSync(file)) {
             return file;
         }
