@@ -10,7 +10,7 @@ import AbstractCommand from './AbstractCommand';
 //Admin
 import GameCommand from './all/admin/Game';
 import RestartCommand from './all/admin/Restart';
-import Debug from './all/admin/Debug';
+import DebugCommand from './all/admin/Debug';
 
 //Moderation
 import BanCommand from './all/moderation/Ban';
@@ -25,6 +25,7 @@ import UpvoteCommand from './all/music/Upvote';
 import DownvoteCommand from './all/music/Downvote';
 import BlacklistCommand from './all/music/Blacklist';
 import DequeueCommand from './all/music/Dequeue';
+import PlaylistCommand from './all/music/Playlist';
 
 //Misc
 import HelpCommand from './all/misc/Help';
@@ -43,7 +44,8 @@ const commands = [
     UnmuteCommand,
     RestartCommand,
     GameCommand,
-    Debug
+    DebugCommand,
+    PlaylistCommand
 ];
 
 export const processMessage = (message : Message) : boolean => {
