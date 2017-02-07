@@ -122,6 +122,15 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
+                    <h3 style={style.commandHeader}>!playlist (!pl)</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- View the current music queue.</h5>
+                    <h5>Usage:
+                        <code>!playlist</code>
+                    </h5>
+                </Row>
+                <Row>
+                    <hr/>
                     <h3 style={style.commandHeader}>!upvote (!up)</h3>
                     <h5 style={style.commandHeader}>
                         &nbsp;- Upvote the currently playing track.</h5>

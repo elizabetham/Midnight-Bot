@@ -28,6 +28,7 @@
 |!**dequeue**|*!dequeue [#\|all]*|Remove a specific- or your last queued track from the queue.|unqueue
 |!**downvote**|*!downvote*|Downvote the currently playing track|down
 |!**upvote**|*!upvote*|Upvote the currently playing track|up
+|!**playlist**|*!playlist*|View the current music queue|pl
 |!**blacklist**|*!blacklist \<add/remove\> \<youtubeURL\>*|Add or remove a track from the permanent blacklist|
 |!**skip**|*!skip*|Skip the currently playing track|
 |!**ban**|*!ban \<user\> [[for]reason]*|Ban a guild member permanently|

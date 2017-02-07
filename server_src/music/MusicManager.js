@@ -404,7 +404,6 @@ class MusicManager {
 
     addToIdlePlaylist(queueItem : QueueItem) {
         this.idlePlaylist.push(queueItem);
-        console.log("Loaded default playlist item:", queueItem.videoInfo.title);
     }
 
     skip : Function;
