@@ -326,6 +326,11 @@ class MusicManager {
 
     async play(query : string, member : GuildMember) {
 
+        //Only allow listeners to queue
+        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id) {
+            throw {e: "NOT_LISTENING"};
+        }
+
         let redisKey = member.id + ":MusicQueueCooldown";
         let res = await Redis.existsAsync(redisKey);
         if (res) {
