@@ -42,6 +42,8 @@ class MusicManager {
         ? TextChannel;
     votes : Map < string,
     boolean >; //<UID,VoteType : boolean>
+    lastNowPlayingUpdate : number;
+    scheduledNowPlayingUpdate : number;
 
     //Flow protection variables
     skipped : boolean;
@@ -53,6 +55,8 @@ class MusicManager {
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
         this.votes = new Map();
         this.skipped = false;
+        this.lastNowPlayingUpdate = 0;
+        this.scheduledNowPlayingUpdate = 0;
 
         //Bind methods
         this.skip = this.skip.bind(this);
@@ -414,7 +418,7 @@ class MusicManager {
         if (origin != "CMD") {
             let count = await Redis.incrAsync("MUSIC_SKIP_FLOOD");
             await Redis.expireAsync("MUSIC_SKIP_FLOOD", 2);
-            if (count >= 5) {
+            if (count >= 10) {
                 Logging.error("SKIP_LOOP");
                 if (this.controlChannel) {
                     this.controlChannel.sendMessage("An internal error occurred, please contact a staff member!");
@@ -518,6 +522,24 @@ class MusicManager {
     updateNowPlaying : Function;
 
     async updateNowPlaying() {
+        //Prevent spam updates
+        if (moment().unix() - this.lastNowPlayingUpdate < 3000) {
+            //If an update is already scheduled, stop here.
+            if (this.scheduledNowPlayingUpdate) {
+                return;
+            }
+            //If no update is scheduled, schedule one.
+            this.scheduledNowPlayingUpdate = setTimeout(() => {
+                this.scheduledNowPlayingUpdate = 0;
+                this.updateNowPlaying();
+            }, 3100);
+            return;
+        }
+
+        //Register last update
+        this.lastNowPlayingUpdate = moment().unix();
+
+        //Update
         if (this.controlChannel && this.activeItem) {
             let controlChannel = this.controlChannel;
             let activeItem = this.activeItem;
