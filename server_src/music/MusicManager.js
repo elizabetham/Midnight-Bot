@@ -440,6 +440,23 @@ class MusicManager {
         //Process vote effects
         await this.processVoteEffects("SONG_END");
 
+        //Remove items from the queue from members who left the voice channel
+        //Obtain guild member objects for applicable users
+        let members = new Map((await Promise.all(this.queue.queue.map(async(item) => [
+            item.requestedBy, this.activeVoiceChannel
+                ? await this.activeVoiceChannel.guild.fetchMember(item.requestedBy)
+                : null
+        ]))).filter(i => i[1]));
+        //Remove them from the queue
+        this.queue.queue = this.queue.queue.filter(item => {
+            let member = members.get(item.requestedBy);
+            let result = (this.activeVoiceChannel && member && member.voiceChannelID == this.activeVoiceChannel.id);
+            if (member && !result) {
+                member.sendMessage("Your track **'" + item.videoInfo.title + "'** has been dequeued because you left the music channel.");
+            }
+            return result;
+        });
+
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
             ? this.idlePlaylist
