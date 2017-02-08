@@ -461,8 +461,7 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
-            this.skip("PREVIOUS_TRACK_FAILED");
-            return;
+            return await this.skip("PREVIOUS_TRACK_FAILED");
         }
 
         //Register current item
@@ -484,16 +483,14 @@ class MusicManager {
                 if (this.controlChannel) {
                     (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it took too long to download.")).delete(5000);
                 }
-                this.skip("PREVIOUS_TRACK_FAILED");
-                return;
+                return await this.skip("PREVIOUS_TRACK_FAILED");
             }
         } catch (e) {
             console.log(e);
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
-            this.skip("PREVIOUS_TRACK_FAILED");
-            return;
+            return await this.skip("PREVIOUS_TRACK_FAILED");
         }
 
         //Play the next item on stream
@@ -518,9 +515,8 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
             }
-            this.skip("STREAM_ERROR_SKIP");
+            return await this.skip("STREAM_ERROR_SKIP");
         }
-
         return true;
     }
 
