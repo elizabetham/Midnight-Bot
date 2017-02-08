@@ -333,11 +333,6 @@ class MusicManager {
 
     async play(query : string, member : GuildMember) {
 
-        //Only allow listeners to queue
-        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id || member.deaf) {
-            throw {e: "NOT_LISTENING"};
-        }
-
         let redisKey = member.id + ":MusicQueueCooldown";
         let res = await Redis.existsAsync(redisKey);
         if (res) {
@@ -427,7 +422,7 @@ class MusicManager {
     async skip(origin : string) {
 
         //Flood protection
-        if (origin != "CMD") {
+        if (origin != "CMD" && origin != "QUEUED_BY_NON_LISTENER") {
             let count = await Redis.incrAsync("MUSIC_SKIP_FLOOD");
             await Redis.expireAsync("MUSIC_SKIP_FLOOD", 2);
             if (count >= 10) {
@@ -447,23 +442,6 @@ class MusicManager {
         //Process vote effects
         await this.processVoteEffects("SONG_END");
 
-        //Remove items from the queue from members who left the voice channel
-        //Obtain guild member objects for applicable users
-        let members = new Map((await Promise.all(this.queue.queue.map(async(item) => [
-            item.requestedBy, this.activeVoiceChannel
-                ? await this.activeVoiceChannel.guild.fetchMember(item.requestedBy)
-                : null
-        ]))).filter(i => i[1]));
-        //Remove them from the queue
-        this.queue.queue = this.queue.queue.filter(item => {
-            let member = members.get(item.requestedBy);
-            let result = (this.activeVoiceChannel && member && member.voiceChannelID == this.activeVoiceChannel.id);
-            if (member && !result) {
-                member.sendMessage("Your track **'" + item.videoInfo.title + "'** has been dequeued because you left the music channel.");
-            }
-            return result;
-        });
-
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
             ? this.idlePlaylist
@@ -478,6 +456,17 @@ class MusicManager {
                 this.nowPlayingMessage.delete().catch(e => {});
             }
             return false;
+        }
+
+        //Skip the new song if the requester is not present
+        if (nextItem.requestedBy) {
+            let member = (this.activeVoiceChannel)
+                ? await this.activeVoiceChannel.guild.fetchMember(nextItem.requestedBy)
+                : null;
+            if (this.activeVoiceChannel && member && (member.deaf || member.voiceChannelID != this.activeVoiceChannel.id)) {
+                member.sendMessage("Your track **'" + nextItem.videoInfo.title + "'** has been dequeued because you are not currently listening.");
+                return await this.skip("QUEUED_BY_NON_LISTENER");
+            }
         }
 
         //Skip failed downloads
