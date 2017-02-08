@@ -75,6 +75,7 @@ class MusicManager {
         this.blacklistVideo = this.blacklistVideo.bind(this);
         this.checkPermBlacklist = this.checkPermBlacklist.bind(this);
         this.addToIdlePlaylist = this.addToIdlePlaylist.bind(this);
+        this.getListeners = this.getListeners.bind(this);
 
         (async() => {
 
@@ -173,14 +174,14 @@ class MusicManager {
     }
 
     vote : Function;
-    async vote(user : GuildMember, type : boolean) {
+    async vote(member : GuildMember, type : boolean) {
         //Prevent double voting
-        if (this.votes.has(user.id)) {
+        if (this.votes.has(member.id)) {
             throw {e: "ALREADY_VOTED"};
         }
 
         //Only allow listeners to vote
-        if (!this.activeVoiceChannel || user.voiceChannelID != this.activeVoiceChannel.id) {
+        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id || member.deaf) {
             throw {e: "NOT_LISTENING"};
         }
 
@@ -195,18 +196,26 @@ class MusicManager {
         }
 
         //Prevent voting for self
-        if (this.activeItem.requestedBy == user.id) {
+        if (this.activeItem.requestedBy == member.id) {
             throw {e: "SELF_VOTE"};
         }
 
         //Apply vote
-        this.votes.set(user.id, type);
+        this.votes.set(member.id, type);
 
         //Process vote effects
         await this.processVoteEffects("VOTE");
 
         //Redraw vote data
         await this.updateNowPlaying();
+    }
+
+    getListeners : () => Array < GuildMember >;
+
+    getListeners() : Array < GuildMember > {
+        return this.activeVoiceChannel
+            ? this.activeVoiceChannel.members.array().filter(member => !member.deaf && !member.user.bot)
+            : [];
     }
 
     processVoteEffects : Function;
@@ -225,9 +234,7 @@ class MusicManager {
         const votes = Array.from(this.votes.values()).length;
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
         const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-        const listeners = this.activeVoiceChannel
-            ? this.activeVoiceChannel.members.array().length - 1
-            : 0;
+        const listeners = this.getListeners().length;
 
         //Negativity threshold;
         if (downvotes / listeners >= 0.40 && votes >= 5 && !this.skipped && event != "SONG_END") {
@@ -327,7 +334,7 @@ class MusicManager {
     async play(query : string, member : GuildMember) {
 
         //Only allow listeners to queue
-        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id) {
+        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id || member.deaf) {
             throw {e: "NOT_LISTENING"};
         }
 
