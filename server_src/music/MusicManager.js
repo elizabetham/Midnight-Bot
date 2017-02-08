@@ -43,7 +43,7 @@ class MusicManager {
     votes : Map < string,
     boolean >; //<UID,VoteType : boolean>
     lastNowPlayingUpdate : number;
-    scheduledNowPlayingUpdate : number;
+    scheduledNowPlayingUpdate : boolean;
 
     //Flow protection variables
     skipped : boolean;
@@ -56,7 +56,7 @@ class MusicManager {
         this.votes = new Map();
         this.skipped = false;
         this.lastNowPlayingUpdate = 0;
-        this.scheduledNowPlayingUpdate = 0;
+        this.scheduledNowPlayingUpdate = false;
 
         //Bind methods
         this.skip = this.skip.bind(this);
@@ -439,9 +439,6 @@ class MusicManager {
             this.activeStream.end('skipMusic');
         }
 
-        //Process vote effects
-        await this.processVoteEffects("SONG_END");
-
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
             ? this.idlePlaylist
@@ -449,24 +446,28 @@ class MusicManager {
                 ? this.activeItem.videoInfo.video_id
                 : "")));
 
-        //If there's nothing to play, just don't play anything.
-        if (!nextItem) {
-            DiscordUtils.setPlaying(await DiscordUtils.getPlaying());
-            if (this.nowPlayingMessage) {
-                this.nowPlayingMessage.delete().catch(e => {});
-            }
-            return false;
-        }
-
         //Skip the new song if the requester is not present
-        if (nextItem.requestedBy) {
+        if (nextItem && nextItem.requestedBy) {
             let member = (this.activeVoiceChannel)
                 ? await this.activeVoiceChannel.guild.fetchMember(nextItem.requestedBy)
                 : null;
             if (this.activeVoiceChannel && member && (member.deaf || member.voiceChannelID != this.activeVoiceChannel.id)) {
                 member.sendMessage("Your track **'" + nextItem.videoInfo.title + "'** has been dequeued because you are not currently listening.");
                 return await this.skip("QUEUED_BY_NON_LISTENER");
+}        }
+
+        //Process vote effects
+        await this.processVoteEffects("SONG_END");
+
+        //If there's nothing to play, just don't play anything.
+        if (!nextItem) {
+            DiscordUtils.setPlaying(await DiscordUtils.getPlaying());
+            if (this.nowPlayingMessage) {
+                this.nowPlayingMessage.delete().catch(e => {});
             }
+            this.activeItem = null;
+            this.activeStream = null;
+            return;
         }
 
         //Skip failed downloads
@@ -536,22 +537,23 @@ class MusicManager {
     updateNowPlaying : Function;
 
     async updateNowPlaying() {
+
         //Prevent spam updates
-        if (moment().unix() - this.lastNowPlayingUpdate < 3000) {
+        if (moment().unix() - this.lastNowPlayingUpdate < 3) {
+
             //If an update is already scheduled, stop here.
             if (this.scheduledNowPlayingUpdate) {
                 return;
             }
+
             //If no update is scheduled, schedule one.
-            this.scheduledNowPlayingUpdate = setTimeout(() => {
-                this.scheduledNowPlayingUpdate = 0;
+            this.scheduledNowPlayingUpdate = true;
+            setTimeout(() => {
+                this.scheduledNowPlayingUpdate = false;
                 this.updateNowPlaying();
             }, 3100);
             return;
         }
-
-        //Register last update
-        this.lastNowPlayingUpdate = moment().unix();
 
         //Update
         if (this.controlChannel && this.activeItem) {
