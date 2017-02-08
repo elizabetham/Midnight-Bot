@@ -33,7 +33,6 @@ class BulkMentionFilter extends AbstractFilter {
     }
 
     async action(message : Message) : Promise < void > {
-        message.delete().catch(e => {});
         message.author.sendMessage("Your message was removed: Identical consecutive messages are not permitted.");
         let infraction = new Infraction(message.author.id, moment().unix(), {
             type: 'WARN',
@@ -43,6 +42,7 @@ class BulkMentionFilter extends AbstractFilter {
             triggerMessage: message.content
         });
         Logging.infractionLog(await infraction.save());
+        message.delete().catch(e => {});
     }
 }
 

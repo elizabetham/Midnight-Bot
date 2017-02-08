@@ -42,6 +42,8 @@ class MusicManager {
         ? TextChannel;
     votes : Map < string,
     boolean >; //<UID,VoteType : boolean>
+    lastNowPlayingUpdate : number;
+    scheduledNowPlayingUpdate : number;
 
     //Flow protection variables
     skipped : boolean;
@@ -53,6 +55,8 @@ class MusicManager {
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
         this.votes = new Map();
         this.skipped = false;
+        this.lastNowPlayingUpdate = 0;
+        this.scheduledNowPlayingUpdate = 0;
 
         //Bind methods
         this.skip = this.skip.bind(this);
@@ -71,6 +75,7 @@ class MusicManager {
         this.blacklistVideo = this.blacklistVideo.bind(this);
         this.checkPermBlacklist = this.checkPermBlacklist.bind(this);
         this.addToIdlePlaylist = this.addToIdlePlaylist.bind(this);
+        this.getListeners = this.getListeners.bind(this);
 
         (async() => {
 
@@ -169,14 +174,14 @@ class MusicManager {
     }
 
     vote : Function;
-    async vote(user : GuildMember, type : boolean) {
+    async vote(member : GuildMember, type : boolean) {
         //Prevent double voting
-        if (this.votes.has(user.id)) {
+        if (this.votes.has(member.id)) {
             throw {e: "ALREADY_VOTED"};
         }
 
         //Only allow listeners to vote
-        if (!this.activeVoiceChannel || user.voiceChannelID != this.activeVoiceChannel.id) {
+        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id || member.deaf) {
             throw {e: "NOT_LISTENING"};
         }
 
@@ -191,18 +196,26 @@ class MusicManager {
         }
 
         //Prevent voting for self
-        if (this.activeItem.requestedBy == user.id) {
+        if (this.activeItem.requestedBy == member.id) {
             throw {e: "SELF_VOTE"};
         }
 
         //Apply vote
-        this.votes.set(user.id, type);
+        this.votes.set(member.id, type);
 
         //Process vote effects
         await this.processVoteEffects("VOTE");
 
         //Redraw vote data
         await this.updateNowPlaying();
+    }
+
+    getListeners : () => Array < GuildMember >;
+
+    getListeners() : Array < GuildMember > {
+        return this.activeVoiceChannel
+            ? this.activeVoiceChannel.members.array().filter(member => !member.deaf && !member.user.bot)
+            : [];
     }
 
     processVoteEffects : Function;
@@ -221,9 +234,7 @@ class MusicManager {
         const votes = Array.from(this.votes.values()).length;
         const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
         const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-        const listeners = this.activeVoiceChannel
-            ? this.activeVoiceChannel.members.array().length - 1
-            : 0;
+        const listeners = this.getListeners().length;
 
         //Negativity threshold;
         if (downvotes / listeners >= 0.40 && votes >= 5 && !this.skipped && event != "SONG_END") {
@@ -322,6 +333,11 @@ class MusicManager {
 
     async play(query : string, member : GuildMember) {
 
+        //Only allow listeners to queue
+        if (!this.activeVoiceChannel || member.voiceChannelID != this.activeVoiceChannel.id || member.deaf) {
+            throw {e: "NOT_LISTENING"};
+        }
+
         let redisKey = member.id + ":MusicQueueCooldown";
         let res = await Redis.existsAsync(redisKey);
         if (res) {
@@ -414,7 +430,7 @@ class MusicManager {
         if (origin != "CMD") {
             let count = await Redis.incrAsync("MUSIC_SKIP_FLOOD");
             await Redis.expireAsync("MUSIC_SKIP_FLOOD", 2);
-            if (count >= 5) {
+            if (count >= 10) {
                 Logging.error("SKIP_LOOP");
                 if (this.controlChannel) {
                     this.controlChannel.sendMessage("An internal error occurred, please contact a staff member!");
@@ -430,6 +446,23 @@ class MusicManager {
 
         //Process vote effects
         await this.processVoteEffects("SONG_END");
+
+        //Remove items from the queue from members who left the voice channel
+        //Obtain guild member objects for applicable users
+        let members = new Map((await Promise.all(this.queue.queue.map(async(item) => [
+            item.requestedBy, this.activeVoiceChannel
+                ? await this.activeVoiceChannel.guild.fetchMember(item.requestedBy)
+                : null
+        ]))).filter(i => i[1]));
+        //Remove them from the queue
+        this.queue.queue = this.queue.queue.filter(item => {
+            let member = members.get(item.requestedBy);
+            let result = (this.activeVoiceChannel && member && member.voiceChannelID == this.activeVoiceChannel.id);
+            if (member && !result) {
+                member.sendMessage("Your track **'" + item.videoInfo.title + "'** has been dequeued because you left the music channel.");
+            }
+            return result;
+        });
 
         //Get next item on the queue, or an item from the idle playlist
         const nextItem : QueueItem = this.queue.pop() || _.sample((this.idlePlaylist.length == 1 || !this.activeItem)
@@ -452,8 +485,7 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
-            this.skip("PREVIOUS_TRACK_FAILED");
-            return;
+            return await this.skip("PREVIOUS_TRACK_FAILED");
         }
 
         //Register current item
@@ -475,16 +507,14 @@ class MusicManager {
                 if (this.controlChannel) {
                     (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it took too long to download.")).delete(5000);
                 }
-                this.skip("PREVIOUS_TRACK_FAILED");
-                return;
+                return await this.skip("PREVIOUS_TRACK_FAILED");
             }
         } catch (e) {
             console.log(e);
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
-            this.skip("PREVIOUS_TRACK_FAILED");
-            return;
+            return await this.skip("PREVIOUS_TRACK_FAILED");
         }
 
         //Play the next item on stream
@@ -509,15 +539,32 @@ class MusicManager {
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
             }
-            this.skip("STREAM_ERROR_SKIP");
+            return await this.skip("STREAM_ERROR_SKIP");
         }
-
         return true;
     }
 
     updateNowPlaying : Function;
 
     async updateNowPlaying() {
+        //Prevent spam updates
+        if (moment().unix() - this.lastNowPlayingUpdate < 3000) {
+            //If an update is already scheduled, stop here.
+            if (this.scheduledNowPlayingUpdate) {
+                return;
+            }
+            //If no update is scheduled, schedule one.
+            this.scheduledNowPlayingUpdate = setTimeout(() => {
+                this.scheduledNowPlayingUpdate = 0;
+                this.updateNowPlaying();
+            }, 3100);
+            return;
+        }
+
+        //Register last update
+        this.lastNowPlayingUpdate = moment().unix();
+
+        //Update
         if (this.controlChannel && this.activeItem) {
             let controlChannel = this.controlChannel;
             let activeItem = this.activeItem;
