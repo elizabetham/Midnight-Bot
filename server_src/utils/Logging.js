@@ -31,8 +31,8 @@ export const mod = (msg : string) => {
     });
 };
 
-export const format = (prefix : string, text : string) => {
-    if (text.indexOf('\n') > -1) {
+export const format = (prefix : string, text : string, codeblock : boolean = false) => {
+    if (codeblock) {
         text = '```\n' + text + "\n```";
     }
     return "**[" + prefix + "]** " + text;
@@ -87,7 +87,7 @@ export const warning = async(identifier : string, err : any) => {
 
     //post in client log channel
     console.log(err);
-    bot(format("WARNING [" + identifier + "]", err));
+    bot(format("WARNING [" + identifier + "]", err, true));
 };
 
 export const error = async(identifier : string, err : any) => {
@@ -101,7 +101,7 @@ export const error = async(identifier : string, err : any) => {
 
     //post in client log channel
     console.error(err);
-    bot(format("ERROR [" + identifier + "]", err));
+    bot(format("ERROR [" + identifier + "]", err, true));
 };
 
 export default {
