@@ -66,8 +66,6 @@ config = Object.assign({}, publicConfig);
 
 //MISC SETTINGS
 
-//A pastebin key for quick error reporting in the bot log channel (Optional)
-config.PASTEBIN_DEV_KEY = 'YOUR_PASTEBIN_KEY';
 //Your MongoDB connection details
 config.database = "mongodb://user:password@host:port/db";
 
@@ -131,6 +129,8 @@ export default config;
 ### Running Midnight
 
 **Initial setup:**
+
+**IMPORTANT:** _Midnight depends on [node-gyp](https://github.com/nodejs/node-gyp) in order to build. Make sure to follow the installation instructions for your platform in their [README.md](https://github.com/nodejs/node-gyp/blob/master/README.md#installation), so that you meet its requirements_
 
 - Set up your MongoDB and Redis instances
 - Clone the Midnight repository
