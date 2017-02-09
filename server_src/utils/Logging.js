@@ -9,16 +9,11 @@ import {InfractionRecord} from './DBManager';
 import Config from '../../config';
 import moment from 'moment';
 
-//Dependencies
-const pastebin = (Config.PASTEBIN_DEV_KEY)
-    ? new(require('pastebin-js'))(Config.PASTEBIN_DEV_KEY)
-    : null;
-
 export const bot = (msg : string) => {
     DiscordUtils.client.guilds.array().forEach(async(guild) => {
         try {
             let channel = await DiscordUtils.getTextChannelByName(guild, Config.botLogChannel);
-            channel.sendMessage(msg);
+            channel.sendMessage(msg, {split: true});
         } catch (err) {
             error("MOD_LOG", err);
         }
@@ -29,14 +24,19 @@ export const mod = (msg : string) => {
     DiscordUtils.client.guilds.array().forEach(async(guild) => {
         try {
             let channel = await DiscordUtils.getTextChannelByName(guild, Config.botModChannel);
-            channel.sendMessage(msg);
+            channel.sendMessage(msg, {split: true});
         } catch (err) {
             error("MOD_LOG", err);
         }
     });
 };
 
-export const format = (prefix : string, text : string) => "**[" + prefix + "]** " + text;
+export const format = (prefix : string, text : string) => {
+    if (text.indexOf('\n') > -1) {
+        text = '```\n' + text + "\n```";
+    }
+    return "**[" + prefix + "]** " + text;
+};
 
 export const infractionLog = async(infraction :
     ? InfractionRecord) => {
@@ -72,30 +72,36 @@ export const infractionLog = async(infraction :
     };
 
 let errorTimeData = {};
+let warnTimeData = {};
+
+//TODO: REPLACE LOGGING SOLUTION
+
+export const warning = async(identifier : string, err : any) => {
+    //Log error to console
+    console.log("WARNING [" + identifier + "]", err);
+
+    //Prevent botlog spam
+    if (warnTimeData[identifier] != undefined && moment().unix() - warnTimeData[identifier] < 300)
+        return;
+    warnTimeData[identifier] = moment().unix();
+
+    //post in client log channel
+    console.log(err);
+    bot(format("WARNING [" + identifier + "]", err));
+};
 
 export const error = async(identifier : string, err : any) => {
     //Log error to console
-    console.error("[" + identifier + "]", err);
+    console.error("ERROR [" + identifier + "]", err);
 
     //Prevent botlog spam
     if (errorTimeData[identifier] != undefined && moment().unix() - errorTimeData[identifier] < 300)
         return;
     errorTimeData[identifier] = moment().unix();
 
-    //Create pastebin & post in client log channel
-    if (pastebin) {
-        try {
-            let data = await pastebin.createPaste({
-                text: JSON.stringify(err, null, 2),
-                privacy: 1,
-                title: "[Midnight] Error (ID: " + identifier + ")"
-            });
-            bot(format("ERROR", "[" + identifier + "]: <http://pastebin.com/" + data + ">"));
-        } catch (err) {
-            console.error(err);
-            bot(format("ERROR", "[" + identifier + "]: Could not upload to pastebin."));
-        }
-    }
+    //post in client log channel
+    console.error(err);
+    bot(format("ERROR [" + identifier + "]", err));
 };
 
 export default {
@@ -103,5 +109,6 @@ export default {
     mod,
     format,
     infractionLog,
-    error
+    error,
+    warning
 };

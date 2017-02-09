@@ -12,8 +12,6 @@ import Config from '../config';
 
 //Dependencies
 import moment from 'moment';
-import pastebinJs from 'pastebin-js'
-const pastebin = new pastebinJs(Config.PASTEBIN_DEV_KEY);
 
 //Types
 import {GuildMember, Message} from 'discord.js';
