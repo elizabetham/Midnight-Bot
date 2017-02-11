@@ -454,7 +454,8 @@ class MusicManager {
             if (this.activeVoiceChannel && member && (member.deaf || member.voiceChannelID != this.activeVoiceChannel.id)) {
                 member.sendMessage("Your track **'" + nextItem.videoInfo.title + "'** has been dequeued because you are not currently listening.");
                 return await this.skip("QUEUED_BY_NON_LISTENER");
-}        }
+            }
+        }
 
         //Process vote effects
         await this.processVoteEffects("SONG_END");
