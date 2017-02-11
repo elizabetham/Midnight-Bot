@@ -47,10 +47,6 @@ export const UserRecord = mongoose.model('UserRecord', new mongoose.Schema({
     username_lower: {
         type: String,
         required: true
-    },
-    djAwardPoints: {
-        type: Number,
-        required: false
     }
 }));
 
@@ -102,6 +98,19 @@ export const BlacklistedVideo = mongoose.model('blacklistedvideo', new mongoose.
         type: String,
         required: false
     }
+}));
+
+export const GenericEvent = mongoose.model('GenericEvent', new mongoose.Schema({
+    initiatorUID: String,
+    eventType: {
+        required: true,
+        type: String
+    },
+    timestamp: {
+        required: true,
+        type: Number
+    },
+    data: mongoose.Schema.Types.Mixed
 }));
 
 //Handle redis errors

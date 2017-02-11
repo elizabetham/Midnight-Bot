@@ -17,11 +17,12 @@ import QueueItem from './QueueItem';
 import MusicQueue from './MusicQueue';
 import {yt, secondsToTimestamp} from './MusicTools';
 import {PERMISSION_PRESETS} from '../utils/Permission';
-import {Redis, UserRecord, BlacklistedVideo} from '../utils/DBManager';
+import {Redis, UserRecord, BlacklistedVideo, GenericEvent as GenericEventRecord} from '../utils/DBManager';
 import moment from 'moment';
 import UserUtils from '../utils/UserUtils';
 import ordinal from 'ordinal-number-suffix';
 import Logging from '../utils/Logging';
+import GenericEvent from '../datatypes/GenericEvent';
 
 class MusicManager {
 
@@ -44,6 +45,7 @@ class MusicManager {
     boolean >; //<UID,VoteType : boolean>
     lastNowPlayingUpdate : number;
     scheduledNowPlayingUpdate : boolean;
+    trackStartedAt : number;
 
     //Flow protection variables
     skipped : boolean;
@@ -55,6 +57,7 @@ class MusicManager {
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
         this.votes = new Map();
         this.skipped = false;
+        this.trackStartedAt = 0;
         this.lastNowPlayingUpdate = 0;
         this.scheduledNowPlayingUpdate = false;
 
@@ -197,14 +200,19 @@ class MusicManager {
             throw {e: "NO_ACTIVE_SONG"};
         }
 
-        //Don't vote if the current item comes from the default playlist
-        if (!this.activeItem.requestedBy) {
-            throw {e: "MIDNIGHT_DJ"};
-        }
-
         //Prevent voting for self
         if (this.activeItem.requestedBy == member.id) {
             throw {e: "SELF_VOTE"};
+        }
+
+        //Only allow voting after 10 seconds into the song
+        const enableVotingAfter = 10;
+        if (moment().unix() - this.trackStartedAt < enableVotingAfter) {
+            throw {
+                e: "NO_VOTING_YET",
+                set: enableVotingAfter,
+                wait: enableVotingAfter + this.trackStartedAt - moment().unix()
+            };
         }
 
         //Apply vote
@@ -270,10 +278,12 @@ class MusicManager {
             }
 
             //Blacklist it permanently if skipped >= 3 times
+            let blacklisted = false;
             if (this.activeItem) {
                 let key = this.activeItem.videoInfo.video_id + ":MusicVoteSkipped";
                 let skipped = await Redis.incrAsync(key);
                 if (skipped >= 3) {
+                    blacklisted = true;
                     try {
                         this.blacklistVideo(key);
                     } catch (e) {
@@ -282,6 +292,16 @@ class MusicManager {
                         }
                     }
                 }
+            }
+
+            //Log event
+            if (this.activeItem) {
+                new GenericEvent("TRACK_VOTESKIP").setData({
+                    videoId: this.activeItem.videoInfo.video_id,
+                    requestedBy: this.activeItem.requestedBy || undefined,
+                    downvotes: downvotes,
+                    blacklisted: blacklisted
+                }).save();
             }
 
             //Send message
@@ -300,39 +320,32 @@ class MusicManager {
         }
 
         //Song end
-        if (event == "SONG_END" && this.activeItem && this.activeItem.requestedBy) {
+        if (event == "SONG_END" && this.activeItem) {
+            let videoInfo = this.activeItem.videoInfo;
             let requestedBy = this.activeItem.requestedBy;
-            let msg = "<@" + requestedBy + ">" + ", Your track ended with **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:.";
-            if (upvotes / votes >= 0.75 && votes >= 5) {
-                //Save award point
-                let record = await UserUtils.assertUserRecord(requestedBy);
-                record.djAwardPoints = record.djAwardPoints
-                    ? record.djAwardPoints + 1
-                    : 1;
-                await record.save();
-
-                //Obtain placement
-                //TODO: REPLACE WITH MORE EFFICIENT SOLUTION
-                let found = false;
-                let placement = (await UserRecord.find({
-                    djAwardPoints: {
-                        $gt: 0
+            if (requestedBy) {
+                let msg = "<@" + requestedBy + ">" + ", Your track ended with **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown:.";
+                if (upvotes / votes >= 0.75 && votes >= 5) {
+                    new GenericEvent("GET_AWARD_POINT").setInitiator(requestedBy).save();
+                    try {
+                        msg += " You have received an award point! You now have " + (await GenericEventRecord.count({eventType: "GET_AWARD_POINT", initiatorUID: requestedBy})) + "** award points!";
+                    } catch (err) {
+                        Logging.error("AWARD_POINT_COUNT", err);
                     }
-                }).sort({djAwardPoints: 1, username: 1}).lean()).filter((r, index) => {
-                    if (r.userid == record.userid) {
-                        found = true;
+                }
+                if (this.controlChannel) {
+                    let message = await this.controlChannel.sendMessage(msg);
+                    if (votes < 5) {
+                        message.delete(10000).catch(e => {});
                     }
-                    return found;
-                }).length;
-                //Add to message
-                msg += " You have been given an award point! You now have **" + record.djAwardPoints + "** points, putting you in the **" + ordinal(placement) + "** position on the leaderboard!";
-            }
-            if (this.controlChannel) {
-                let message = await this.controlChannel.sendMessage(msg);
-                if (votes < 5) {
-                    message.delete(10000).catch(e => {});
                 }
             }
+
+            Array.from(this.votes.entries()).forEach(entry => {
+                new GenericEvent(entry[1]
+                    ? "TRACK_UPVOTE"
+                    : "TRACK_DOWNVOTE").setInitiator(entry[0]).setData({videoId: videoInfo.video_id, requestedBy: requestedBy}).save();
+            });
         }
     }
 
@@ -352,7 +365,7 @@ class MusicManager {
         }
 
         //Check if user is allowed another queue
-        const currentlyQueued = this.queue.queue.filter(i => i.requestedBy == member.id).length;
+        const currentlyQueued = this.queue.getQueue().filter(i => i.requestedBy == member.id).length;
         const allowedQueues = ([
             [
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
@@ -372,7 +385,7 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + parseInt(val.videoInfo.length_seconds), 0) + ((this.activeItem)
+        let eta = this.queue.getQueue().reduce((tot, val) => tot + parseInt(val.videoInfo.length_seconds), 0) + ((this.activeItem)
             ? parseInt(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
@@ -520,6 +533,15 @@ class MusicManager {
 
                 //Update now-playing message
                 await this.updateNowPlaying();
+
+                //Log play
+                if (this.activeItem && this.activeItem.requestedBy) {
+                    const activeItem = this.activeItem;
+                    new GenericEvent("USER_PLAY_TRACK").setData({videoId: activeItem.videoInfo.video_id}).setInitiator(activeItem.requestedBy).save();
+                }
+
+                //Note track start time
+                this.trackStartedAt = moment().unix();
             }
         } catch (e) {
             Logging.error("YT_STREAM_ERROR", {
@@ -566,18 +588,16 @@ class MusicManager {
                 : "Midnight") + "**\n";;
 
             //Playlist
-            if (this.queue.queue.length > 0) {
-                (await Promise.all(this.queue.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
+            if (this.queue.getQueue().length > 0) {
+                (await Promise.all(this.queue.getQueue().map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
                     ? (await UserUtils.assertUserRecord(item.requestedBy)).username
                     : "Midnight") + "**\n"))).forEach(line => newMessage += line);
             }
 
             //Voting info
-            if (activeItem.requestedBy) {
-                const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
-                const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-                newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
-            }
+            const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
+            const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
+            newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
 
             //If the now playing message doesn't exist or is not the last message anymore, create a new one
             if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {
@@ -611,7 +631,7 @@ class MusicManager {
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000),
             currentItem: this.activeItem,
-            queue: this.queue.queue
+            queue: this.queue.getQueue()
         };
     }
 

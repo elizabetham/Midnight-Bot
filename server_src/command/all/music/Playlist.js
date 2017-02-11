@@ -36,8 +36,8 @@ class PlaylistCommand extends AbstractCommand {
         }
 
         //Playlist
-        if (MusicManager.queue.queue.length > 0) {
-            (await Promise.all(MusicManager.queue.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
+        if (MusicManager.queue.getQueue().length > 0) {
+            (await Promise.all(MusicManager.queue.getQueue().map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
                 ? (await UserUtils.assertUserRecord(item.requestedBy)).username
                 : "Midnight") + "**\n"))).forEach(line => newMessage += line);
         } else if (newMessage == "") {
