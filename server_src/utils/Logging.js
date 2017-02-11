@@ -87,6 +87,9 @@ export const warning = async(identifier : string, err : any) => {
 
     //post in client log channel
     console.log(err);
+    if (typeof err != "string") {
+        err = JSON.stringify(err, null, 2);
+    }
     bot(format("WARNING [" + identifier + "]", err, true));
 };
 
@@ -101,6 +104,9 @@ export const error = async(identifier : string, err : any) => {
 
     //post in client log channel
     console.error(err);
+    if (typeof err != "string") {
+        err = JSON.stringify(err, null, 2);
+    }
     bot(format("ERROR [" + identifier + "]", err, true));
 };
 
