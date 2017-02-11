@@ -16,6 +16,11 @@ class BulkMentionFilter extends AbstractFilter {
     }
 
     async check(message : Message) : Promise < boolean > {
+        //Ignore messages with no text content (Such as direct file uploads)
+        if(!message.content || message.content == "") {
+            return false;
+        }
+
         //Define key
         let key = message.author.id + ":lastMessage";
 
