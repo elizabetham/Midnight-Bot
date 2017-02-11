@@ -39,7 +39,7 @@ class DequeueCommand extends AbstractCommand {
             }
 
             if (args[0].toLowerCase() == "all") {
-                MusicManager.queue.queue.splice(0, MusicManager.queue.queue.length);
+                MusicManager.queue.purge();
                 this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " Queue purged.", 5000, msg);
                 return;
             }
@@ -53,15 +53,17 @@ class DequeueCommand extends AbstractCommand {
             const index = parseInt(args[0]) - 1;
 
             //Check if it's a valid reference
-            if (index < 0 || parseInt(args[0]) >= MusicManager.queue.queue.length) {
+            if (index < 0 || parseInt(args[0]) >= MusicManager.queue.getQueue().length) {
                 this.tools.volatileReply(reply, "`" + args[0] + "` does not match any item on the queue. Please use a number on the queue.", 5000, msg);
                 return;
             }
 
             //Remove item at index from queue
-            let titleOfRemoved = MusicManager.queue.queue.splice(index, 1)[0].videoInfo.title;
+            let removedTrack = MusicManager.queue.removeAtIndex(index);
 
-            this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " **" + titleOfRemoved + "** has been removed from the queue!", 5000, msg);
+            if (removedTrack) {
+                this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " **" + removedTrack.videoInfo.title + "** has been removed from the queue!", 5000, msg);
+            }
             return;
         }
 
@@ -70,7 +72,7 @@ class DequeueCommand extends AbstractCommand {
         //
 
         //Find last queued track
-        let track = MusicManager.queue.queue.slice().reverse().find(item => item.requestedBy == user.id);
+        let track = MusicManager.queue.getQueue().slice().reverse().find(item => item.requestedBy == user.id);
 
         //If not found quit here
         if (!track) {
@@ -79,10 +81,12 @@ class DequeueCommand extends AbstractCommand {
         }
 
         //Remove it from the queue
-        let titleOfRemoved = MusicManager.queue.queue.splice(MusicManager.queue.queue.indexOf(track), 1)[0].videoInfo.title;
+        let removedTrack = MusicManager.queue.removeAtIndex(MusicManager.queue.getQueue().indexOf(track));
 
         //Let the user know of success
-        this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " **" + titleOfRemoved + "** has been removed from the queue!", 5000, msg);
+        if (removedTrack) {
+            this.tools.volatileReply(reply, _.sample(Lang.AFFIRMATIVE) + " **" + removedTrack.videoInfo.title + "** has been removed from the queue!", 5000, msg);
+        }
     };
 
 }

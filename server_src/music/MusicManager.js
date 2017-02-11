@@ -364,7 +364,7 @@ class MusicManager {
         }
 
         //Check if user is allowed another queue
-        const currentlyQueued = this.queue.queue.filter(i => i.requestedBy == member.id).length;
+        const currentlyQueued = this.queue.getQueue().filter(i => i.requestedBy == member.id).length;
         const allowedQueues = ([
             [
                 PERMISSION_PRESETS.CONVICTS.MODERATOR, 5
@@ -384,7 +384,7 @@ class MusicManager {
         }
 
         //Calculate seconds remaining before playing
-        let eta = this.queue.queue.reduce((tot, val) => tot + parseInt(val.videoInfo.length_seconds), 0) + ((this.activeItem)
+        let eta = this.queue.getQueue().reduce((tot, val) => tot + parseInt(val.videoInfo.length_seconds), 0) + ((this.activeItem)
             ? parseInt(this.activeItem.videoInfo.length_seconds) - Math.floor((this.activeStream
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000)
@@ -581,8 +581,8 @@ class MusicManager {
                 : "Midnight") + "**\n";;
 
             //Playlist
-            if (this.queue.queue.length > 0) {
-                (await Promise.all(this.queue.queue.map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
+            if (this.queue.getQueue().length > 0) {
+                (await Promise.all(this.queue.getQueue().map(async(item, index) => "`" + (index + 1) + ".` **" + item.videoInfo.title + "** added by **" + (item.requestedBy
                     ? (await UserUtils.assertUserRecord(item.requestedBy)).username
                     : "Midnight") + "**\n"))).forEach(line => newMessage += line);
             }
@@ -626,7 +626,7 @@ class MusicManager {
                 ? this.activeStream.totalStreamTime
                 : 0) / 1000),
             currentItem: this.activeItem,
-            queue: this.queue.queue
+            queue: this.queue.getQueue()
         };
     }
 

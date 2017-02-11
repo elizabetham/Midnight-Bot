@@ -18,6 +18,71 @@ class MusicQueue {
         this.size = this.size.bind(this);
         this.pop = this.pop.bind(this);
         this.push = this.push.bind(this);
+        this.saveCache = this.saveCache.bind(this);
+        this.loadFromCache = this.loadFromCache.bind(this);
+        this.getQueue = this.getQueue.bind(this);
+        this.purge = this.purge.bind(this);
+        this.setQueue = this.setQueue.bind(this);
+
+        //Restore from cache if possible
+        this.loadFromCache();
+    }
+
+    removeAtIndex : (number) =>
+        ? QueueItem;
+
+    removeAtIndex(index : number) {
+        if (index >= this.queue.length || index < 0) {
+            return null;
+        }
+        return this.queue.splice(index, 1)[0];
+    }
+
+    getQueue : () => Array < QueueItem >;
+
+    getQueue() {
+        return this.queue.slice();
+    }
+
+    purge : Function;
+
+    purge() {
+        this.setQueue([]);
+    }
+
+    setQueue : Function;
+
+    setQueue(newQueue : Array < QueueItem >) {
+        this.queue = newQueue;
+        this.saveCache();
+    }
+
+    loadFromCache : Function;
+
+    async loadFromCache() {
+        try {
+            let cacheData = await Redis.getAsync("MusicQueue");
+            if (!cacheData) 
+                return;
+            let loadedQueue : Array < QueueItem > = JSON.parse(cacheData);
+            this.queue = loadedQueue.map(item => new QueueItem(item.requestedBy, item.videoInfo));
+            console.log("Loaded cached queue from REDIS:", loadedQueue.length, "items.");
+        } catch (err) {
+            //Don't bother loading
+        }
+    }
+
+    saveCache : Function;
+
+    async saveCache() {
+        //Remove queue from cache if there's nothing in it
+        if (this.queue.length == 0) {
+            Redis.del("MusicQueue");
+            return;
+        }
+
+        //Save data in cache
+        Redis.set("MusicQueue", JSON.stringify(this.queue));
     }
 
     size : Function;
@@ -29,7 +94,9 @@ class MusicQueue {
     pop : Function;
 
     pop() {
-        return this.queue.shift();
+        let result = this.queue.shift();
+        this.saveCache();
+        return result;
     }
 
     push : Function;
@@ -111,6 +178,8 @@ class MusicQueue {
         //Push new video onto queue
         const newItem = new QueueItem(requestedBy, videoInfo);
         this.queue.push(newItem);
+
+        this.saveCache();
 
         //Return the found video
         return newItem;
