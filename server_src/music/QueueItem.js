@@ -34,7 +34,7 @@ class QueueItem {
                 return file;
             } else {
                 //If the file size is 0, delete the file
-                fs.unlink(file);
+                fs.unlinkSync(file);
             }
         }
 
@@ -47,7 +47,7 @@ class QueueItem {
             let stats = fs.statSync(file);
             if (stats.size == 0) {
                 //Delete the file if its filesize is 0
-                fs.unlink(file);
+                fs.unlinkSync(file);
                 throw "INCORRECT_FILESIZE";
             }
 
@@ -58,6 +58,13 @@ class QueueItem {
             //Report that download failed.
             console.log(err);
             console.log("FAILED download: '" + this.videoInfo.title + "'");
+
+            //Attempt deleting the failed download
+            try {
+                fs.unlinkSync(file);
+            } catch (err) {}
+
+            //Throw exception
             throw {msg: "FAILED_DOWNLOAD", e: err};
         }
     }
