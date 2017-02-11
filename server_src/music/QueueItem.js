@@ -28,7 +28,14 @@ class QueueItem {
 
         //Check if the download already exists.
         if (fs.existsSync(file)) {
-            return file;
+            let stats = fs.statSync(file);
+            //Return the existing file if it has a filesize
+            if (stats.size > 0) {
+                return file;
+            } else {
+                //If the file size is 0, delete the file
+                fs.unlink(file);
+            }
         }
 
         try {
@@ -36,7 +43,15 @@ class QueueItem {
             console.log("Start download: '" + this.videoInfo.title + "'");
             await yt.download(this.videoInfo, file);
 
-            //We're done downloading, let's return the path
+            //We're done downloading, let's verify the result
+            let stats = fs.statSync(file);
+            if (stats.size == 0) {
+                //Delete the file if its filesize is 0
+                fs.unlink(file);
+                throw "INCORRECT_FILESIZE";
+            }
+
+            //let's return the path
             console.log("Finished download: '" + this.videoInfo.title + "'");
             return file;
         } catch (err) {
