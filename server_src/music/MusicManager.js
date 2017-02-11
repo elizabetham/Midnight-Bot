@@ -128,9 +128,17 @@ class MusicManager {
                 //Reconnect when connection lost
                 if (this.activeConnection) {
                     this.activeConnection.on('disconnect', async() => {
+                        Logging.warning("VOICE_RECONNECT", "Voice disconnected unexpectedly. Attempting rejoin....");
                         this.activeConnection = (this.activeVoiceChannel)
                             ? await this.activeVoiceChannel.join()
                             : null;
+                        if (this.activeConnection) {
+                            Logging.warning("VOICE_RECONNECT", "Voice recovery succeeded");
+                        } else {
+                            Logging.error("VOICE_RECONNECT", "Voice recovery failed!");
+                            return;
+                        }
+                        await this.skip("VOICE_RECONNECT");
                     });
                 }
             });
