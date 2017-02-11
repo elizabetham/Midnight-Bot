@@ -199,11 +199,6 @@ class MusicManager {
             throw {e: "NO_ACTIVE_SONG"};
         }
 
-        //Don't vote if the current item comes from the default playlist
-        if (!this.activeItem.requestedBy) {
-            throw {e: "MIDNIGHT_DJ"};
-        }
-
         //Prevent voting for self
         if (this.activeItem.requestedBy == member.id) {
             throw {e: "SELF_VOTE"};
@@ -588,11 +583,9 @@ class MusicManager {
             }
 
             //Voting info
-            if (activeItem.requestedBy) {
-                const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
-                const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-                newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
-            }
+            const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
+            const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
+            newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
 
             //If the now playing message doesn't exist or is not the last message anymore, create a new one
             if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {

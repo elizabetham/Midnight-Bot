@@ -39,9 +39,6 @@ class DownvoteCommand extends AbstractCommand {
                 case "NOT_LISTENING":
                     this.tools.volatileReply(reply, "You're not allowed to vote if you're not a listener.", 2000, msg);
                     break;
-                case "MIDNIGHT_DJ":
-                    this.tools.volatileReply(reply, "This is not a user requested song. You can't vote on songs from the default playlist!", 5000, msg);
-                    break;
                 case "NO_ACTIVE_SONG":
                     this.tools.volatileReply(reply, "There is no song currently playing to vote for.", 5000, msg);
                     break;
