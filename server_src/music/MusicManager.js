@@ -44,6 +44,7 @@ class MusicManager {
     boolean >; //<UID,VoteType : boolean>
     lastNowPlayingUpdate : number;
     scheduledNowPlayingUpdate : boolean;
+    trackStartedAt : number;
 
     //Flow protection variables
     skipped : boolean;
@@ -55,6 +56,7 @@ class MusicManager {
         this.queue = new MusicQueue(Config.MUSIC_MAX_QUEUE_SIZE || 20, this);
         this.votes = new Map();
         this.skipped = false;
+        this.trackStartedAt = 0;
         this.lastNowPlayingUpdate = 0;
         this.scheduledNowPlayingUpdate = false;
 
@@ -205,6 +207,16 @@ class MusicManager {
         //Prevent voting for self
         if (this.activeItem.requestedBy == member.id) {
             throw {e: "SELF_VOTE"};
+        }
+
+        //Only allow voting after 10 seconds into the song
+        const enableVotingAfter = 10;
+        if (moment().unix() - this.trackStartedAt < enableVotingAfter) {
+            throw {
+                e: "NO_VOTING_YET",
+                set: enableVotingAfter,
+                wait: enableVotingAfter + this.trackStartedAt - moment().unix()
+            };
         }
 
         //Apply vote
@@ -520,6 +532,9 @@ class MusicManager {
 
                 //Update now-playing message
                 await this.updateNowPlaying();
+
+                //Note track start time
+                this.trackStartedAt = moment().unix();
             }
         } catch (e) {
             Logging.error("YT_STREAM_ERROR", {

@@ -48,6 +48,9 @@ class DownvoteCommand extends AbstractCommand {
                 case "SELF_VOTE":
                     this.tools.volatileReply(reply, "You cannot vote for yourself m8", 5000, msg);
                     break;
+                case "NO_VOTING_YET":
+                    this.tools.volatileReply(reply, "Please let this song play for **" + e.wait + "** more seconds before voting!", 5000, msg);
+                    break;
                 default:
                     console.log("UNKNOWN DOWNVOTE RESPONSE", e);
                     this.tools.volatileReply(reply, "An unknown error has occurred. Please notify a staff member!", 5000, msg);
