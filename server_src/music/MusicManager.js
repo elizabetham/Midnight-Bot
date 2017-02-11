@@ -128,14 +128,13 @@ class MusicManager {
                 //Reconnect when connection lost
                 if (this.activeConnection) {
                     this.activeConnection.on('disconnect', async() => {
-                        Logging.warning("VOICE_RECONNECT", "Voice disconnected unexpectedly. Attempting rejoin....");
                         this.activeConnection = (this.activeVoiceChannel)
                             ? await this.activeVoiceChannel.join()
                             : null;
                         if (this.activeConnection) {
-                            Logging.warning("VOICE_RECONNECT", "Voice recovery succeeded");
+                            Logging.warning("VOICE_RECONNECT", "Voice disconnected unexpectedly. Voice recovery succeeded");
                         } else {
-                            Logging.error("VOICE_RECONNECT", "Voice recovery failed!");
+                            Logging.error("VOICE_RECONNECT", "Voice disconnected unexpectedly. Voice recovery failed!");
                             return;
                         }
                         await this.skip("VOICE_RECONNECT");
@@ -479,14 +478,6 @@ class MusicManager {
             return;
         }
 
-        //Skip failed downloads
-        if (nextItem.status == "FAILED") {
-            if (this.controlChannel) {
-                (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
-            }
-            return await this.skip("PREVIOUS_TRACK_FAILED");
-        }
-
         //Register current item
         this.activeItem = nextItem;
 
@@ -509,7 +500,7 @@ class MusicManager {
                 return await this.skip("PREVIOUS_TRACK_FAILED");
             }
         } catch (e) {
-            console.log(e);
+            Logging.error("YTDL_FAILED", e);
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
