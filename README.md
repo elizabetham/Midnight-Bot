@@ -111,7 +111,8 @@ export default config;
 
 ### Scripts
 
-- `npm run init`: Initialize the project, installs dependencies & fetches flow libdefs.
+- `npm run init`: Initialize the project, installs dependencies & fetches flow libdefs. **Linux only.**
+- `npm run winit`: Do the same as above, but use Windows CMD commands instead. **Windows only.**
 - `npm run test`: Runs unit tests & checks for flow errors.
 - `npm run test-jenkins`: Similar to `npm run test` but with a mocha test reporter compatible with Jenkins for continuous integration.
 - `npm run build`: Build for production.
