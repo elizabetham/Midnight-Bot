@@ -513,10 +513,20 @@ class MusicManager {
                 return await this.skip("PREVIOUS_TRACK_FAILED");
             }
         } catch (e) {
+            //Log download error
             Logging.error("YTDL_FAILED", e);
+
+            //Tell members song could not be played
             if (this.controlChannel) {
                 (await this.controlChannel.sendMessage("**" + nextItem.videoInfo.title + "** could not be played as it could not be downloaded.")).delete(5000);
             }
+
+            //If the song is on the default playlist, let staff know to check it
+            if (this.idlePlaylist.find(item => item.videoInfo.video_id == nextItem.videoInfo.video_id)) {
+                Logging.bot("The following song on the default playlist is unaccessible. It is advised to manually check if it's still supported: **'" + nextItem.videoInfo.title + "'** https://www.youtube.com/watch?v=" + nextItem.videoInfo.video_id);
+            }
+
+            //Attempt playing the next track
             return await this.skip("PREVIOUS_TRACK_FAILED");
         }
 
