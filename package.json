@@ -5,6 +5,7 @@
   "main": "Midnight.js",
   "scripts": {
     "init": "rm -rf node_modules && rm -rf flow-typed && npm install && flow-typed update",
+    "winit": "RD /S /Q node_modules && RD /S /Q flow-typed && npm install && flow-typed update",
     "test": "flow check && mocha --compilers js:babel-register --require babel-polyfill",
     "test-jenkins": "flow check && JUNIT_REPORT_PATH=report.xml mocha --colors --compilers js:babel-register --require babel-polyfill --reporter mocha-jenkins-reporter",
     "build": "webpack --config webpack.prod.config.js",
