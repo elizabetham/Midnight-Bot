@@ -33,7 +33,7 @@ export const mod = (msg : string) => {
 
 export const format = (prefix : string, text : string, codeblock : boolean = false) => {
     if (codeblock) {
-        text = '```\n' + text + "\n```";
+        text = '\n```\n' + text + "\n```\n";
     }
     return "**[" + prefix + "]** " + text;
 };

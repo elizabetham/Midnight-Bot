@@ -554,12 +554,12 @@ class MusicManager {
                 this.trackStartedAt = moment().unix();
             }
         } catch (e) {
-            Logging.error("YT_STREAM_ERROR", {
+            Logging.warning("YT_STREAM_ERROR", {
                 e: e,
                 item: nextItem
             });
             if (this.controlChannel) {
-                (await this.controlChannel.sendMessage("I could not manage to stream the next song! Please notify a staff member.")).delete(5000);
+                (await this.controlChannel.sendMessage("I could not manage to stream the next song!")).delete(5000);
             }
             return await this.skip("STREAM_ERROR_SKIP");
         }
