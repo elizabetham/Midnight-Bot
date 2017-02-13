@@ -12,12 +12,12 @@ class GameCommand extends AbstractCommand {
 
     constructor() {
         super("game", [
-            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR, PERMISSION_PRESETS.MAGICANDCHILL.MODS
         ], "[status]", "Set Midnight's game status");
     }
 
     async exec(args : Array < string >, reply : (msg : string) => Promise < Message >, user : GuildMember, msg : Message) {
-        if (!MusicManager) {
+        if (MusicManager) {
             this.tools.volatileReply(reply, "It is not possible to set my game status while the music module is active!", 5000, msg);
             return;
         }

@@ -53,7 +53,9 @@ export const infractionLog = async(infraction :
     }
     try {
         let user = await DiscordUtils.client.fetchUser(infraction.userid);
-        let permalink = Config.baseURL + "/#/infractions/" + infraction.userid + "/" + infraction._id;
+        let permalink = Config.baseURL
+            ? Config.baseURL + "/#/infractions/" + infraction.userid + "/" + infraction._id
+            : "";
         msg += "User **" + user.username + "** (**" + infraction.userid + "**) has received an infraction: " + permalink;
         if (infraction.filter)
             msg += "\nFilter: " + infraction.filter.displayName;

@@ -13,7 +13,7 @@ class DebugCommand extends AbstractCommand {
 
     constructor() {
         super("debug", [
-            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR, PERMISSION_PRESETS.MAGICANDCHILL.MODS
         ], "", "Debugging tools for administrators", ["dbg"]);
     }
 

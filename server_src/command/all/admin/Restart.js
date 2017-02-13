@@ -10,7 +10,7 @@ class RestartCommand extends AbstractCommand {
 
     constructor() {
         super("restart", [
-            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR
+            PERMISSION_PRESETS.CONVICTS.MASTER_MODS, PERMISSION_PRESETS.BOTDEV.MODERATOR, PERMISSION_PRESETS.MAGICANDCHILL.MODS
         ], "", "Make Midnight restart herself.");
     }
 
