@@ -17,7 +17,7 @@ class UnmuteCommand extends AbstractCommand {
 
     constructor() {
         super("unmute", [
-            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR, PERMISSION_PRESETS.MAGICANDCHILL.MODS
         ], "<user> [[for]reason]", "Unmute a muted guild member");
     }
 

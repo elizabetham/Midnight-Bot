@@ -12,13 +12,15 @@ import './server_src/utils/Cron';
 import DiscordUtils from './server_src/utils/DiscordUtils';
 DiscordUtils.start();
 
-//Start express
+//Load express
 import expressApp from './server_src/http/HTTPServer';
 
 //Start HTTP server
-expressApp.listen(Config.HTTP_PORT, () => {
-    console.log("Express listening on port " + Config.HTTP_PORT);
-});
+if (Config.enableWebUI) {
+    expressApp.listen(Config.HTTP_PORT, () => {
+        console.log("Express listening on port " + Config.HTTP_PORT);
+    });
+}
 
 //Start music Module
 import MusicManager from './server_src/music/MusicManager';

@@ -48,7 +48,6 @@
  - A role in your Discord server named `Muted`
  - An installation of FFMPEG, added to $PATH
  - An API key for the Youtube Data API (Optional)
- - A Pastebin API key for error reporting (Optional)
 
 ### Configuration
 
@@ -86,6 +85,8 @@ config.MUSIC_IDLE_PLAYLIST = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"];
 config.HTTP_PORT = 8080;
 //Whether to allow Cross Origin Resource Sharing
 config.allowCORS = false; //Recommended to leave at 'false'
+//Enable or disable the web UI
+config.enableWebUI = true;
 
 //DISCORD SETTINGS
 

@@ -15,7 +15,7 @@ class MuteCommand extends AbstractCommand {
 
     constructor() {
         super("mute", [
-            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR
+            PERMISSION_PRESETS.CONVICTS.MODERATOR, PERMISSION_PRESETS.BOTDEV.MODERATOR, PERMISSION_PRESETS.MAGICANDCHILL.MODS
         ], "<user> <duration|forever> [[for]reason]", "Mute a guild member for a specific period of time");
     }
 
