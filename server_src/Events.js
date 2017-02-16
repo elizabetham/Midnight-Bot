@@ -82,7 +82,7 @@ let combatMuteEvasion = async(guildMember : GuildMember) => {
             }
 
             //Leave log
-            Logging.mod(Logging.format("MUTE EVASION DETECTED", "By user **" + guildMember.user.username + "** (**" + guildMember.user.id + ")**"));
+            Logging.mod(Logging.format("MUTE EVASION DETECTED", "User **" + guildMember.user.username + "** (**" + guildMember.user.id + ")** has attempted to dodge a mute."));
         }
     } catch (err) {
         Logging.error("MUTE_EVASION_COMBAT_FIND", err);

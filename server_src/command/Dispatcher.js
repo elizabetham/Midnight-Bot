@@ -17,6 +17,8 @@ import BanCommand from './all/moderation/Ban';
 import MuteCommand from './all/moderation/Mute';
 import UnmuteCommand from './all/moderation/Unmute';
 import UnbanCommand from './all/moderation/Unban';
+import UnmuteVCCommand from './all/moderation/Unmutevc';
+import MuteVCCommand from './all/moderation/Mutevc';
 
 //Music
 import QueueCommand from './all/music/Queue';
@@ -42,6 +44,8 @@ const commands = [
     UnbanCommand,
     MuteCommand,
     UnmuteCommand,
+    MuteVCCommand,
+    UnmuteVCCommand,
     RestartCommand,
     GameCommand,
     DebugCommand,

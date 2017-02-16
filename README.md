@@ -35,6 +35,8 @@
 |!**unban**|*!unban \<user\> [[for]reason]*|Unban a banned guild member|
 |!**mute**|*!mute \<user\> \<duration\|forever\> [[for]reason]*|Mute a guild member for a specific period of time|
 |!**unmute**|*!unmute \<user\>*|Unmute a muted guild member|
+|!**mutevc**|*!mutevc [channelId]*|Mute all users below moderator in a voice channel|
+|!**unmutevc**|*!unmutevc [channelId]*|Lift a mute on a voice channel|
 |!**restart**|*!restart*|Make Midnight restart herself.|
 |!**game**|*!game [status]*|Set Midnight's game status|
 |!**debug**|*!debug*|Database related administration tools|dbg
