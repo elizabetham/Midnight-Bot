@@ -5,7 +5,6 @@ import express from 'express';
 import {InfractionRecord, UserRecord} from '../../utils/DBManager';
 import moment from 'moment';
 import _ from 'lodash';
-import {middleware as cache} from 'apicache';
 
 //Types
 import type {$Request, $Response}
@@ -28,7 +27,7 @@ router.get('/djleaderboard', async function(req : $Request, res : $Response) {
     }
 });
 
-router.get('/infractionstats', cache('1 hour'), async function(req : $Request, res : $Response) {
+router.get('/infractionstats', async function(req : $Request, res : $Response) {
 
     let getTimeData = async(buckets : number, interval : number) => {
         const current : number = new Date(Math.ceil(new Date().getTime() / 1000 / interval) * interval * 1000).getTime() / 1000;
