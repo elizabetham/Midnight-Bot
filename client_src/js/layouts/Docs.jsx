@@ -220,6 +220,28 @@ class DocsLayout extends Component {
                 </Row>
                 <Row>
                     <hr/>
+                    <h3 style={style.commandHeader}>!mutevc</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Mute all users below moderator in a voice channel.</h5>
+                    <h5>Usage:
+                        <code>!mutevc [channelId]</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code><br>In case no channel ID is supplied, the executor's active voice channel will be used.</br>
+                    </p>
+                </Row>
+                <Row>
+                    <hr/>
+                    <h3 style={style.commandHeader}>!unmutevc</h3>
+                    <h5 style={style.commandHeader}>
+                        &nbsp;- Lift a mute on a voice channel.</h5>
+                    <h5>Usage:
+                        <code>!unmutevc [channelId]</code>
+                    </h5>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code><br>In case no channel ID is supplied, the executor's active voice channel will be used.</br>
+                    </p>
+                </Row>
+                <Row>
+                    <hr/>
                     <h3>Administration</h3>
                 </Row>
                 <Row>
