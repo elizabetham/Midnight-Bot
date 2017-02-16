@@ -607,7 +607,7 @@ class MusicManager {
             //Voting info
             const downvotes = Array.from(this.votes.values()).filter(vote => !vote).length;
             const upvotes = Array.from(this.votes.values()).filter(vote => vote).length;
-            newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**!";
+            newMessage += "\nVotes: **" + upvotes + "**:thumbsup: **" + downvotes + "**:thumbsdown: - To vote, use **!upvote** or **!downvote**";
 
             //If the now playing message doesn't exist or is not the last message anymore, create a new one
             if (!this.nowPlayingMessage || (await controlChannel.fetchMessages({after: this.nowPlayingMessage.id})).array().length > 0) {
