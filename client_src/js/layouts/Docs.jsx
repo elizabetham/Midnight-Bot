@@ -226,7 +226,7 @@ class DocsLayout extends Component {
                     <h5>Usage:
                         <code>!mutevc [channelId]</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Moderator</code><br>In case no channel ID is supplied, the executor's active voice channel will be used.</br>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code><br/>In case no channel ID is supplied, the executor's active voice channel will be used.<br/>
                     </p>
                 </Row>
                 <Row>
@@ -237,7 +237,7 @@ class DocsLayout extends Component {
                     <h5>Usage:
                         <code>!unmutevc [channelId]</code>
                     </h5>
-                    <p>Minimum role required:&nbsp;<code>Moderator</code><br>In case no channel ID is supplied, the executor's active voice channel will be used.</br>
+                    <p>Minimum role required:&nbsp;<code>Moderator</code><br/>In case no channel ID is supplied, the executor's active voice channel will be used.<br/>
                     </p>
                 </Row>
                 <Row>

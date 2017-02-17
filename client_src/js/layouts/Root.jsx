@@ -21,7 +21,7 @@ class Root extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme(midnightTheme)}>
                 <Router history={this.props.history}>
                     <Route path='/' component={App}>
-                        <IndexRedirect to="/statistics"/>
+                        <IndexRedirect to="/docs"/>
                         <Route path="/infractions(/:userid(/:infractionid))" component={Infractions}/>
                         <Route path="/statistics" component={Statistics}/>
                         <Route path="/docs" component={Docs}/>
